@@ -1,0 +1,143 @@
+Frege Goodness
+==============
+:Author: Dierk König
+
+A a series of short, hopefully informative, and briefly commented snippets and thoughts about
+the Frege programming language.
+
+
+== A magical trick
+
+First, think of a function _f_ that maps a lists of arbitrary element types to another list of the exact same type.
+
+In Frege terms, such a function _f_ is declared as
+[source,frege]
+----
+    f :: [a] -> [a]
+----
+.Assume nothing
+NOTE: We cannot assume anything about the features of _a_.
+      That very much limits what _f_ can possibly do.
+      For example, _f_ cannot add "plus one" to all elements since _a_ is not known to support arithmetic.
+
+Now, really, go for it. *Think of any such function _f_ and keep it secret!*
+
+Second, think of any _specific_ function _g_ with type `a -> b` that for a given type returns a value of some other type.
+For example, you can choose:
+
+.An example for _g_ as a function from Int to String
+[source,frege]
+----
+    g :: Int -> String
+    g x = show x ++ show x ++ show x
+----
+That is, `g 1` would return the String `"111"`.
+
+But you can really think of any specific function _g_ you fancy.
+
+.Here is the first part of the trick
+* make a list of values that could be passed into _g_ (a list of Int values in our example above)
+* now, apply your _f_ to that list
+* then feed the result into `map g`
+* you now have a list of return values of _g_
+
+Do you have it?
+
+.Now the second part
+* start with the same list as you started part 1 with
+* now, *first* apply `map g` to the list
+* then apply your secret function _f_
+
+.TADAAA!
+IMPORTANT: You will arrive at the same result again!
+
+Let's try with an example. Assume we had chosen the `reverse` function for _f_. +
+_This is what you had in mind anyway, right?_
+
+Starting with
+[source,frege]
+----
+    [1, 2, 3]
+----
+
+applied to _reverse_ is
+[source,frege]
+----
+    reverse [1,2,3]
+----
+
+fed into `map g` and successively substituting the definitions gives us
+[source,frege]
+----
+    map g (reverse [1,2,3])
+    map g [3, 2, 1]
+    ["333", "222", "111"]
+----
+
+Now the other way around: first mapping, then reversing
+[source,frege]
+----
+    reverse (map g [1, 2, 3])
+    reverse ["111", "222", "333"]
+    ["333", "222", "111"]
+----
+*Voilà, same result!*
+
+TIP: This is a pretty interesting theorem that only holds in the purely functional world.
+     If we had any kind of assignments, state, or effects, we could not possibly hope for
+     a theorem that allows us *safe reordering*.
+
+Here is a graphical representation of the theorem.
+
+.Commutative diagram for functor composition.
+[ditaa,functor_composition]
+----
+     +-----+    f     +-----+
+     | [a] +--------->| [a] |
+     +--+--+          +--+--+
+        |                |
+        |                |
+  map g |      ///       | map g
+        |                |
+        V                V
+     +-----+          +-----+
+     | [b] +--------->| [b] |
+     +-----+    f     +-----+
+----
+We start at the upper left corner to reach the lower right one. We can go either way (first right, then down or
+first down, then right) to arrive at the same result.
+
+The +///+ in the diagram is the mathematical notation to say that that the diagram _commutes_. +
+_When we covered this in school math, I assumed this would never be of any practical relevance
+to me. Boy, was I wrong!_
+
+=== More Examples
+We do not have many restrictions on _g_ (beside being a pure function).
+It even works when _g_ returns an IO type like `IO ()` when g was the function `g x = println x`.
+The result would be a list of (yet unperformed) IO actions in that case, which can still be reversed
+like any other list.
+
+The situation is different for _f_. There are not so many functions that map `[a]` to `[a]`.
+But when you _hoogle_ for the
+type, a few interesting ones show up. Beside `reverse`, there is of course `id` but also
+`tail` (all but the first element), `init` (all but the last element), and `cycle`,
+which produces an infinite list by endlessly repeating the current list.
+
+That brings to mention that the theorem works also perfectly well on infinite lists
+in a lazy language like Frege.
+
+.Purity for the win
+NOTE: Does our theorem apply to other JVM languages as well? No. +
+      The theorem requires pure functions.
+
+=== References
+[horizontal]
+Hoogle [a]->[a]::
+https://www.haskell.org/hoogle/?hoogle=%5Ba%5D+-%3E+%5Ba%5D
+
+Phil Wadler::
+Tech Mesh 2012 - Faith, Evolution, and Programming Languages: from Haskell to Java
+https://www.youtube.com/watch?v=NZeDRs6snm0
+
+Functor::
+http://en.wikipedia.org/wiki/Functor

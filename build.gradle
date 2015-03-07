@@ -1,0 +1,54 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+ 
+    dependencies {
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.2'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.6'
+        classpath 'com.github.jruby-gradle:jruby-gradle-plugin:0.1.11'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.7'
+//        classpath 'com.bluepapa32:gradle-watch-plugin:0.1.4'
+    }
+}
+ 
+apply plugin: 'org.asciidoctor.convert'
+apply plugin: 'com.github.jruby-gradle.base'
+apply plugin: 'com.github.ben-manes.versions'
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+ 
+dependencies {
+    gems 'rubygems:asciidoctor-diagram:1.2.1'
+}
+ 
+asciidoctor {
+    // let jruby-gradle download and install gems
+    dependsOn jrubyPrepareGems
+ 
+    // include the diagram gem
+    requires = ['asciidoctor-diagram']
+    gemPath = jrubyPrepareGems.outputDir
+ 
+    options doctype: 'book'
+
+    // let's convert to PDF while we're at it
+    backends = ['html5'] // pdf
+ 
+    attributes 'source-highlighter'    : 'coderay',
+               'coderay-linenums-mode' : 'table',
+               toc                     : 'left',
+               icon                    : 'font',
+               linkattrs               : true,
+               encoding                : 'utf-8'
+ 
+    resources {
+        from('src/docs/asciidoc') {
+             include '**/*.png'
+        }
+    }
+}
+
