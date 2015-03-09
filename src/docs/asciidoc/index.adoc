@@ -1,0 +1,9 @@
+Frege Goodness
+==============
+:Author: Dierk König
+
+A a series of short, hopefully informative, and briefly commented snippets and thoughts about
+the Frege programming language.
+
+include::magical_trick.adoc[]
+include::qc_property.adoc[]

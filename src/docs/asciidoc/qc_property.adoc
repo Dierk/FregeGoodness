@@ -1,0 +1,113 @@
+[[qc_property]]
+== A Simple QuickCheck Property
+
+Frege comes with a testing facility that enables _property-based_ testing. +
+Let's have a first glance on what we can do with it.
+
+In the post "xref:magical_trick[A magical trick]" we worked with these functions _f_ and _g_.
+
+[source,frege]
+----
+    f :: [a] -> [a]  -- we should think of any such function
+    f  = reverse     -- that was our pick
+
+    g :: Int -> String
+    g x = show x ++ show x ++ show x
+----
+
+We found that we can freely choose between
+
+[source,frege]
+----
+    map g (f [1, 2, 3])
+----
+and
+[source,frege]
+----
+    f (map g [1, 2, 3])
+----
+to arrive at the same result.
+
+In other words, we found a property (I prefer the term _invariant_) that we can test.
+
+.For the JUnit folks
+****
+If you come from a JUnit background, your current consideration is most likely
+"which test cases will we supply?" +
+And the answer is "we don't care. We will let the tool pick from the domain - randomly!"
+
+This sounded totally silly to me when I first encountered it. But there is actually some benefit to it
+and - don't be afraid - one can still do single, hard-coded test cases to e.g. cover the corner cases.
+****
+
+Here is how we can define a property in Frege with QuickCheck:
+
+[source,frege]
+----
+    import frege.test.QuickCheck
+
+    commutativity xs = property ( map g (f xs) == f (map g xs) )
+----
+
+Having defined this property, we can quickly check whether it holds:
+
+[source,frege]
+----
+    quickCheck commutativity
+----
+
+Which yields us
+----
++++ OK, passed 100 tests.
+----
+
+That is seriously surprising! How could QuickCheck possibly know what test data
+to generate for the 100 tests? We did not even tell it the argument type! +
+The clever Frege type inference comes into play here.
+
+To see the inferred type of _commutativity_ we can ask the REPL:
+----
+    :t commutativity
+    [Int] -> Bool
+----
+
+Let's follow through what the Frege type inference engine must have considered:
+
+The function _g_ takes an +Int+ argument
+and the argument to `map g` must be a list of the arguments to _g_, therefore,
+_xs_ can only be a list of +Int+ values. Furthermore, _f_ works on a list of any types and thus
+imposes no further restrictions.
+
+There is some reasonably advanced thinking involved to arrive at the same
+conclusion that Frege infers at compile time.
+
+Knowing that _xs_ is of type +[Int]+, _quickCheck_ can ask the list type to produce
+arbitrary values of itself (in various sizes), while lists in turn ask +Int+ to
+also produce arbitrary +Int+ values. This works in a type-safe manner since both
++List+ and +Int+ are instances of the Arbitrary _typeclass_: they belong to the class
+of types that know how to generate arbitrary values of their type.
+
+We haven't talked about the function _property_, yet. What is that for?
+Well, while the test above runs perfectly well without it, there is value in wrapping the boolean
+expression in a +Property+ type. One benefit is that the QuickCheck _tool_ can scan
+for all functions of that type and run them all at once without resorting to any conventions
+like "must start with prop_" or so.
+
+=== More Examples
+We claimed that we can choose any functions _f_ and _g_ that satisfy our types.
+Try a few and do you very best to break the invariant! Honestly, do it!
+You will learn something.
+
+Hint: When you try with infinite lists or functions _g_ that have a side-effect,
+you will run into issues with checking for equality. Reading the paper below may help, then.
+
+_There is so much more to say about QuickCheck. We will do so in future posts._
+
+=== References
+[horizontal]
+Koen Claessen, John Hughes::
+QuickCheck: A Lightweight Tool for Random Testing of Haskell Programs
+http://www.eecs.northwestern.edu/~robby/courses/395-495-2009-fall/quick.pdf
+
+The tool::
+https://github.com/Frege/frege/wiki/Getting-Started#quickcheck

@@ -1,11 +1,4 @@
-Frege Goodness
-==============
-:Author: Dierk König
-
-A a series of short, hopefully informative, and briefly commented snippets and thoughts about
-the Frege programming language.
-
-
+[[magical_trick]]
 == A magical trick
 
 First, think of a function _f_ that maps a lists of arbitrary element types to another list of the exact same type.
