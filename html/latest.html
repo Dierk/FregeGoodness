@@ -585,8 +585,8 @@ back in the 19<sup>th</sup> century.</p>
 <h3 id="_the_dollar_sign">The dollar sign</h3>
 <div class="paragraph">
 <p>When a function application like <code>g x</code> appears as an argument to <em>f</em> then
-it must be written in parentheses like <code>f (g x)</code> (because otherwise, <em>g</em> would
-become an argument to <em>f</em>, which is not what we want). This can get unwieldy
+it must be written in parentheses like <code>f (g x)</code> because otherwise, <em>g</em> would
+become an argument to <em>f</em>, which is not what we want. This can get unwieldy
 when the nesting gets deeper and therefore there is an alternative using
 the dollar sign.</p>
 </div>
@@ -599,8 +599,8 @@ the dollar sign.</p>
 <div class="paragraph">
 <p>Interestingly, the <em>$</em> operator is not a language construct. It is an ordinary
 function that is declared as an infix operator. The definition of <em>$</em> is
-<code>f $ x = x</code> . The trick is that <em>$</em> has very low operator precedence and therefore
-all operators to its right (and also to the left as we will see later)
+<code>f $ x = f x</code> . The trick is that <em>$</em> has very low operator precedence and therefore
+all operators to its right (and analogously to the left as we will see later)
 are applied before its result is finally applied to <em>f</em>.</p>
 </div>
 <div class="sidebarblock">
@@ -703,7 +703,7 @@ for <em>inc</em>. And here is proof that this is a valid transformation:</p>
 </div>
 <div class="paragraph">
 <p>Keeping the above equivalence in mind should help you to become
-confident with these options when writing you own code but even more so
+confident with these options when writing your own code but even more so
 when reading other developer&#8217;s code.</p>
 </div>
 <div class="paragraph">
@@ -711,7 +711,7 @@ when reading other developer&#8217;s code.</p>
 For example, we have used the point-free style in the previous post, when
 we said <code>f = reverse</code> and I&#8217;m sure you guessed the meaning even
 though it was not explained. We could have said <code>f x = reverse x</code> but there
-is a subtle difference - not in what the code does but in what it
+is a subtle distinction - not in what the code does but in what it
 communicates:</p>
 </div>
 <div class="olist arabic">
@@ -720,7 +720,7 @@ communicates:</p>
 <p><code>f</code> <em>is the function</em> <code>reverse</code></p>
 </li>
 <li>
-<p><code>f</code> is defined as <em>doing</em> <code>reverse</code></p>
+<p><code>f</code> is <em>doing</em> <code>reverse</code></p>
 </li>
 </ol>
 </div>

@@ -39,8 +39,8 @@ back in the 19^th^ century.
 === The dollar sign
 
 When a function application like `g x` appears as an argument to _f_ then
-it must be written in parentheses like `f (g x)` (because otherwise, _g_ would
-become an argument to _f_, which is not what we want). This can get unwieldy
+it must be written in parentheses like `f (g x)` because otherwise, _g_ would
+become an argument to _f_, which is not what we want. This can get unwieldy
 when the nesting gets deeper and therefore there is an alternative using
 the dollar sign.
 
@@ -52,8 +52,8 @@ the dollar sign.
 
 Interestingly, the _$_ operator is not a language construct. It is an ordinary
 function that is declared as an infix operator. The definition of _$_ is
-`f $ x = x` . The trick is that _$_ has very low operator precedence and therefore
-all operators to its right (and also to the left as we will see later)
+`f $ x = f x` . The trick is that _$_ has very low operator precedence and therefore
+all operators to its right (and analogously to the left as we will see later)
 are applied before its result is finally applied to _f_.
 
 ****
