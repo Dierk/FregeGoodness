@@ -1,0 +1,146 @@
+[[silence]]
+== Silent notation
+
+In a language that is built from functions and expressions, one can reasonably
+expect to see a lot of parentheses. It is no coincidence that LISP is humorously known
+for its proverbial overload with parentheses.
+
+Frege has a very silent notation, though, and supports a coding style that
+uses very little parentheses at all.
+
+Lets start with function application.
+
+=== Function application
+
+[source,frege]
+----
+    f(x)    -- as known from many languages
+    f x     -- Frege style (like linear functions in mathematics)
+    f $ x   -- explicit function application with the $ operator
+    f(x,y)  -- taking a tuple as an argument
+    f x y   -- same as ((f x) y)
+----
+
+Frege uses the blank character - the most silent one in the character set -
+to denote function application. Function application has the highest
+precedence of all operators. It binds more tightly than all others.
+It is also left associative such that `f x y` is really
+two function applications: first `f x`, which returns a function that then takes
+`y` as an argument.
+
+****
+The last example is usually called _currying_ or _partial function application_.
+But there is technically nothing _partial_ about it. It is just so that
+_f_ is a function that when _x_ is applied to it, returns another function
+(which in turn than takes _y_). Functions that return functions were first described by Gottlob Frege
+back in the 19^th^ century.
+****
+
+=== The dollar sign
+
+When a function application like `g x` appears as an argument to _f_ then
+it must be written in parentheses like `f (g x)` (because otherwise, _g_ would
+become an argument to _f_, which is not what we want). This can get unwieldy
+when the nesting gets deeper and therefore there is an alternative using
+the dollar sign.
+
+[source,frege]
+----
+    foo (bar (baz (buz x)))  -- deeply nested style
+    foo $ bar $ baz $ buz x  -- flat $ style
+----
+
+Interestingly, the _$_ operator is not a language construct. It is an ordinary
+function that is declared as an infix operator. The definition of _$_ is
+`f $ x = x` . The trick is that _$_ has very low operator precedence and therefore
+all operators to its right (and also to the left as we will see later)
+are applied before its result is finally applied to _f_.
+
+****
+The net effect is that when you see a _$_ you can mentally replace it with
+parentheses that enclose the rest of the expression.
+****
+
+=== Function composition
+
+Now, even if we love to see dollars, the _$_ operator is certainly not very silent in its appearance, but
+we dot-operator is. It it the operator for _function composition_:
+`f(g(x))` can - just like in school math - be written as `(f • g) x` .
+
+[source,frege]
+----
+    (foo . bar . baz . buz) x  -- function composition with dot
+    (foo • bar • baz • buz) x  -- Frege also allows unicode 2022
+----
+
+****
+When looking at function composition it is best to *read it right-to-left* since
+first `buz x` is evaluated, then `baz`, then `bar`, and finally `foo` -
+in the exact same order as when writing the nested parentheses.
+****
+
+We said that function application has the highest precedence - even higher
+than function composition.
+Therefore, we need the parentheses above to prevent the binding between
+_buz_ and _x_. But, hey, we learned that dollar has lowest precedence,
+so putting that in between should also work, right? Yes it does.
+[source,frege]
+----
+    foo . bar . baz . buz $ x  -- this is not used so often
+----
+
+Now, can we shave the _x_ off such that we can drop dollars and parens as well?
+
+Yes, but that needs a bit of background.
+
+=== Functions are lambdas
+
+Let's assume we have a method `inc` that just adds 1 to its argument.
+There are two equivalent ways of writing this:
+
+[source,frege]
+----
+    inc x = x + 1           -- usual function definition
+    inc   = \x -> x + 1     -- equivalent lambda style
+----
+
+=== Point-free style
+
+Now if we want a function _f_ to work like _inc_, we can use _inc_
+in the definition of _f_ and relay the argument.
+
+[source,frege]
+----
+    f x   = inc x           -- f should be like inc
+    f     = inc             -- point-free style, "cancel x"
+----
+
+But we can even cancel down the _x_ such that _f_ looks like an alias
+for _inc_. And here is proof that this is a valid transformation:
+
+[source,frege]
+----
+    f     = inc             -- beta reduction =>
+    f     = \x -> x + 1     -- replace formal lambda parameter with free variable =>
+    f x   = x + 1           -- same as definition of inc
+----
+
+This finally leaves us with four ways of defining our function:
+
+.The final overview of all four styles
+[source,frege]
+----
+    f x =  foo (bar (baz (buz x)))    -- deeply nested style
+    f x =  foo $ bar $ baz $ buz x    -- flat $ style
+    f x = (foo . bar . baz . buz) x   -- function composition
+    f   =  foo . bar . baz . buz      -- point-free style
+----
+
+You will find all four styles in any reasonably sized program.
+For example, we have used the point-free style in the previous post, when
+we said `f = reverse` and I'm sure you guessed the meaning even
+though it was not explained.
+
+Keeping the above equivalence in mind should help you to become
+confident with these options when writing you own code but even more so
+when reading other developer's code.

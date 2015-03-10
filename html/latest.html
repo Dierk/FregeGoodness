@@ -5,7 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.2">
-<meta name="author" content="Dierk König">
+<meta name="author" content="Dierk König, @mittie">
 <title>Frege Goodness</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400">
 <style>
@@ -505,15 +505,18 @@ table.CodeRay td.code>pre{padding:0}
 <div id="header">
 <h1>Frege Goodness</h1>
 <div class="details">
-<span id="author" class="author">Dierk König</span><br>
+<span id="author" class="author">Dierk König, @mittie</span><br>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#qc_property">A Simple QuickCheck Property</a>
+<li><a href="#silence">Silent notation</a>
 <ul class="sectlevel2">
-<li><a href="#_more_examples">More Examples</a></li>
-<li><a href="#_references">References</a></li>
+<li><a href="#_function_application">Function application</a></li>
+<li><a href="#_the_dollar_sign">The dollar sign</a></li>
+<li><a href="#_function_composition">Function composition</a></li>
+<li><a href="#_functions_are_lambdas">Functions are lambdas</a></li>
+<li><a href="#_point_free_style">Point-free style</a></li>
 </ul>
 </li>
 </ul>
@@ -532,164 +535,181 @@ the Frege programming language.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="qc_property">A Simple QuickCheck Property</h2>
+<h2 id="silence">Silent notation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Frege comes with a testing facility that enables <em>property-based</em> testing.<br>
-Let&#8217;s have a first glance on what we can do with it.</p>
+<p>In a language that is built from functions and expressions, one can reasonably
+expect to see a lot of parentheses. It is no coincidence that LISP is humorously known
+for its proverbial overload with parentheses.</p>
 </div>
 <div class="paragraph">
-<p>In the post "<a href="#magical_trick">A magical trick</a>" we worked with these functions <em>f</em> and <em>g</em>.</p>
+<p>Frege has a very silent notation, though, and supports a coding style that
+uses very little parentheses at all.</p>
 </div>
+<div class="paragraph">
+<p>Lets start with function application.</p>
+</div>
+<div class="sect2">
+<h3 id="_function_application">Function application</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">    f :: [a] -&gt; [a]  -- we should think of any such function
-    f  = reverse     -- that was our pick
-
-    g :: Int -&gt; String
-    g x = show x ++ show x ++ show x</code></pre>
+<pre class="CodeRay highlight"><code data-lang="frege">    f(x)    -- as known from many languages
+    f x     -- Frege style (like linear functions in mathematics)
+    f $ x   -- explicit function application with the $ operator
+    f(x,y)  -- taking a tuple as an argument
+    f x y   -- same as ((f x) y)</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>We found that we can freely choose between</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">    map g (f [1, 2, 3])</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>and</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">    f (map g [1, 2, 3])</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>to arrive at the same result.</p>
-</div>
-<div class="paragraph">
-<p>In other words, we found a property (I prefer the term <em>invariant</em>) that we can test.</p>
+<p>Frege uses the blank character - the most silent one in the character set -
+to denote function application. Function application has the highest
+precedence of all operators. It binds more tightly than all others.
+It is also left associative such that <code>f x y</code> is really
+two function applications: first <code>f x</code>, which returns a function that then takes
+<code>y</code> as an argument.</p>
 </div>
 <div class="sidebarblock">
 <div class="content">
-<div class="title">For the JUnit folks</div>
 <div class="paragraph">
-<p>If you come from a JUnit background, your current consideration is most likely
-"which test cases will we supply?"<br>
-And the answer is "we don&#8217;t care. We will let the tool pick from the domain - randomly!"</p>
-</div>
-<div class="paragraph">
-<p>This sounded totally silly to me when I first encountered it. But there is actually some benefit to it
-and - don&#8217;t be afraid - one can still do single, hard-coded test cases to e.g. cover the corner cases.</p>
+<p>The last example is usually called <em>currying</em> or <em>partial function application</em>.
+But there is technically nothing <em>partial</em> about it. It is just so that
+<em>f</em> is a function that when <em>x</em> is applied to it, returns another function
+(which in turn than takes <em>y</em>). Functions that return functions were first described by Gottlob Frege
+back in the 19<sup>th</sup> century.</p>
 </div>
 </div>
-</div>
-<div class="paragraph">
-<p>Here is how we can define a property in Frege with QuickCheck:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">    import frege.test.QuickCheck
-
-    commutativity xs = property ( map g (f xs) == f (map g xs) )</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Having defined this property, we can quickly check whether it holds:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">    quickCheck commutativity</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Which yields us</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>+++ OK, passed 100 tests.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>That is seriously surprising! How could QuickCheck possibly know what test data
-to generate for the 100 tests? We did not even tell it the argument type!<br>
-The clever Frege type inference comes into play here.</p>
-</div>
-<div class="paragraph">
-<p>To see the inferred type of <em>commutativity</em> we can ask the REPL:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>    :t commutativity
-    [Int] -&gt; Bool</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s follow through what the Frege type inference engine must have considered:</p>
-</div>
-<div class="paragraph">
-<p>The function <em>g</em> takes an <code>Int</code> argument
-and the argument to <code>map g</code> must be a list of the arguments to <em>g</em>, therefore,
-<em>xs</em> can only be a list of <code>Int</code> values. Furthermore, <em>f</em> works on a list of any types and thus
-imposes no further restrictions.</p>
-</div>
-<div class="paragraph">
-<p>There is some reasonably advanced thinking involved to arrive at the same
-conclusion that Frege infers at compile time.</p>
-</div>
-<div class="paragraph">
-<p>Knowing that <em>xs</em> is of type <code>[Int]</code>, <em>quickCheck</em> can ask the list type to produce
-arbitrary values of itself (in various sizes), while lists in turn ask <code>Int</code> to
-also produce arbitrary <code>Int</code> values. This works in a type-safe manner since both
-<code>List</code> and <code>Int</code> are instances of the Arbitrary <em>typeclass</em>: they belong to the class
-of types that know how to generate arbitrary values of their type.</p>
-</div>
-<div class="paragraph">
-<p>We haven&#8217;t talked about the function <em>property</em>, yet. What is that for?
-Well, while the test above runs perfectly well without it, there is value in wrapping the boolean
-expression in a <code>Property</code> type. One benefit is that the QuickCheck <em>tool</em> can scan
-for all functions of that type and run them all at once without resorting to any conventions
-like "must start with prop_" or so.</p>
-</div>
-<div class="sect2">
-<h3 id="_more_examples">More Examples</h3>
-<div class="paragraph">
-<p>We claimed that we can choose any functions <em>f</em> and <em>g</em> that satisfy our types.
-Try a few and do you very best to break the invariant! Honestly, do it!
-You will learn something.</p>
-</div>
-<div class="paragraph">
-<p>Hint: When you try with infinite lists or functions <em>g</em> that have a side-effect,
-you will run into issues with checking for equality. Reading the paper below may help, then.</p>
-</div>
-<div class="paragraph">
-<p><em>There is so much more to say about QuickCheck. We will do so in future posts.</em></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_references">References</h3>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-Koen Claessen, John Hughes
-</td>
-<td class="hdlist2">
-<p>QuickCheck: A Lightweight Tool for Random Testing of Haskell Programs
-<a href="http://www.eecs.northwestern.edu/~robby/courses/395-495-2009-fall/quick.pdf" class="bare">http://www.eecs.northwestern.edu/~robby/courses/395-495-2009-fall/quick.pdf</a></p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-The tool
-</td>
-<td class="hdlist2">
-<p><a href="https://github.com/Frege/frege/wiki/Getting-Started#quickcheck" class="bare">https://github.com/Frege/frege/wiki/Getting-Started#quickcheck</a></p>
-</td>
-</tr>
-</table>
+<h3 id="_the_dollar_sign">The dollar sign</h3>
+<div class="paragraph">
+<p>When a function application like <code>g x</code> appears as an argument to <em>f</em> then
+it must be written in parentheses like <code>f (g x)</code> (because otherwise, <em>g</em> would
+become an argument to <em>f</em>, which is not what we want). This can get unwieldy
+when the nesting gets deeper and therefore there is an alternative using
+the dollar sign.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    foo (bar (baz (buz x)))  -- deeply nested style
+    foo $ bar $ baz $ buz x  -- flat $ style</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Interestingly, the <em>$</em> operator is not a language construct. It is an ordinary
+function that is declared as an infix operator. The definition of <em>$</em> is
+<code>f $ x = x</code> . The trick is that <em>$</em> has very low operator precedence and therefore
+all operators to its right (and also to the left as we will see later)
+are applied before its result is finally applied to <em>f</em>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>The net effect is that when you see a <em>$</em> you can mentally replace it with
+parentheses that enclose the rest of the expression.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_function_composition">Function composition</h3>
+<div class="paragraph">
+<p>Now, even if we love to see dollars, the <em>$</em> operator is certainly not very silent in its appearance, but
+we dot-operator is. It it the operator for <em>function composition</em>:
+<code>f(g(x))</code> can - just like in school math - be written as <code>(f • g) x</code> .</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    (foo . bar . baz . buz) x  -- function composition with dot
+    (foo • bar • baz • buz) x  -- Frege also allows unicode 2022</code></pre>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>When looking at function composition it is best to <strong>read it right-to-left</strong> since
+first <code>buz x</code> is evaluated, then <code>baz</code>, then <code>bar</code>, and finally <code>foo</code> -
+in the exact same order as when writing the nested parentheses.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>We said that function application has the highest precedence - even higher
+than function composition.
+Therefore, we need the parentheses above to prevent the binding between
+<em>buz</em> and <em>x</em>. But, hey, we learned that dollar has lowest precedence,
+so putting that in between should also work, right? Yes it does.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    foo . bar . baz . buz $ x  -- this is not used so often</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, can we shave the <em>x</em> off such that we can drop dollars and parens as well?</p>
+</div>
+<div class="paragraph">
+<p>Yes, but that needs a bit of background.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_functions_are_lambdas">Functions are lambdas</h3>
+<div class="paragraph">
+<p>Let&#8217;s assume we have a method <code>inc</code> that just adds 1 to its argument.
+There are two equivalent ways of writing this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    inc x = x + 1           -- usual function definition
+    inc   = \x -&gt; x + 1     -- equivalent lambda style</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_point_free_style">Point-free style</h3>
+<div class="paragraph">
+<p>Now if we want a function <em>f</em> to work like <em>inc</em>, we can use <em>inc</em>
+in the definition of <em>f</em> and relay the argument.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    f x   = inc x           -- f should be like inc
+    f     = inc             -- point-free style, &quot;cancel x&quot;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But we can even cancel down the <em>x</em> such that <em>f</em> looks like an alias
+for <em>inc</em>. And here is proof that this is a valid transformation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    f     = inc             -- beta reduction =&gt;
+    f     = \x -&gt; x + 1     -- replace formal lambda parameter with free variable =&gt;
+    f x   = x + 1           -- same as definition of inc</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This finally leaves us with four ways of defining our function:</p>
+</div>
+<div class="listingblock">
+<div class="title">The final overview of all four styles</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    f x =  foo (bar (baz (buz x)))    -- deeply nested style
+    f x =  foo $ bar $ baz $ buz x    -- flat $ style
+    f x = (foo . bar . baz . buz) x   -- function composition
+    f   =  foo . bar . baz . buz      -- point-free style</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will find all four styles in any reasonably sized program.
+For example, we have used the point-free style in the previous post, when
+we said <code>f = reverse</code> and I&#8217;m sure you guessed the meaning even
+though it was not explained.</p>
+</div>
+<div class="paragraph">
+<p>Keeping the above equivalence in mind should help you to become
+confident with these options when writing you own code but even more so
+when reading other developer&#8217;s code.</p>
 </div>
 </div>
 </div>
@@ -697,7 +717,7 @@ The tool
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-09 22:40:08 MEZ
+Last updated 2015-03-10 23:20:03 MEZ
 </div>
 </div>
 </body>
