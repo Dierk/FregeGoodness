@@ -64,8 +64,8 @@ parentheses that enclose the rest of the expression.
 === Function composition
 
 Now, even if we love to see dollars, the _$_ operator is certainly not very silent in its appearance, but
-we dot-operator is. It it the operator for _function composition_:
-`f(g(x))` can - just like in school math - be written as `(f • g) x` .
+the dot-operator is. It it the operator for _function composition_:
+`f(g(x))` can - just like in school math - be written as `(f • g) x`.
 
 [source,frege]
 ----
@@ -136,11 +136,29 @@ This finally leaves us with four ways of defining our function:
     f   =  foo . bar . baz . buz      -- point-free style
 ----
 
+Keeping the above equivalence in mind should help you to become
+confident with these options when writing your own code but even more so
+when reading other developer's code.
+
 You will find all four styles in any reasonably sized program.
 For example, we have used the point-free style in the previous post, when
 we said `f = reverse` and I'm sure you guessed the meaning even
-though it was not explained.
+though it was not explained. We could have said `f x = reverse x` but there
+is a subtle distinction - not in what the code does but in what it
+communicates:
 
-Keeping the above equivalence in mind should help you to become
-confident with these options when writing you own code but even more so
-when reading other developer's code.
+. `f` _is the function_ `reverse`
+. `f` is _doing_ `reverse`
+
+The prototypical adoption cycle for newcomers is: they are first puzzled by
+the point-free style, then excited, then they overuse it, then they settle
+at a reasonable dose.
+
+=== References
+[horizontal]
+Frege Language Reference::
+http://www.frege-lang.org/doc/Language.pdf
+
+Declaration of the $ function::
+https://github.com/Frege/frege/blob/master/frege/prelude/PreludeBase.fr#L109-109
+where line numbers might change
