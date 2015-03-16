@@ -125,4 +125,6 @@ http://www.amazon.com/Purely-Functional-Structures-Chris-Okasaki/dp/0521663504
 
 Rich Hickey::
 Keynote: The Value of Values +
-http://www.infoq.com/presentations/Value-Values
+http://www.infoq.com/presentations/Value-Values +
+Persistent data structures +
+https://www.youtube.com/watch?v=hb3rurFxrZ8 (min 20 ff)
