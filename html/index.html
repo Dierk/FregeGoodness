@@ -532,6 +532,13 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_references_3">References</a></li>
 </ul>
 </li>
+<li><a href="#immutables">Efficient Immutables</a>
+<ul class="sectlevel2">
+<li><a href="#_custom_data_structures">Custom Data Structures</a></li>
+<li><a href="#_more_considerations">More Considerations</a></li>
+<li><a href="#_references_4">References</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -540,8 +547,9 @@ table.CodeRay td.code>pre{padding:0}
 <div class="sectionbody">
 <div class="paragraph">
 <p>A a series of short, hopefully informative, and briefly commented snippets and thoughts about
-the Frege programming language.
-The latest post is always available <a href="http://dierk.github.io/FregeGoodness/html/latest.html">here</a>.</p>
+the <a href="http://www.frege-lang.org">Frege programming language</a>.
+The latest post is always available <a href="http://dierk.github.io/FregeGoodness/html/latest.html">here</a>.
+Feel free to file <a href="https://github.com/Dierk/FregeGoodness/tree/gh-pages">issues, comments, and pull requests</a>.</p>
 </div>
 </div>
 </div>
@@ -1168,10 +1176,214 @@ where line numbers might change</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="immutables">Efficient Immutables</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A cornerstone of functional programming is to work almost exclusively on values.
+Values never change. 42 is 42 and when you apply it to the function
+<code>(+1)</code> which returns 43 then 42 still remains to be 42.</p>
+</div>
+<div class="paragraph">
+<p>Values are immutable.</p>
+</div>
+<div class="paragraph">
+<p>This is quite obvious for the case of numbers. But how about Strings? Most popular languages
+treat them as immutable values. This has the benefit that we can safely
+pass them around without worries that some other code may change their content.</p>
+</div>
+<div class="paragraph">
+<p>Frege extends the benefits of immutability to all pure<sup>*</sup> data structures,
+including lists, maps and other standard data structures as well your self-made ones!</p>
+</div>
+<div class="paragraph">
+<p>(*) <em>Pure means that the data structure doesn&#8217;t announce any state change or other side effect in its type</em>.</p>
+</div>
+<div class="paragraph">
+<p>This may sound totally unpractical when you come from an object-oriented background and you
+may ask if that doesn&#8217;t lead to extensive copying and memory exhaustion.
+It turns out that when <em>consequently</em> programming with values there is only a surprisingly small price to pay
+for a huge number of benefits.</p>
+</div>
+<div class="sect2">
+<h3 id="_custom_data_structures">Custom Data Structures</h3>
+<div class="paragraph">
+<p>Let&#8217;s start with common, simple data structure: a <code>Person</code> that has a first name, a last name, and
+thinks in a certain programming language.</p>
+</div>
+<div class="listingblock">
+<div class="title">A simple Person data type</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    data Person = Person { firstname, lastname, language :: String }
+
+    javaDierk   = Person &quot;Dierk&quot; &quot;König&quot; &quot;Java&quot;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When we create a the <code>javaDierk</code> value of that <code>Person</code> type it is automatically immutable!</p>
+</div>
+<div class="paragraph">
+<p>There are actually two separate features of the language that we see here:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Frege has no assignments, so the <code>=</code> sign above denotes a <em>definition</em> not an assignment.
+In particular, we cannot redefine <code>javaDierk</code> to point to some other person. Whoever references
+<code>javaDierk</code> will once and forever see the "thinking in Java" version of me.</p>
+</li>
+<li>
+<p>We cannot change the person value itself. But we can create new value, based on the given one.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">Changing a field creates a copy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    groovyDierk = javaDierk.{ language = &quot;Groovy&quot; }
+    fregeDierk  = javaDierk.{ language = &quot;Frege&quot;  }</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+There are many interesting ways to work with the <em>record syntax</em> that we will cover in a future post.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For now, we have three distinct <code>Person</code> values. With every change we get a
+new copy. What looked like "setters" works actually more like a <em>copy constructor</em>.</p>
+</div>
+<div class="paragraph">
+<p>But even though we have three copies, there is some automatic <em>structural sharing</em> going on
+as depicted in the following figure:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="Efficient_Immutables.png" alt="Efficient Immutables">
+</div>
+<div class="title">Figure 2. Efficient immutables through structural sharing</div>
+</div>
+<div class="paragraph">
+<p>Since we are <em>consequently</em> working with values, we can <em>always</em> safely share not only
+String values as in the example above but <em>every</em> value. Note that this property could not be achieved
+if we would allow any kind of mutability to silently creep in.</p>
+</div>
+<div class="paragraph">
+<p>But what if I have a really big data structure and make a real lot of changes to it?
+Well, let&#8217;s try. Assume we have a value of the data structure <code>D</code> with a field <code>x</code> that contains
+a million Strings (maybe subject to lazy evaluation).
+Then we update a second field <code>y</code> a million times. This will produce a million copies
+and we are crazy enough to hold on to each and every copy to prevent early garbage collection.</p>
+</div>
+<div class="paragraph">
+<p>Even this crazy scenario only produces the tiny rightmost blue hump in memory consumption that you see
+in the magnifier glass below.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="Immutable_memory_consumption.png" alt="Immutable memory consumption">
+</div>
+<div class="title">Figure 3. Efficient, GC-friendly memory consumption</div>
+</div>
+<div class="paragraph">
+<p>Note that the <em>list of Strings</em> is just as immutable as a single String and can thus be safely shared
+between all copies of <code>D</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Sharing is good</div>
+<div class="paragraph">
+<p>In his awesome talks, Venkat Subramaniam likes to mention that mom always told us: "sharing is good".</p>
+</div>
+<div class="paragraph">
+<p>And, yes, I&#8217;m happy to share my toys with anybody, provided that nobody can break them - and that I can
+retain a copy for myself (this is where most analogies with software tend to break).</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>It goes without saying that immutable data structures can not only be shared safely between
+API providers and consumers in a single-threaded scenario but also between <em>concurrent</em> and
+massively <em>parallel</em> computations.</p>
+</div>
+<div class="paragraph">
+<p>The small price we pay is a little bit of temporary memory and some extra time for garbage collection.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+<div class="title">Immutable by default</div>
+The best of all: we did not write a single character to make that all work!<br>
+We did not invest a single brain cycle. It is all automatic.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_more_considerations">More Considerations</h3>
+<div class="paragraph">
+<p>Deeply nested data structures are notoriously expensive to copy and to compare.
+Immutable data structures can often alleviate that burden by just copying or compare
+one single reference.
+A good example is what we called the "copy constructor". Beside setting the provided value(s),
+it just copies the top-level references and, yet, it is a <em>deep copy</em> anyway.</p>
+</div>
+<div class="paragraph">
+<p>All standard data structures in Frege are immutable. This must be surprising if you come from the
+OO world. We are so used that e.g. a map changes its content all the time. We may even consider
+that to be a map&#8217;s main purpose in life! Now is the time to reconsider that world view.
+In the references you will find information and inspiration about that topic.</p>
+</div>
+<div class="paragraph">
+<p>Now what is <em>dierk&#8217;s</em> current language that he thinks in? Which of the three references do we use?
+Wouldn&#8217;t it be better to keep just one reference around that points to "the latest"
+<code>Person</code>? We will cover this scenario in a future post where we will also experience the
+Frege "mechanics" that prevent such mutable state from undermining our immutable data structures.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_references_4">References</h3>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+Chris Okasaki
+</td>
+<td class="hdlist2">
+<p>"Purely Functional Data Structures"<br>
+<a href="http://www.amazon.com/Purely-Functional-Structures-Chris-Okasaki/dp/0521663504" class="bare">http://www.amazon.com/Purely-Functional-Structures-Chris-Okasaki/dp/0521663504</a></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Rich Hickey
+</td>
+<td class="hdlist2">
+<p>Keynote: The Value of Values<br>
+<a href="http://www.infoq.com/presentations/Value-Values" class="bare">http://www.infoq.com/presentations/Value-Values</a></p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-10 23:19:38 MEZ
+Last updated 2015-03-16 17:45:54 MEZ
 </div>
 </div>
 </body>

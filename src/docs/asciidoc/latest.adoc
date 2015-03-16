@@ -3,8 +3,9 @@ Frege Goodness
 :Author: Dierk König, @mittie
 
 Latest post of a series of short, hopefully informative, and briefly commented snippets and thoughts about
-the Frege programming language.
+the http://www.frege-lang.org[Frege programming language].
 
 The collection of all posts is available under http://dierk.github.io/FregeGoodness/html/index.html[index.html].
+Feel free to file https://github.com/Dierk/FregeGoodness/tree/gh-pages[issues, comments, and pull requests].
 
-include::silence.adoc[]
+include::immutables.adoc[]

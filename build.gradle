@@ -28,6 +28,7 @@ dependencies {
 asciidoctor {
     // let jruby-gradle download and install gems
     dependsOn jrubyPrepareGems
+
  
     // include the diagram gem
     requires = ['asciidoctor-diagram']
@@ -51,4 +52,9 @@ asciidoctor {
         }
     }
 }
-
+asciidoctor.doLast {
+    copy {
+        from "$outputDir/html5"
+        into "html"
+    }
+}
