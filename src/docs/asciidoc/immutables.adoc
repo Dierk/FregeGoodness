@@ -2,8 +2,8 @@
 == Efficient Immutables
 
 A cornerstone of functional programming is to work almost exclusively on values.
-Values never change. 42 is 42 and when you apply it to the function
-`(+1)` which returns 43 then 42 still remains to be 42.
+Values never change. 42 is 42 and when you apply the function
+`(+1)` to it which returns 43 then 42 still remains to be 42.
 
 Values are immutable.
 
@@ -102,7 +102,7 @@ We did not invest a single brain cycle. It is all automatic.
 
 === More Considerations
 Deeply nested data structures are notoriously expensive to copy and to compare.
-Immutable data structures can often alleviate that burden by just copying or compare
+Immutable data structures can often alleviate that burden by just copying or comparing
 one single reference.
 A good example is what we called the "copy constructor". Beside setting the provided value(s),
 it just copies the top-level references and, yet, it is a _deep copy_ anyway.
