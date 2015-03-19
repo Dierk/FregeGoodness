@@ -558,7 +558,7 @@ two function applications: first <code>f x</code>, which returns a function that
 <div class="paragraph">
 <p>The last example is usually called <em>currying</em> or <em>partial function application</em>.
 But there is technically nothing <em>partial</em> about it. It is just so that
-<em>f</em> is a function that when <em>x</em> is applied to it, returns another function
+<em>f</em> is a function that takes <em>x</em> and returns another function
 (which in turn than takes <em>y</em>). Functions that return functions were first described by Gottlob Frege
 back in the 19<sup>th</sup> century.</p>
 </div>
@@ -615,6 +615,9 @@ the dot-operator is. It it the operator for <em>function composition</em>:
 <p>When looking at function composition it is best to <strong>read it right-to-left</strong> since
 first <code>buz x</code> is evaluated, then <code>baz</code>, then <code>bar</code>, and finally <code>foo</code> -
 in the exact same order as when writing the nested parentheses.</p>
+</div>
+<div class="paragraph">
+<p>In fact, it is very similar to how pipes work on unix systems (only the direction is reversed).</p>
 </div>
 </div>
 </div>
@@ -743,7 +746,7 @@ where line numbers might change</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-11 00:19:55 MEZ
+Last updated 2015-03-19 15:42:12 MEZ
 </div>
 </div>
 </body>

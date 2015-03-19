@@ -539,6 +539,14 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_references_4">References</a></li>
 </ul>
 </li>
+<li><a href="#easy_io">Easy IO</a>
+<ul class="sectlevel2">
+<li><a href="#_the_code_java_vs_groovy_vs_frege">The code: Java vs Groovy vs Frege</a></li>
+<li><a href="#_who_is_more_explicit">Who is more explicit?</a></li>
+<li><a href="#_the_fundamental_difference">The fundamental difference</a></li>
+<li><a href="#_summary">Summary</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -609,7 +617,7 @@ For example, you can choose:</p>
 <p>make a list of values that could be passed into <em>g</em> (a list of Int values in our example above)</p>
 </li>
 <li>
-<p>now, apply your <em>f</em> to that list</p>
+<p>now, apply your secret <em>f</em> to that list</p>
 </li>
 <li>
 <p>then feed the result into <code>map g</code></p>
@@ -994,7 +1002,7 @@ two function applications: first <code>f x</code>, which returns a function that
 <div class="paragraph">
 <p>The last example is usually called <em>currying</em> or <em>partial function application</em>.
 But there is technically nothing <em>partial</em> about it. It is just so that
-<em>f</em> is a function that when <em>x</em> is applied to it, returns another function
+<em>f</em> is a function that takes <em>x</em> and returns another function
 (which in turn than takes <em>y</em>). Functions that return functions were first described by Gottlob Frege
 back in the 19<sup>th</sup> century.</p>
 </div>
@@ -1051,6 +1059,9 @@ the dot-operator is. It it the operator for <em>function composition</em>:
 <p>When looking at function composition it is best to <strong>read it right-to-left</strong> since
 first <code>buz x</code> is evaluated, then <code>baz</code>, then <code>bar</code>, and finally <code>foo</code> -
 in the exact same order as when writing the nested parentheses.</p>
+</div>
+<div class="paragraph">
+<p>In fact, it is very similar to how pipes work on unix systems (only the direction is reversed).</p>
 </div>
 </div>
 </div>
@@ -1182,7 +1193,7 @@ where line numbers might change</p>
 <div class="paragraph">
 <p>A cornerstone of functional programming is to work almost exclusively on values.
 Values never change. 42 is 42 and when you apply the function
-<code>(+1)</code> to it which returns 43 then 42 still remains to be 42.</p>
+<code>(+1)</code> to it, then it will return 43 but 42 remains to be 42.</p>
 </div>
 <div class="paragraph">
 <p>Values are immutable.</p>
@@ -1382,10 +1393,247 @@ Persistent data structures<br>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="easy_io">Easy IO</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Conventional wisdom has it that IO is difficult, cumbersome, if not even impossible
+in pure functional programming.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see and compare the solutions for the simple case of a method (Java, Groovy) and function
+(Frege) that prints 1, 2, 3 to the console.</p>
+</div>
+<div class="paragraph">
+<p>This looks like an overly simplistic example but it actually has some interesting
+lessons for us if we dare to question our familiar habits.</p>
+</div>
+<div class="sect2">
+<h3 id="_the_code_java_vs_groovy_vs_frege">The code: Java vs Groovy vs Frege</h3>
+<div class="paragraph">
+<p>Here is the code for comparison.</p>
+</div>
+<div class="listingblock">
+<div class="title">The Java method</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">    <span class="comment">// Java</span>
+    <span class="type">void</span> print123() {
+        <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>);
+        <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">2</span><span class="delimiter">&quot;</span></span>);
+        <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">3</span><span class="delimiter">&quot;</span></span>);
+    }</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">The Groovy method</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">    <span class="comment">// Groovy</span>
+    <span class="keyword">def</span> <span class="function">print123</span>() {
+        println <span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>
+        println <span class="string"><span class="delimiter">&quot;</span><span class="content">2</span><span class="delimiter">&quot;</span></span>
+        println <span class="string"><span class="delimiter">&quot;</span><span class="content">3</span><span class="delimiter">&quot;</span></span>
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Groovy developer has a lot of choices. He can use the exact same syntax as in the
+Java version and it will be valid Groovy. Here is a rather compact version.</p>
+</div>
+<div class="listingblock">
+<div class="title">The Frege function</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">    -- Frege
+    print123 = do
+        println &quot;1&quot;
+        println &quot;2&quot;
+        println &quot;3&quot;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Surprisingly, <strong>the Frege function is the shortest</strong> of all three, even slightly shorter
+than the Groovy version by 4 characters! Furthermore, it has the least amount of punctuation.</p>
+</div>
+<div class="paragraph">
+<p><em>There is an obvious repetition in the examples and in both Groovy and Frege we could compress the three lines
+easily into a single one but we will leave that discussion for a future post</em>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Mythbuster</div>
+<div class="paragraph">
+<p>So the myth that pure functional programming makes IO difficult is easily debunked.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>But now comes the big surprise: Frege is not only the shortest, it is also the most explicit about the effect!</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_who_is_more_explicit">Who is more explicit?</h3>
+<div class="paragraph">
+<p>Let&#8217;s see what each language announces in the type signature.</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+Java
+</td>
+<td class="hdlist2">
+<p>The method returns <code>void</code>. This tells pretty much nothing, whereas it at least assures that we
+do not accidentally assign the return value to some reference since the Java compiler disallows that.
+However, the signature tells nothing at all that we print to <code>stdout</code>. This is actually rather surprising.
+<strong>Why is <code>println</code> not throwing an IOException</strong> such that we are forced to either catch it or
+announce it in the signature? Furthermore, <code>System.out</code> is a <em>global, mutable field</em> that we
+access <em>without any protection</em>. It would be conventional to have at least a getter method.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Groovy
+</td>
+<td class="hdlist2">
+<p>Groovy has pretty much the same characteristics as Java beside that it is more honest about Exceptions:
+it does not even pretend to enforce them. The <code>def</code> return type that we have chosen has the effect that the
+method has a return value: the value of the last evaluated expression, which in our case is <code>null</code> since that
+is what <code>println</code> returns. But again, that is the Groovy way: trust the programmer.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Frege
+</td>
+<td class="hdlist2">
+<p>The code does not mention any type at all but that doesn&#8217;t mean that there isn&#8217;t any. The type is <em>inferred</em> and when
+we ask the REPL with <code>:type print123</code> it tells us <code>IO ()</code> (pronounced "I - O - unit"), which is all the
+information we need. It tells us that the function is (potentially) doing IO operations with all the implications that
+may come with that. No other method can call us without also announcing IO in its type.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_fundamental_difference">The fundamental difference</h3>
+<div class="paragraph">
+<p>The fundamental difference is that in an imperative language like Java and Groovy there is technically no
+connection between the three <code>println</code> statements. You can reorder them, you can interleave them with totally
+unrelated computations, and you will not see that in the type signature.</p>
+</div>
+<div class="paragraph">
+<p>The case is totally different in Frege. There are no statements, only expressions.</p>
+</div>
+<div class="paragraph">
+<p><code>println "2"</code> and <code>println "3"</code> are not just two lines that happen sit beneath each other.
+They have a very strong connection. In fact, they are both expressions that happen to be an argument
+to a function that <em>binds</em> the two together with a logic that the <em>IO</em> type specifies.
+The return type of <em>bind</em> is the return type of its second argument. In our case <code>IO ()</code> again.</p>
+</div>
+<div class="listingblock">
+<div class="title">Returns IO () since (println "3") return IO ()</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="pseudo">    bind (println &quot;2&quot;) (println &quot;3&quot;)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And, of course, the same is true for <code>println "1"</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Returns IO () since &#8230;&#8203; you get it, right?</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="pseudo">    bind (println &quot;1&quot;)  (bind (println &quot;2&quot;) (println &quot;3&quot;))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So the whole function body that looked so imperative boils down to a single expression and
+type inference becomes a piece of cake.</p>
+</div>
+<div class="paragraph">
+<p>At this point, we have everything collapsed to a single expression until the <code>do</code> keyword, which
+is calling the <em>bind</em> function of that single expression. Since our expression is
+of type <code>IO</code>, the <code>IO.bind</code> will be used.</p>
+</div>
+<div class="paragraph">
+<p>We have seen before, for example in "<a href="#silence">Silent Notation</a>", that functional programming
+sometimes means to read backwards. This is again true for the do-notation. This time it is not
+right-to-left but bottom-to-top to find the overall result type.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="title">A personal experience</div>
+It took me a while to understand how these mechanics work and in particular how on earth the <em>do</em> knows
+which <em>bind</em> to use. There are many explanations around but that part was always missing for me -
+probably because it was so obvious to everybody else.
+</td>
+</tr>
+</table>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">By the way</div>
+<div class="paragraph">
+<p>When looking for the <em>bind</em> function, you will see that it is written as the <code>&gt;&gt;=</code> infix operator.
+So <code>bind a b</code> appears as <code>a &gt;&gt;= b</code> (and there are a few variants that we will cover later).</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>As an aside, using <em>bind</em> like an infix operator</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    a `bind`
+    b `bind`
+    c</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>reveals an interesting analogy. This is just like writing the imperative style of</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    a ;
+    b ;
+    c</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is why <em>bind</em> is also humorously known as <em>the programmable semicolon</em>.
+It provides the logic how two functions compose in a given context and - as we will see later -
+how the first function can pass its result as an argument to the second function.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_summary">Summary</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>IO code can be really easy to write even in a purely functional language like Frege.</p>
+</li>
+<li>
+<p>Being purely functional does not mean that there is no IO. It means to be rigorously explicit about it.</p>
+</li>
+<li>
+<p>Functional code can look like imperative code without sacrificing its functional nature.</p>
+</li>
+<li>
+<p>Do-notation is your friend in the presence of side effects.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-16 18:06:55 MEZ
+Last updated 2015-03-19 21:37:43 MEZ
 </div>
 </div>
 </body>

@@ -1,0 +1,159 @@
+[[easy_io]]
+== Easy IO
+
+Conventional wisdom has it that IO is difficult, cumbersome, if not even impossible
+in pure functional programming.
+
+Let's see and compare the solutions for the simple case of a method (Java, Groovy) and function
+(Frege) that prints 1, 2, 3 to the console.
+
+This looks like an overly simplistic example but it actually has some interesting
+lessons for us if we dare to question our familiar habits.
+
+=== The code: Java vs Groovy vs Frege
+Here is the code for comparison.
+
+.The Java method
+[source,java]
+----
+    // Java
+    void print123() {
+        System.out.println("1");
+        System.out.println("2");
+        System.out.println("3");
+    }
+----
+
+.The Groovy method
+[source,groovy]
+----
+    // Groovy
+    def print123() {
+        println "1"
+        println "2"
+        println "3"
+    }
+----
+The Groovy developer has a lot of choices. He can use the exact same syntax as in the
+Java version and it will be valid Groovy. Here is a rather compact version.
+
+.The Frege function
+[source,frege]
+----
+    -- Frege
+    print123 = do
+        println "1"
+        println "2"
+        println "3"
+----
+
+Surprisingly, *the Frege function is the shortest* of all three, even slightly shorter
+than the Groovy version by 4 characters! Furthermore, it has the least amount of punctuation.
+
+_There is an obvious repetition in the examples and in both Groovy and Frege we could compress the three lines
+easily into a single one but we will leave that discussion for a future post_.
+
+.Mythbuster
+****
+So the myth that pure functional programming makes IO difficult is easily debunked.
+****
+
+But now comes the big surprise: Frege is not only the shortest, it is also the most explicit about the effect!
+
+=== Who is more explicit?
+
+Let's see what each language announces in the type signature.
+
+[horizontal]
+Java::
+The method returns `void`. This tells pretty much nothing, whereas it at least assures that we
+do not accidentally assign the return value to some reference since the Java compiler disallows that.
+However, the signature tells nothing at all that we print to `stdout`. This is actually rather surprising.
+*Why is `println` not throwing an IOException* such that we are forced to either catch it or
+announce it in the signature? Furthermore, `System.out` is a _global, mutable field_ that we
+access _without any protection_. It would be conventional to have at least a getter method.
+
+Groovy::
+Groovy has pretty much the same characteristics as Java beside that it is more honest about Exceptions:
+it does not even pretend to enforce them. The `def` return type that we have chosen has the effect that the
+method has a return value: the value of the last evaluated expression, which in our case is `null` since that
+is what `println` returns. But again, that is the Groovy way: trust the programmer.
+
+Frege::
+The code does not mention any type at all but that doesn't mean that there isn't any. The type is _inferred_ and when
+we ask the REPL with `:type print123` it tells us `IO ()` (pronounced "I - O - unit"), which is all the
+information we need. It tells us that the function is (potentially) doing IO operations with all the implications that
+may come with that. No other method can call us without also announcing IO in its type.
+
+=== The fundamental difference
+
+The fundamental difference is that in an imperative language like Java and Groovy there is technically no
+connection between the three `println` statements. You can reorder them, you can interleave them with totally
+unrelated computations, and you will not see that in the type signature.
+
+The case is totally different in Frege. There are no statements, only expressions.
+
+`println "2"` and `println "3"` are not just two lines that happen sit beneath each other.
+They have a very strong connection. In fact, they are both expressions that happen to be an argument
+to a function that _binds_ the two together with a logic that the _IO_ type specifies.
+The return type of _bind_ is the return type of its second argument. In our case `IO ()` again.
+
+.Returns IO () since (println "3") return IO ()
+[source,pseudo]
+----
+    bind (println "2") (println "3")
+----
+
+And, of course, the same is true for `println "1"`.
+
+.Returns IO () since ... you get it, right?
+[source,pseudo]
+----
+    bind (println "1")  (bind (println "2") (println "3"))
+----
+
+So the whole function body that looked so imperative boils down to a single expression and
+type inference becomes a piece of cake.
+
+At this point, we have everything collapsed to a single expression until the `do` keyword, which
+is calling the _bind_ function of that single expression. Since our expression is
+of type `IO`, the `IO.bind` will be used.
+
+We have seen before, for example in "xref:silence[Silent Notation]", that functional programming
+sometimes means to read backwards. This is again true for the do-notation. This time it is not
+right-to-left but bottom-to-top to find the overall result type.
+
+.A personal experience
+[NOTE]
+It took me a while to understand how these mechanics work and in particular how on earth the _do_ knows
+which _bind_ to use. There are many explanations around but that part was always missing for me -
+probably because it was so obvious to everybody else.
+
+.By the way
+****
+When looking for the _bind_ function, you will see that it is written as the `>>=` infix operator.
+So `bind a b` appears as `a >>= b` (and there are a few variants that we will cover later).
+****
+
+As an aside, using _bind_ like an infix operator
+----
+    a `bind`
+    b `bind`
+    c
+----
+reveals an interesting analogy. This is just like writing the imperative style of
+----
+    a ;
+    b ;
+    c
+----
+This is why _bind_ is also humorously known as _the programmable semicolon_.
+It provides the logic how two functions compose in a given context and - as we will see later -
+how the first function can pass its result as an argument to the second function.
+
+=== Summary
+
+* IO code can be really easy to write even in a purely functional language like Frege.
+* Being purely functional does not mean that there is no IO. It means to be rigorously explicit about it.
+* Functional code can look like imperative code without sacrificing its functional nature.
+* Do-notation is your friend in the presence of side effects.
