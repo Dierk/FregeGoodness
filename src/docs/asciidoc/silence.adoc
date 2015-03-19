@@ -31,7 +31,7 @@ two function applications: first `f x`, which returns a function that then takes
 ****
 The last example is usually called _currying_ or _partial function application_.
 But there is technically nothing _partial_ about it. It is just so that
-_f_ is a function that when _x_ is applied to it, returns another function
+_f_ is a function that takes _x_ and returns another function
 (which in turn than takes _y_). Functions that return functions were first described by Gottlob Frege
 back in the 19^th^ century.
 ****
@@ -77,6 +77,8 @@ the dot-operator is. It it the operator for _function composition_:
 When looking at function composition it is best to *read it right-to-left* since
 first `buz x` is evaluated, then `baz`, then `bar`, and finally `foo` -
 in the exact same order as when writing the nested parentheses.
+
+In fact, it is very similar to how pipes work on unix systems (only the direction is reversed).
 ****
 
 We said that function application has the highest precedence - even higher

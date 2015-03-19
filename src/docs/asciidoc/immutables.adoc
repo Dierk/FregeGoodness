@@ -3,7 +3,7 @@
 
 A cornerstone of functional programming is to work almost exclusively on values.
 Values never change. 42 is 42 and when you apply the function
-`(+1)` to it which returns 43 then 42 still remains to be 42.
+`(+1)` to it, then it will return 43 but 42 remains to be 42.
 
 Values are immutable.
 

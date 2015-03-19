@@ -30,7 +30,7 @@ But you can really think of any specific function _g_ you fancy.
 
 .Here is the first part of the trick
 * make a list of values that could be passed into _g_ (a list of Int values in our example above)
-* now, apply your _f_ to that list
+* now, apply your secret _f_ to that list
 * then feed the result into `map g`
 * you now have a list of return values of _g_
 
