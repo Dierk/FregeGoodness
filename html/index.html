@@ -547,6 +547,16 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_summary">Summary</a></li>
 </ul>
 </li>
+<li><a href="#_list_and_path">List and path</a>
+<ul class="sectlevel2">
+<li><a href="#_the_domain_model">The domain model</a></li>
+<li><a href="#_how_big_is_the_bank">How big is the bank?</a></li>
+<li><a href="#_the_do_notation_and_comprehension">The "do" notation and comprehension</a></li>
+<li><a href="#_path_queries_almost_sql">Path queries - almost SQL</a></li>
+<li><a href="#_it_all_falls_in_place">It all falls in place</a></li>
+<li><a href="#_references_5">References</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -1630,10 +1640,427 @@ how the first function can pass its result as an argument to the second function
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_list_and_path">List and path</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Lists are the predominant data structure in Frege and it will come at no surprise
+that there are lots of clever ways of dealing with them.</p>
+</div>
+<div class="paragraph">
+<p>We will start with a data model that is a dramatically simplified version of what you
+may find in real life. From there we will explore various ways of
+querying the data.</p>
+</div>
+<div class="sect2">
+<h3 id="_the_domain_model">The domain model</h3>
+<div class="paragraph">
+<p>Let&#8217;s assume that a bank has many clients that hold many investment portfolios that
+in turn are made of positions where each position tells how many items of a
+financial instrument (let&#8217;s assume stock shares for a given ticker) are in that
+portfolio.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="fpath_domain.png" alt="A simplified banking domain" width="610" height="98">
+</div>
+<div class="title">Figure 4. A simplified banking domain</div>
+</div>
+<div class="paragraph">
+<p>The tickers are easily modeled with an enumeration</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">data Ticker = GOOG | MSFT | APPL | CANO | NOOB
+derive Eq Ticker</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The rest of the domain is just normal data structures in record syntax.</p>
+</div>
+<div class="listingblock">
+<div class="title">The core domain data structures</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">data Bank       = Bank      { clients       :: [Client]     }
+data Client     = Client    { portfolios    :: [Portfolio]  }
+data Portfolio  = Portfolio { positions     :: [Position]   }
+data Position   = Position  { soMany :: Int, ticker :: Ticker }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now let&#8217;s create an example bank that has 1000 clients, each having 3 portfolios with various positions.</p>
+</div>
+<div class="listingblock">
+<div class="title">Domain sample data</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">bank = Bank { clients = replicate 1000
+    Client { portfolios = replicate 3
+        Portfolio { positions = [
+            Position { soMany = 1, ticker = APPL },
+            Position { soMany = 2, ticker = MSFT },
+            Position { soMany = 8, ticker = CANO }
+        ]}
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you haven&#8217;t seen <code>replicate</code> before: it takes a size and an element and produces a list of
+elements of that size. The type is<br>
+<code>replicate :: Int -&gt; a -&gt; [a]</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="title">Short and friendly to incremental development</div>
+Defining the domain has been very short. Using positional parameters instead of record syntax would
+have been even shorter. But so it is easier to extend the data structures later.<br>
+Even the creation of many sample values was quick and it is easy to play around with various sizes.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Finally, we need some pricing information for our stock tickers for later valuation.
+We use a simple association list.</p>
+</div>
+<div class="listingblock">
+<div class="title">Defining prices as an association list</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">prices = [ (GOOG, 100) , (MSFT, 200) , (APPL, 300) , (CANO, 400) ]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that there is no <code>NOOB</code> in the list of prices. We can use that later when testing the
+lookup of prices for tickers that are not in the list.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s do that right away with invariants that tell how to value a position:
+by multiplying the price of the ticker by how many we have of those.</p>
+</div>
+<div class="listingblock">
+<div class="title">Testing the valuation of positions</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">import Test.QuickCheck
+
+zeroValue     = once     $             0 == value (Position 5 NOOB)
+multipleValue = property $ \n -&gt; 100 * n == value (Position n GOOG)</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Writing the test made us think about the <code>NOOB</code> case: what should the value of a position be
+if no price for the ticker can be found? We decided for <code>0</code>, which does the trick for our
+application-level task at hand. A more widely used library function should rather
+signal the error, maybe by returning a <code>Maybe</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When we go in this test-first style, the compiler will complain that there is no
+<code>value</code> function. Let&#8217;s give it one, using the <code>lookup</code> function from <code>Data.List</code>
+to find the price for the ticker.</p>
+</div>
+<div class="listingblock">
+<div class="title">Implementing the value function</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">import Data.List (lookup)
+
+value :: Position -&gt; Int
+value position = calculate $ lookup position.ticker prices where
+    calculate Nothing      = 0
+    calculate (Just price) = position.soMany * price</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>lookup</code> function returns a <code>Maybe</code> since the lookup may fail and we draw
+some attention to this possibility by defining the local <code>calculate</code>
+function with case discrimination on whether the Maybe is <code>Nothing</code> or
+<code>Just</code> the price. (The less dramatic alternative would have been to
+to use the <code>maybe</code> function like <code>maybe 0 ...</code>)</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Why not null?</div>
+<div class="paragraph">
+<p>The Java developer in us may ask: Why not simply returning a <code>null</code> value
+when a lookup fails? Well, as we all know, the caller may forget the null
+check and a <strong>NullPointerException</strong> is likely to happen later - possibly far away
+from the point where the null was set.</p>
+</div>
+<div class="paragraph">
+<p>In Frege, <strong>there is no null</strong> and thus there are <strong>no NullPointerExceptions</strong> any more!</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_how_big_is_the_bank">How big is the bank?</h3>
+<div class="paragraph">
+<p>Banks are often compared by their <em>assets under management</em>, i.e. by the value
+of all positions in all portfolios of all their clients.</p>
+</div>
+<div class="paragraph">
+<p>Hey, we have the data to calculate that! And here are the functions that we need
+to get to that data along with their types.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>bank.clients         --              [Client]    <b class="conum">(1)</b>
+Client.portfolios    -- Client    -&gt; [Portfolio] <b class="conum">(2)</b>
+Portfolio.positions  -- Portfolio -&gt; [Position]  <b class="conum">(3)</b>
+value position       -- Position  -&gt; Int</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Hm, something interesting becomes apparent here: <strong>each function returns a list
+of elements that the next function needs as single elements</strong>.
+So maybe we can generalize over this pattern and <em>bind</em> the functions
+like we did in "<a href="#easy_io">Simple IO</a>".</p>
+</div>
+<div class="paragraph">
+<p>So binding &lt;1&gt; and &lt;2&gt; would be</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>   &lt;1&gt;             &lt;2&gt;                 return type
+[Client] -&gt; (Client -&gt; [Portfolio]) -&gt; [Portfolio]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Binding &lt;2&gt; and &lt;3&gt; would be</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    &lt;2&gt;                   &lt;3&gt;               return type
+[Portfolio] -&gt; (Portfolio -&gt; [Position]) -&gt; [Position]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you see, there is a general pattern behind it such that <em>bind</em> has the type:<br>
+<code>[a] -&gt; (a -&gt; [b]) -&gt; [b]</code></p>
+</div>
+<div class="paragraph">
+<p>You will be glad to hear that this <em>bind</em> function is already available and just like in the
+case of "<a href="#easy_io">Simple IO</a>", it is denoted with the <code>&gt;&gt;=</code> operator.</p>
+</div>
+<div class="paragraph">
+<p>So combining &lt;1&gt; and &lt;2&gt; becomes
+<code>bank.clients &gt;&gt;= Client.portfolios</code></p>
+</div>
+<div class="paragraph">
+<p>Combining &lt;2&gt; and &lt;3&gt; becomes
+<code>Client.portfolios &gt;&gt;= Portfolio.positions</code></p>
+</div>
+<div class="paragraph">
+<p>Combining (&lt;1&gt; and &lt;2&gt;) and &lt;3&gt; becomes<br>
+<code>bank.clients &gt;&gt;= Client.portfolios &gt;&gt;= Portfolio.positions</code></p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+<div class="title">Tadaaaa!</div>
+We have arrived at a simple "path" expression for all positions of all portfolios for all the bank&#8217;s clients!
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To finally drive the point home, here is the first version of calculating the assets under management
+by using the <em>bind</em>, mapping positions to their values, and summing those up.</p>
+</div>
+<div class="listingblock">
+<div class="title">Assets under management, first version</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">assetsUnderManagement1 = sum $
+    map value $
+        bank.clients &gt;&gt;= Client.portfolios &gt;&gt;= Portfolio.positions</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_do_notation_and_comprehension">The "do" notation and comprehension</h3>
+<div class="paragraph">
+<p>Another lesson from "<a href="#easy_io">Simple IO</a>" was that <em>bind</em> allows us to use the "do" notation, which
+leads to the following code.</p>
+</div>
+<div class="listingblock">
+<div class="title">Assets under management with "do" notation</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">assetsUnderManagement2 = sum $
+    map value do
+        client    &lt;- bank.clients
+        portfolio &lt;- client.portfolios
+        portfolio.positions</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The single intermediate values must now be <em>drawn from</em> the list by means of the <code>&lt;-</code> arrow.
+But wait! This looks and sounds utterly familiar and even has the same meaning as in list comprehensions!</p>
+</div>
+<div class="listingblock">
+<div class="title">Assets under management with list comprehension</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">assetsUnderManagement3 = sum
+    [value position |
+        client    &lt;- bank.clients,
+        portfolio &lt;- client.portfolios,
+        position  &lt;- portfolio.positions
+    ]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And in fact, both notations are equivalent and differ only in style.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_path_queries_almost_sql">Path queries - almost SQL</h3>
+<div class="paragraph">
+<p>Suppose we are not interested in <em>all</em> assets but only in the total value
+of all Canoo shares in our bank. With a list comprehension, this is simple
+to do and yields another interesting analogy to SQL queries.</p>
+</div>
+<div class="listingblock">
+<div class="title">List comprehension as a query</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">allCanoo3 = sum
+    [value position |                       -- SELECT
+        client    &lt;- bank.clients,          -- FROM
+        portfolio &lt;- client.portfolios,
+        position  &lt;- portfolio.positions,
+        position.ticker == CANO             -- WHERE
+    ]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>value</code> function is like a SQL projection, <code>position</code> is
+a selection, the lists give the data source, and the guards
+make the where-clauses.</p>
+</div>
+<div class="paragraph">
+<p>We said that "do" notation is equivalent. Here is how it
+looks with filters as where-clauses:</p>
+</div>
+<div class="listingblock">
+<div class="title">Do notation with filter</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">allCanoo2 = sum $
+    map value do
+        client    &lt;- bank.clients
+        portfolio &lt;- client.portfolios
+        filter canoo portfolio.positions
+    where
+        canoo position = position.ticker == CANO</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>One can see the subtle differences in style.</p>
+</div>
+<div class="paragraph">
+<p>Finally, the path version with filtering.</p>
+</div>
+<div class="listingblock">
+<div class="title">Path query with filter</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">allCanoo1 = sum $
+    map value $
+        bank.clients &gt;&gt;= Client.portfolios &gt;&gt;= filter canoo . Portfolio.positions where
+            canoo position = position.ticker == CANO</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Such a filter can be placed at any step in the path and besides filtering,
+one can just as well apply mapping inside the path evaluation.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_it_all_falls_in_place">It all falls in place</h3>
+<div class="paragraph">
+<p>We started with an everyday business scenario and discovered some profound
+properties of lists</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>they make nice path expressions</p>
+</li>
+<li>
+<p>they can be used with the "do" notation</p>
+</li>
+<li>
+<p>comprehensions are not so special</p>
+</li>
+<li>
+<p>we can query a graph of references analogous to SQL</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Overall, comprehensions seem to be the most versatile notation, especially when
+filtering and projection is needed anyway.
+For mere aggregation, path notation is just fine.</p>
+</div>
+<div class="paragraph">
+<p>Path expressions in other languages can also be rather succinct. Our running example
+would for example be the Groovy GPath<br>
+<code>bank.clients*.portfolios*.positions.findAll{it.ticker == CANO}*.value().sum()</code>
+However, one cannot compare the visual appearance of the code only.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Lazy FTW</div>
+<div class="paragraph">
+<p>An important benefit of Frege is the lazy evaluation. The big graph is never
+really materialized, neither are the "resulting lists" (there aren&#8217;t any).
+The path does not build a large data structure but rather a stream
+of evaluations.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_references_5">References</h3>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+Groovy GPath
+</td>
+<td class="hdlist2">
+<p><a href="http://docs.groovy-lang.org/latest/html/documentation/#gpath_expressions" class="bare">http://docs.groovy-lang.org/latest/html/documentation/#gpath_expressions</a></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Haskell Wikibook
+</td>
+<td class="hdlist2">
+<p><a href="https://en.wikibooks.org/wiki/Haskell/Understanding_monads/List" class="bare">https://en.wikibooks.org/wiki/Haskell/Understanding_monads/List</a></p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-19 21:37:43 MEZ
+Last updated 2015-03-29 03:51:47 MESZ
 </div>
 </div>
 </body>

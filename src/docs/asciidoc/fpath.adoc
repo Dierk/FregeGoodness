@@ -1,0 +1,311 @@
+[[fpath]]
+
+== List and path
+
+Lists are the predominant data structure in Frege and it will come at no surprise
+that there are lots of clever ways of dealing with them.
+
+We will start with a data model that is a dramatically simplified version of what you
+may find in real life. From there we will explore various ways of
+querying the data.
+
+=== The domain model
+Let's assume that a bank has many clients that hold many investment portfolios that
+in turn are made of positions where each position tells how many items of a
+financial instrument (let's assume stock shares for a given ticker) are in that
+portfolio.
+
+.A simplified banking domain
+[ditaa,fpath_domain]
+----
+     +------+*  +--------+*  +-----------+*  +----------+
+     | Bank +-->| Client +-->| Portfolio +-->| Position |
+     +------+   +--------+   +-----------+   +----------+
+----
+
+The tickers are easily modeled with an enumeration
+
+[source,frege]
+----
+data Ticker = GOOG | MSFT | APPL | CANO | NOOB
+derive Eq Ticker
+----
+
+The rest of the domain is just normal data structures in record syntax.
+
+.The core domain data structures
+[source,frege]
+----
+data Bank       = Bank      { clients       :: [Client]     }
+data Client     = Client    { portfolios    :: [Portfolio]  }
+data Portfolio  = Portfolio { positions     :: [Position]   }
+data Position   = Position  { soMany :: Int, ticker :: Ticker }
+----
+
+Now let's create an example bank that has 1000 clients, each having 3 portfolios with various positions.
+
+.Domain sample data
+[source,frege]
+----
+bank = Bank { clients = replicate 1000
+    Client { portfolios = replicate 3
+        Portfolio { positions = [
+            Position { soMany = 1, ticker = APPL },
+            Position { soMany = 2, ticker = MSFT },
+            Position { soMany = 8, ticker = CANO }
+        ]}
+    }
+}
+----
+
+If you haven't seen `replicate` before: it takes a size and an element and produces a list of
+elements of that size. The type is +
+`replicate :: Int -> a -> [a]`
+
+.Short and friendly to incremental development
+[NOTE]
+Defining the domain has been very short. Using positional parameters instead of record syntax would
+have been even shorter. But so it is easier to extend the data structures later. +
+Even the creation of many sample values was quick and it is easy to play around with various sizes.
+
+Finally, we need some pricing information for our stock tickers for later valuation.
+We use a simple association list.
+
+.Defining prices as an association list
+[source,frege]
+----
+prices = [ (GOOG, 100) , (MSFT, 200) , (APPL, 300) , (CANO, 400) ]
+----
+
+Note that there is no `NOOB` in the list of prices. We can use that later when testing the
+lookup of prices for tickers that are not in the list.
+
+Let's do that right away with invariants that tell how to value a position:
+by multiplying the price of the ticker by how many we have of those.
+
+.Testing the valuation of positions
+[source,frege]
+----
+import Test.QuickCheck
+
+zeroValue     = once     $             0 == value (Position 5 NOOB)
+multipleValue = property $ \n -> 100 * n == value (Position n GOOG)
+----
+
+[NOTE]
+Writing the test made us think about the `NOOB` case: what should the value of a position be
+if no price for the ticker can be found? We decided for `0`, which does the trick for our
+application-level task at hand. A more widely used library function should rather
+signal the error, maybe by returning a `Maybe`.
+
+When we go in this test-first style, the compiler will complain that there is no
+`value` function. Let's give it one, using the `lookup` function from `Data.List`
+to find the price for the ticker.
+
+.Implementing the value function
+[source,frege]
+----
+import Data.List (lookup)
+
+value :: Position -> Int
+value position = calculate $ lookup position.ticker prices where
+    calculate Nothing      = 0
+    calculate (Just price) = position.soMany * price
+----
+
+The `lookup` function returns a `Maybe` since the lookup may fail and we draw
+some attention to this possibility by defining the local `calculate`
+function with case discrimination on whether the Maybe is `Nothing` or
+`Just` the price. (The less dramatic alternative would have been to
+to use the `maybe` function like `maybe 0 ...`)
+
+.Why not null?
+****
+The Java developer in us may ask: Why not simply returning a `null` value
+when a lookup fails? Well, as we all know, the caller may forget the null
+check and a *NullPointerException* is likely to happen later - possibly far away
+from the point where the null was set.
+
+In Frege, *there is no null* and thus there are *no NullPointerExceptions* any more!
+****
+
+=== How big is the bank?
+
+Banks are often compared by their _assets under management_, i.e. by the value
+of all positions in all portfolios of all their clients.
+
+Hey, we have the data to calculate that! And here are the functions that we need
+to get to that data along with their types.
+
+----
+bank.clients         --              [Client]    <1>
+Client.portfolios    -- Client    -> [Portfolio] <2>
+Portfolio.positions  -- Portfolio -> [Position]  <3>
+value position       -- Position  -> Int
+----
+
+Hm, something interesting becomes apparent here: *each function returns a list
+of elements that the next function needs as single elements*.
+So maybe we can generalize over this pattern and _bind_ the functions
+like we did in "xref:easy_io[Easy IO]".
+
+So binding <1> and <2> would be
+----
+   <1>             <2>                 return type
+[Client] -> (Client -> [Portfolio]) -> [Portfolio]
+----
+
+Binding <2> and <3> would be
+----
+    <2>                   <3>               return type
+[Portfolio] -> (Portfolio -> [Position]) -> [Position]
+----
+
+As you see, there is a general pattern behind it such that _bind_ has the type: +
+`[a] -> (a -> [b]) -> [b]`
+
+You will be glad to hear that this _bind_ function is already available and just like in the
+case of "xref:easy_io[Easy IO]", it is denoted with the `>>=` operator.
+
+So combining <1> and <2> becomes
+`bank.clients >>= Client.portfolios`
+
+Combining <2> and <3> becomes
+`Client.portfolios >>= Portfolio.positions`
+
+Combining (<1> and <2>) and <3> becomes +
+`bank.clients >>= Client.portfolios >>= Portfolio.positions`
+
+.Tadaaaa!
+[IMPORTANT]
+We have arrived at a simple "path" expression for all positions of all portfolios for all the bank's clients!
+
+To finally drive the point home, here is the first version of calculating the assets under management
+by using the _bind_, mapping positions to their values, and summing those up.
+
+.Assets under management, first version
+[source,frege]
+----
+assetsUnderManagement1 = sum $
+    map value $
+        bank.clients >>= Client.portfolios >>= Portfolio.positions
+----
+
+=== The "do" notation and comprehension
+
+Another lesson from "xref:easy_io[Easy IO]" was that _bind_ allows us to use the "do" notation, which
+leads to the following code.
+
+.Assets under management with "do" notation
+[source,frege]
+----
+assetsUnderManagement2 = sum $
+    map value do
+        client    <- bank.clients
+        portfolio <- client.portfolios
+        portfolio.positions
+----
+
+The single intermediate values must now be _drawn from_ the list by means of the `<-` arrow.
+But wait! This looks and sounds utterly familiar and even has the same meaning as in list comprehensions!
+
+.Assets under management with list comprehension
+[source,frege]
+----
+assetsUnderManagement3 = sum
+    [value position |
+        client    <- bank.clients,
+        portfolio <- client.portfolios,
+        position  <- portfolio.positions
+    ]
+----
+
+And in fact, both notations are equivalent and differ only in style.
+
+=== Path queries - almost SQL
+
+Suppose we are not interested in _all_ assets but only in the total value
+of all Canoo shares in our bank. With a list comprehension, this is simple
+to do and yields another interesting analogy to SQL queries.
+
+.List comprehension as a query
+[source,frege]
+----
+allCanoo3 = sum
+    [value position |                       -- SELECT
+        client    <- bank.clients,          -- FROM
+        portfolio <- client.portfolios,
+        position  <- portfolio.positions,
+        position.ticker == CANO             -- WHERE
+    ]
+----
+
+The `value` function is like a SQL projection, `position` is
+a selection, the lists give the data source, and the guards
+make the where-clauses.
+
+We said that "do" notation is equivalent. Here is how it
+looks with filters as where-clauses:
+
+.Do notation with filter
+[source,frege]
+----
+allCanoo2 = sum $
+    map value do
+        client    <- bank.clients
+        portfolio <- client.portfolios
+        filter canoo portfolio.positions
+    where
+        canoo position = position.ticker == CANO
+----
+
+One can see the subtle differences in style.
+
+Finally, the path version with filtering.
+
+.Path query with filter
+[source,frege]
+----
+allCanoo1 = sum $
+    map value $
+        bank.clients >>= Client.portfolios >>= filter canoo . Portfolio.positions where
+            canoo position = position.ticker == CANO
+----
+
+Such a filter can be placed at any step in the path and besides filtering,
+one can just as well apply mapping inside the path evaluation.
+
+=== It all falls in place
+
+We started with an everyday business scenario and discovered some profound
+properties of lists
+
+* they make nice path expressions
+* they can be used with the "do" notation
+* comprehensions are not so special
+* we can query a graph of references analogous to SQL
+
+Overall, comprehensions seem to be the most versatile notation, especially when
+filtering and projection is needed anyway.
+For mere aggregation, path notation is just fine.
+
+Path expressions in other languages can also be rather succinct. Our running example
+would for example be the Groovy GPath +
+`bank.clients*.portfolios*.positions.findAll{it.ticker == CANO}*.value().sum()`
+However, one cannot compare the visual appearance of the code only.
+
+.Lazy FTW
+****
+An important benefit of Frege is the lazy evaluation. The big graph is never
+really materialized, neither are the "resulting lists" (there aren't any).
+The path does not build a large data structure but rather a stream
+of evaluations.
+****
+
+=== References
+[horizontal]
+Groovy GPath::
+http://docs.groovy-lang.org/latest/html/documentation/#gpath_expressions
+
+Haskell Wikibook::
+https://en.wikibooks.org/wiki/Haskell/Understanding_monads/List
