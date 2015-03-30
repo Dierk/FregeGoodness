@@ -1,5 +1,4 @@
 [[maybe_path]]
-
 == The Maybe path
 
 In "xref:fpath[Lists and path]" we have experienced how to construct path expressions
