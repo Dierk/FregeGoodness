@@ -9,8 +9,9 @@ task and it goes like so:
 * instead of every fifth number say "buzz"
 * when fizz and buzz fall together, say "fizzbuzz".
 
-While this is a rather trivial task, it can still reveal some insight about
-functional design and modularity.
+While this is a rather trivial task, it can anyway bring some insight about
+functional design and modularity - if we only dare to question our conventional
+approach and are bold enough to leave our comfort zone.
 
 === The pieces
 
@@ -122,46 +123,61 @@ actually been the #1 hit.
 [source, java]
 ----
 public class FizzBuzz{
-	public static void main(String[] args){
-		for(int i= 1; i <= 100; i++){
-			if(i % 15 == 0){
-				System.out.println("FizzBuzz");
-			}else if(i % 3 == 0){
-				System.out.println("Fizz");
-			}else if(i % 5 == 0){
-				System.out.println("Buzz");
-			}else{
-				System.out.println(i);
-			}
-		}
-	}
+    public static void main(String[] args){
+        for(int i= 1; i <= 100; i++){
+            if(i % 15 == 0){
+                System.out.println("FizzBuzz");
+            }else if(i % 3 == 0){
+                System.out.println("Fizz");
+            }else if(i % 5 == 0){
+                System.out.println("Buzz");
+            }else{
+                System.out.println(i);
+            }
+        }
+    }
 }
 ----
 
-Even this trivial task reveals some interesting differences in the
-programming approach.
+While the imperative solution will be more familiar to many readers (and until recently
+that would have included myself) there are hard facts that reveal how
+intertwined the imperative solution is compared to the simple, modular one in Frege.
 
 Conditionals::
 Programming errors are more likely to appear the more conditionals are in the code.
 In nested conditionals the probability of errors increases exponentially
-(at least for me).
+(at least for me). +
+__Java: 4 conditionals, 3 nested. Frege: 1.__
 
 Operators::
 The more operators there are in my code, the more likely errors
 creep in. With combination of operators the probability of errors
-increases exponentially (at least for me).
+increases exponentially (at least for me). +
+__Java: 7, Frege 1.__
 
 Maintainability::
 * What pieces of the code do you have to change to show some other part of the
-fizzbuzz sequence?
-* How much code do you have to touch when not printing to stdout but to stderr?
-* How much code do you have to touch when a rule changes? What if there are new rules?
+fizzbuzz sequence?  +
+__Java: have to rework the loop, Frege: one number.__
+* How much code do you have to touch when not printing to stdout but to stderr? +
+__Java: 4 lines, Frege: 1 line.__
+* How much code do you have to touch when a rule changes? What if there are new rules? +
+__Java: everything must be reworked, Frege: small, localized change.__
 
 Specification::
-How well is the specification reflected in the implementation?
+How well is the specification reflected in the implementation? +
+__Java: very indirectly (where is modulo 15 in the spec?), Frege: exact one-to-one correspondence.__
 
 In his seminal paper "Why functional programming matters", John Hughes makes the point that
-one main benefit is *improved modularity* by separating production from usage of data and
+one main benefit is *improved modularity* by separating production of data from its usage and
 combining simple pieces of logic.
-The fizzbuzz task is an compelling evidence for that claim. +
+The fizzbuzz task is an compelling evidence for that claim.
+
+=== References
+
+Why FP matters::
 http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf
+
+Simplicity::
+Rich Hickey, RailsConf Keynote 2012 https://www.youtube.com/watch?v=rI8tNMsozo0
+

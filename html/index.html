@@ -569,6 +569,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_combining_rules">Combining rules</a></li>
 <li><a href="#_combine_with_numbers">Combine with numbers</a></li>
 <li><a href="#_considerations">Considerations</a></li>
+<li><a href="#_references_7">References</a></li>
 </ul>
 </li>
 </ul>
@@ -2425,8 +2426,9 @@ task and it goes like so:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>While this is a rather trivial task, it can still reveal some insight about
-functional design and modularity.</p>
+<p>While this is a rather trivial task, it can anyway bring some insight about
+functional design and modularity - if we only dare to question our conventional
+approach and are bold enough to leave our comfort zone.</p>
 </div>
 <div class="sect2">
 <h3 id="_the_pieces">The pieces</h3>
@@ -2558,25 +2560,26 @@ actually been the #1 hit.</p>
 <div class="title">FizzBuzz in Java</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">FizzBuzz</span>{
-        <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args){
-                <span class="keyword">for</span>(<span class="type">int</span> i= <span class="integer">1</span>; i &lt;= <span class="integer">100</span>; i++){
-                        <span class="keyword">if</span>(i % <span class="integer">15</span> == <span class="integer">0</span>){
-                                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">FizzBuzz</span><span class="delimiter">&quot;</span></span>);
-                        }<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="integer">3</span> == <span class="integer">0</span>){
-                                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">Fizz</span><span class="delimiter">&quot;</span></span>);
-                        }<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="integer">5</span> == <span class="integer">0</span>){
-                                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">Buzz</span><span class="delimiter">&quot;</span></span>);
-                        }<span class="keyword">else</span>{
-                                <span class="predefined-type">System</span>.out.println(i);
-                        }
-                }
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args){
+        <span class="keyword">for</span>(<span class="type">int</span> i= <span class="integer">1</span>; i &lt;= <span class="integer">100</span>; i++){
+            <span class="keyword">if</span>(i % <span class="integer">15</span> == <span class="integer">0</span>){
+                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">FizzBuzz</span><span class="delimiter">&quot;</span></span>);
+            }<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="integer">3</span> == <span class="integer">0</span>){
+                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">Fizz</span><span class="delimiter">&quot;</span></span>);
+            }<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="integer">5</span> == <span class="integer">0</span>){
+                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">Buzz</span><span class="delimiter">&quot;</span></span>);
+            }<span class="keyword">else</span>{
+                <span class="predefined-type">System</span>.out.println(i);
+            }
         }
+    }
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Even this trivial task reveals some interesting differences in the
-programming approach.</p>
+<p>While the imperative solution will be more familiar to many readers (and until recently
+that would have included myself) there are hard facts that reveal how
+intertwined the imperative solution is compared to the simple, modular one in Frege.</p>
 </div>
 <div class="dlist">
 <dl>
@@ -2584,13 +2587,15 @@ programming approach.</p>
 <dd>
 <p>Programming errors are more likely to appear the more conditionals are in the code.
 In nested conditionals the probability of errors increases exponentially
-(at least for me).</p>
+(at least for me).<br>
+<em>Java: 4 conditionals, 3 nested. Frege: 1.</em></p>
 </dd>
 <dt class="hdlist1">Operators</dt>
 <dd>
 <p>The more operators there are in my code, the more likely errors
 creep in. With combination of operators the probability of errors
-increases exponentially (at least for me).</p>
+increases exponentially (at least for me).<br>
+<em>Java: 7, Frege 1.</em></p>
 </dd>
 <dt class="hdlist1">Maintainability</dt>
 <dd>
@@ -2598,29 +2603,47 @@ increases exponentially (at least for me).</p>
 <ul>
 <li>
 <p>What pieces of the code do you have to change to show some other part of the
-fizzbuzz sequence?</p>
+fizzbuzz sequence? <br>
+<em>Java: have to rework the loop, Frege: one number.</em></p>
 </li>
 <li>
-<p>How much code do you have to touch when not printing to stdout but to stderr?</p>
+<p>How much code do you have to touch when not printing to stdout but to stderr?<br>
+<em>Java: 4 lines, Frege: 1 line.</em></p>
 </li>
 <li>
-<p>How much code do you have to touch when a rule changes? What if there are new rules?</p>
+<p>How much code do you have to touch when a rule changes? What if there are new rules?<br>
+<em>Java: everything must be reworked, Frege: small, localized change.</em></p>
 </li>
 </ul>
 </div>
 </dd>
 <dt class="hdlist1">Specification</dt>
 <dd>
-<p>How well is the specification reflected in the implementation?</p>
+<p>How well is the specification reflected in the implementation?<br>
+<em>Java: very indirectly (where is modulo 15 in the spec?), Frege: exact one-to-one correspondence.</em></p>
 </dd>
 </dl>
 </div>
 <div class="paragraph">
 <p>In his seminal paper "Why functional programming matters", John Hughes makes the point that
-one main benefit is <strong>improved modularity</strong> by separating production from usage of data and
+one main benefit is <strong>improved modularity</strong> by separating production of data from its usage and
 combining simple pieces of logic.
-The fizzbuzz task is an compelling evidence for that claim.<br>
-<a href="http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf" class="bare">http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf</a></p>
+The fizzbuzz task is an compelling evidence for that claim.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_references_7">References</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Why FP matters</dt>
+<dd>
+<p><a href="http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf" class="bare">http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf</a></p>
+</dd>
+<dt class="hdlist1">Simplicity</dt>
+<dd>
+<p>Rich Hickey, RailsConf Keynote 2012 <a href="https://www.youtube.com/watch?v=rI8tNMsozo0" class="bare">https://www.youtube.com/watch?v=rI8tNMsozo0</a></p>
+</dd>
+</dl>
 </div>
 </div>
 </div>
