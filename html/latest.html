@@ -510,14 +510,12 @@ table.CodeRay td.code>pre{padding:0}
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#maybe_path">The Maybe path</a>
+<li><a href="#fizzbuzz">FizzBuzz</a>
 <ul class="sectlevel2">
-<li><a href="#_the_domain_model">The domain model</a></li>
-<li><a href="#_first_cut">First cut</a></li>
-<li><a href="#_improving_on_notation">Improving on notation</a></li>
-<li><a href="#_the_do_notation_again">The "do" notation, again</a></li>
-<li><a href="#_comparing_approaches">Comparing approaches</a></li>
-<li><a href="#_references">References</a></li>
+<li><a href="#_the_pieces">The pieces</a></li>
+<li><a href="#_combining_rules">Combining rules</a></li>
+<li><a href="#_combine_with_numbers">Combine with numbers</a></li>
+<li><a href="#_considerations">Considerations</a></li>
 </ul>
 </li>
 </ul>
@@ -537,335 +535,225 @@ Feel free to file <a href="https://github.com/Dierk/FregeGoodness/tree/gh-pages"
 </div>
 </div>
 <div class="sect1">
-<h2 id="maybe_path">The Maybe path</h2>
+<h2 id="fizzbuzz">FizzBuzz</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In "<a href="#fpath">Lists and path</a>" we have experienced how to construct path expressions
-that are made up of list structures. We have also seen the <code>Maybe</code> type that signals
-the (un-) availability of a value.</p>
+<p>There is a children&#8217;s game that is sometimes used as a simple programming
+task and it goes like so:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>count the numbers 1, 2, 3, &#8230;&#8203;</p>
+</li>
+<li>
+<p>instead of every third number say "fizz"</p>
+</li>
+<li>
+<p>instead of every fifth number say "buzz"</p>
+</li>
+<li>
+<p>when fizz and buzz fall together, say "fizzbuzz".</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>Today, we will see that the exact same kind of path expressions can arise when
-multiple <code>Maybe</code> types are in play.</p>
+<p>While this is a rather trivial task, it can still reveal some insight about
+functional design and modularity.</p>
 </div>
 <div class="sect2">
-<h3 id="_the_domain_model">The domain model</h3>
+<h3 id="_the_pieces">The pieces</h3>
 <div class="paragraph">
-<p>Coming back to our banking domain model, we now assume that the bank may have a <em>star</em>
-client (think "Warren Buffet"). He may have a favorite, best performing portfolio: his <em>star</em>
-portfolio with the most heeded position being - you guessed it - the optional <em>star</em> position.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="maybe_path_domain.png" alt="Stars in a simplified banking domain" width="610" height="98">
-</div>
-<div class="title">Figure 1. Stars in a simplified banking domain</div>
+<p>There are many ways to solve the task and we will follow a path that may
+seem a bit unfamiliar when you come from imperative, object oriented
+programming: we will combine infinite productions.</p>
 </div>
 <div class="paragraph">
-<p>Modeled with record syntax, the domain is easily expressed as below.
-Note the similarity to the domain in "<a href="#fpath">Lists and path</a>".
-We only replace <em>list of</em> types with <em>Maybe</em> and adapt the names.</p>
+<p>First, we need an infinite production of numbers. In Frege that is
+used so often that it has it&#8217;s own idiom:</p>
 </div>
 <div class="listingblock">
-<div class="title">The core domain data structures</div>
+<div class="title">All numbers</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">data Bank       = Bank      { star   :: Maybe Client     }
-data Client     = Client    { star   :: Maybe Portfolio  }
-data Portfolio  = Portfolio { star   :: Maybe Position   }
-data Position   = Position  { soMany :: Int, ticker :: Ticker }</code></pre>
+<pre class="CodeRay highlight"><code data-lang="frege">[1..]</code></pre>
 </div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-A <code>Position</code> always has a ticker, even though that makes our live a little harder later.
-      We want to keep it a bit "realistic".
-</td>
-</tr>
-</table>
 </div>
 <div class="paragraph">
-<p>Now let&#8217;s create an example bank with all optional values being available.</p>
+<p>Second, we need a pattern like "every third item" for the fizzes.
+We model this as an endless repetition of strings, which are
+all empty, except every third one is "fizz".</p>
 </div>
 <div class="listingblock">
-<div class="title">The bank with all stars</div>
+<div class="title">The infinite fizz pattern</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">starBank = Bank {
-    star = Just Client {
-        star = Just Portfolio {
-            star = Just Position { soMany = 8, ticker = CANO }
+<pre class="CodeRay highlight"><code data-lang="frege">fizzes = cycle [&quot;&quot;, &quot;&quot;, &quot;fizz&quot;]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By now, you will have guessed what the buzzes pattern looks like.</p>
+</div>
+<div class="listingblock">
+<div class="title">The infinite buzz pattern</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">buzzes = cycle [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;buzz&quot;]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These are all the pieces we need. Note how naturally they follow from the
+specification.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_combining_rules">Combining rules</h3>
+<div class="paragraph">
+<p>Now we have to combine the parts. First, we have to create a pattern
+that combines fizzes and buzzes such that we get a pattern like<br>
+<code>"", "", "fizz", "", "buzz", "fizz", "", ...</code></p>
+</div>
+<div class="paragraph">
+<p>It can be created by simply concatenating fizzes and buzzes item-wise,
+to create a new, endless production:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>fizzes:  "", "", "fizz", "", "",     "fizz", "", ...
+buzzes:  "", "", "",     "", "buzz", "",     "", ...
+(++)  :  "", "", "fizz", "", "buzz", "fizz", "", ...</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">The infinite fizz-buzz pattern</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">pattern = zipWith (++) fizzes buzzes</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>One can view this pattern as a new <em>rule</em> that is constructed as
+a combination of the previous primitive rules.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">For the Geeks</div>
+<div class="paragraph">
+<p>We make use of the fact that concatenating the empty string at the
+front or at the rear leaves a string unchanged.
+Strings actually form a <em>Monoid</em> under concatenation with ""
+as the neutral element. The operation is also
+associative, which would be required
+if we combined three or more rules.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>We now have an infinite fizzbuzz pattern.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_combine_with_numbers">Combine with numbers</h3>
+<div class="paragraph">
+<p>Now we can superimpose the pattern on the infinite list of numbers
+to get the final infinite production.</p>
+</div>
+<div class="listingblock">
+<div class="title">The final fizzbuzz solution</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">fizzes   = cycle [&quot;&quot;, &quot;&quot;, &quot;fizz&quot;]
+buzzes   = cycle [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;buzz&quot;]
+pattern  = zipWith (++) fizzes buzzes
+fizzbuzz = zipWith combine pattern [1..] where
+    combine word number = if null word
+                             then show number
+                             else word</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These infinite productions are very versatile to use.
+We have already seen twice how to combine them, but they
+can also easily filtered and selected from.</p>
+</div>
+<div class="listingblock">
+<div class="title">Showing parts of the infinite production</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">main _ = do
+    println $ take 5 $ drop 200 fizzbuzz
+
+--  [&quot;fizz&quot;, &quot;202&quot;, &quot;203&quot;, &quot;fizz&quot;, &quot;buzz&quot;]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_considerations">Considerations</h3>
+<div class="paragraph">
+<p>When searching the web, you will find solutions like the one below, which has
+actually been the #1 hit.</p>
+</div>
+<div class="listingblock">
+<div class="title">FizzBuzz in Java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">FizzBuzz</span>{
+        <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args){
+                <span class="keyword">for</span>(<span class="type">int</span> i= <span class="integer">1</span>; i &lt;= <span class="integer">100</span>; i++){
+                        <span class="keyword">if</span>(i % <span class="integer">15</span> == <span class="integer">0</span>){
+                                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">FizzBuzz</span><span class="delimiter">&quot;</span></span>);
+                        }<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="integer">3</span> == <span class="integer">0</span>){
+                                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">Fizz</span><span class="delimiter">&quot;</span></span>);
+                        }<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="integer">5</span> == <span class="integer">0</span>){
+                                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">Buzz</span><span class="delimiter">&quot;</span></span>);
+                        }<span class="keyword">else</span>{
+                                <span class="predefined-type">System</span>.out.println(i);
+                        }
+                }
         }
-    }
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>But there may be other banks, where either no star client is known or he doesn&#8217;t have a
-preferred portfolio or there is no special position worth considering.</p>
+<p>Even this trivial task reveals some interesting differences in the
+programming approach.</p>
 </div>
-<div class="listingblock">
-<div class="title">Poor banks (hypothetical)</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">noStarBank      = Bank { star = Nothing }
-noPortfolioBank = Bank { star = Just Client { star = Nothing } }</code></pre>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Conditionals</dt>
+<dd>
+<p>Programming errors are more likely to appear the more conditionals are in the code.
+In nested conditionals the probability of errors increases exponentially
+(at least for me).</p>
+</dd>
+<dt class="hdlist1">Operators</dt>
+<dd>
+<p>The more operators there are in my code, the more likely errors
+creep in. With combination of operators the probability of errors
+increases exponentially (at least for me).</p>
+</dd>
+<dt class="hdlist1">Maintainability</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>What pieces of the code do you have to change to show some other part of the
+fizzbuzz sequence?</p>
+</li>
+<li>
+<p>How much code do you have to touch when not printing to stdout but to stderr?</p>
+</li>
+<li>
+<p>How much code do you have to touch when a rule changes? What if there are new rules?</p>
+</li>
+</ul>
 </div>
-</div>
-<div class="paragraph">
-<p>We may be foolish enough to think that we can make money by just investing
-in the star client&#8217;s favorite ticker. To make that happen, we first have to find it.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_first_cut">First cut</h3>
-<div class="paragraph">
-<p>To find the star ticker, we have to find the star position (if any) of the
-star portfolio (if any) of the star client (if any).</p>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s make a <code>starTicker</code> function for that purpose that takes a <code>bank</code> and
-if there is a star ticker, return just that and nothing otherwise.
-In short, the type is</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>starTicker :: Bank -&gt; Maybe Ticker</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>There are a number of straightforward ways of implementing this
-(case discrimination, case expression, nested <em>if</em>, <em>maybe</em> function), all of which
-lead to an intricate solution similar to the one below.</p>
-</div>
-<div class="listingblock">
-<div class="title">Works but is difficult to read</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">starTicker bank = starPortfolio bank.star where
-    starPortfolio Nothing = Nothing
-    starPortfolio (Just client) = starPosition client.star where
-        starPosition Nothing = Nothing
-        starPosition (Just portfolio) = starTicker portfolio.star where
-            starTicker Nothing = Nothing
-            starTicker (Just position) = Just position.ticker</code></pre>
-</div>
+</dd>
+<dt class="hdlist1">Specification</dt>
+<dd>
+<p>How well is the specification reflected in the implementation?</p>
+</dd>
+</dl>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s see whether this works as expected. Remember that <em>Nothing</em> may appear anywhere
-in the process and we need to make sure that we never fall off the ship.</p>
-</div>
-<div class="listingblock">
-<div class="title">Testing</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">import Test.QuickCheck
-
-star1 = once $ starTicker starBank        == Just CANO
-star2 = once $ starTicker noStarBank      == Nothing
-star3 = once $ starTicker noPortfolioBank == Nothing</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>While this approach works, we can certainly do better.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_improving_on_notation">Improving on notation</h3>
-<div class="paragraph">
-<p>Let&#8217;s step back and reconsider what we are doing here.</p>
-</div>
-<div class="paragraph">
-<p>Looking at the involved functions and their types we see a similar pattern as in "<a href="#fpath">Lists and path</a>".</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>bank.star        --              Maybe Client    <b class="conum">(1)</b>
-Client.star      -- Client    -&gt; Maybe Portfolio <b class="conum">(2)</b>
-Portfolio.star   -- Portfolio -&gt; Maybe Position  <b class="conum">(3)</b>
-Position.ticker  -- Position  -&gt; Ticker</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Each function returns a <em>Maybe</em> of the type that the next function takes as the input.
-So maybe we can generalize over this pattern and <em>bind</em> the functions
-such that we can put them in a line.</p>
-</div>
-<div class="paragraph">
-<p>Binding &lt;1&gt; and &lt;2&gt; would be</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>&lt;1&gt;             &lt;2&gt;                            return type
-Maybe Client -&gt; (Client -&gt; Maybe Portfolio) -&gt; Maybe Portfolio</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Binding &lt;2&gt; and &lt;3&gt; would be</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>&lt;2&gt;                &lt;3&gt;                              return type
-Maybe Portfolio -&gt; (Portfolio -&gt; Maybe Position) -&gt; Maybe Position</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>As you see, there is a general pattern behind it such that <em>bind</em> has the type:<br>
-<code>Maybe a -&gt; (a -&gt; Maybe b) -&gt; Maybe b</code></p>
-</div>
-<div class="paragraph">
-<p>You will be glad to hear that this <em>bind</em> function is already available and just like in the
-cases of "<a href="#easy_io">Easy IO</a>" and "<a href="#fpath">Lists and path</a>", it is denoted with the <code>&gt;&gt;=</code> operator.</p>
-</div>
-<div class="paragraph">
-<p>So combining &lt;1&gt; and &lt;2&gt; becomes
-<code>bank.star &gt;&gt;= Client.star</code></p>
-</div>
-<div class="paragraph">
-<p>Combining &lt;2&gt; and &lt;3&gt; becomes
-<code>Client.star &gt;&gt;= Portfolio.star</code></p>
-</div>
-<div class="paragraph">
-<p>Combining (&lt;1&gt; and &lt;2&gt;) and &lt;3&gt; becomes<br>
-<code>bank.star &gt;&gt;= Client.star &gt;&gt;= Portfolio.star</code></p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Important</div>
-</td>
-<td class="content">
-<div class="title">Tadaaaa!</div>
-We have <em>again</em> arrived at a simple "path" expression, this time for the optional star position of the optional star
-portfolio of the optional star client!
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>To complete the task, here is the solution in a single path.</p>
-</div>
-<div class="listingblock">
-<div class="title">Chaining Maybe values in a path</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">starTicker bank =
-    bank.star &gt;&gt;= Client.star &gt;&gt;= Portfolio.star &gt;&gt;= \position -&gt; Just position.ticker</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If the <code>Position.ticker</code> would also be a <em>Maybe</em> type then chaining would be even nicer.
-But this variant is more realistic, since there can never be a position without a ticker.
-It is also instructive to see this variant where the argument that is passed to the function
-is captured in the lambda parameter.</p>
-</div>
-<div class="paragraph">
-<p>We can simply follow the types. As we have seen in "<a href="#silence">Silent notation</a>"</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>\position -&gt; Just position.ticker   -- Position -&gt; Maybe Ticker</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>is just another notation for</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>foo :: Position -&gt; Maybe Ticker
-foo position = Just position.ticker</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>and we spare the headaches of finding a good name for it.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_do_notation_again">The "do" notation, again</h3>
-<div class="paragraph">
-<p>Meanwhile it should come at no surprise that where there is <em>bind</em>, the "do" notation is
-just around the corner.</p>
-</div>
-<div class="listingblock">
-<div class="title">The star ticker with "do" notation</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">starTicker bank = do
-    warrenBuffet  &lt;- bank.star
-    starPortfolio &lt;- warrenBuffet.star
-    starPosition  &lt;- starPortfolio.star
-    Just starPosition.ticker</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This reads actually pretty nicely and works just like we want it. Note again that each step
-may evaluate to a <code>Nothing</code> in which case the function returns <em>immediately</em> <code>Nothing</code>
-without any further step being evaluated.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_comparing_approaches">Comparing approaches</h3>
-<div class="paragraph">
-<p>The <code>Maybe</code> type turns out to be very versatile in both path expressions and
-when used with the "do" notation.</p>
-</div>
-<div class="paragraph">
-<p>Path expressions in other languages can also be rather succinct. Our running example
-would for example be the Groovy GPath
-<code>bank.star?.star?.star?.ticker</code>, returning <em>null</em> if any step in path was <em>null</em>.</p>
-</div>
-<div class="sidebarblock">
-<div class="content">
-<div class="title">There is no <em>null</em>.</div>
-<div class="paragraph">
-<p>Remember: there is no <em>null</em> in Frege and thus no <em>NullPointerExceptions</em>.
-One cannot say that often enough.</p>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>However, one cannot compare the visual appearance of the code only.</p>
-</div>
-<div class="paragraph">
-<p>Frege has the advantage of carrying the <em>Maybe</em> context through the type
-system ensuring that the caller never forgets that the value may be unavailable.</p>
-</div>
-<div class="paragraph">
-<p>Java would have a similar effect if its NullPointerException was a "checked
-exception" (which it is not). There is an <em>Optional</em> type since Java 8 with a
-method <code>flatMap</code> that works similar to our <em>bind</em>. Time will tell how good
-that abstraction works in Java.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_references">References</h3>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-Groovy Null-Safe
-</td>
-<td class="hdlist2">
-<p><a href="http://groovy-lang.org/operators.html#_safe_navigation_operator" class="bare">http://groovy-lang.org/operators.html#_safe_navigation_operator</a></p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-Learn you a Haskell
-</td>
-<td class="hdlist2">
-<p><a href="http://www.learnyouahaskell.com/a-fistful-of-monads" class="bare">http://www.learnyouahaskell.com/a-fistful-of-monads</a></p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-Java 8 Optionals
-</td>
-<td class="hdlist2">
-<p><a href="http://www.oracle.com/technetwork/articles/java/java8-optional-2175753.html" class="bare">http://www.oracle.com/technetwork/articles/java/java8-optional-2175753.html</a>
-(possibly contains some errors)</p>
-</td>
-</tr>
-</table>
+<p>In his seminal paper "Why functional programming matters", John Hughes makes the point that
+one main benefit is <strong>improved modularity</strong> by separating production from usage of data and
+combining simple pieces of logic.
+The fizzbuzz task is an compelling evidence for that claim.<br>
+<a href="http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf" class="bare">http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf</a></p>
 </div>
 </div>
 </div>
@@ -873,7 +761,7 @@ Java 8 Optionals
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-30 22:33:45 MESZ
+Last updated 2015-04-03 18:55:00 MESZ
 </div>
 </div>
 </body>

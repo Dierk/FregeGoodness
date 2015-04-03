@@ -1,0 +1,167 @@
+[[fizzbuzz]]
+== FizzBuzz
+
+There is a children's game that is sometimes used as a simple programming
+task and it goes like so:
+
+* count the numbers 1, 2, 3, ...
+* instead of every third number say "fizz"
+* instead of every fifth number say "buzz"
+* when fizz and buzz fall together, say "fizzbuzz".
+
+While this is a rather trivial task, it can still reveal some insight about
+functional design and modularity.
+
+=== The pieces
+
+There are many ways to solve the task and we will follow a path that may
+seem a bit unfamiliar when you come from imperative, object oriented
+programming: we will combine infinite productions.
+
+First, we need an infinite production of numbers. In Frege that is
+used so often that it has it's own idiom:
+
+.All numbers
+[source,frege]
+----
+[1..]
+----
+
+Second, we need a pattern like "every third item" for the fizzes.
+We model this as an endless repetition of strings, which are
+all empty, except every third one is "fizz".
+
+.The infinite fizz pattern
+[source,frege]
+----
+fizzes = cycle ["", "", "fizz"]
+----
+
+By now, you will have guessed what the buzzes pattern looks like.
+
+.The infinite buzz pattern
+[source,frege]
+----
+buzzes = cycle ["", "", "", "", "buzz"]
+----
+
+These are all the pieces we need. Note how naturally they follow from the
+specification.
+
+=== Combining rules
+
+Now we have to combine the parts. First, we have to create a pattern
+that combines fizzes and buzzes such that we get a pattern like +
+`"", "", "fizz", "", "buzz", "fizz", "", ...`
+
+It can be created by simply concatenating fizzes and buzzes item-wise,
+to create a new, endless production:
+----
+fizzes:  "", "", "fizz", "", "",     "fizz", "", ...
+buzzes:  "", "", "",     "", "buzz", "",     "", ...
+(++)  :  "", "", "fizz", "", "buzz", "fizz", "", ...
+----
+
+.The infinite fizz-buzz pattern
+[source,frege]
+----
+pattern = zipWith (++) fizzes buzzes
+----
+
+One can view this pattern as a new _rule_ that is constructed as
+a combination of the previous primitive rules.
+
+.For the Geeks
+****
+We make use of the fact that concatenating the empty string at the
+front or at the rear leaves a string unchanged.
+Strings actually form a _Monoid_ under concatenation with ""
+as the neutral element. The operation is also
+associative, which would be required
+if we combined three or more rules.
+****
+
+We now have an infinite fizzbuzz pattern.
+
+=== Combine with numbers
+
+Now we can superimpose the pattern on the infinite list of numbers
+to get the final infinite production.
+
+.The final fizzbuzz solution
+[source,frege]
+----
+fizzes   = cycle ["", "", "fizz"]
+buzzes   = cycle ["", "", "", "", "buzz"]
+pattern  = zipWith (++) fizzes buzzes
+fizzbuzz = zipWith combine pattern [1..] where
+    combine word number = if null word
+                             then show number
+                             else word
+----
+
+These infinite productions are very versatile to use.
+We have already seen twice how to combine them, but they
+can also easily filtered and selected from.
+
+.Showing parts of the infinite production
+[source,frege]
+----
+main _ = do
+    println $ take 5 $ drop 200 fizzbuzz
+
+--  ["fizz", "202", "203", "fizz", "buzz"]
+----
+
+=== Considerations
+
+When searching the web, you will find solutions like the one below, which has
+actually been the #1 hit.
+
+.FizzBuzz in Java
+[source, java]
+----
+public class FizzBuzz{
+	public static void main(String[] args){
+		for(int i= 1; i <= 100; i++){
+			if(i % 15 == 0){
+				System.out.println("FizzBuzz");
+			}else if(i % 3 == 0){
+				System.out.println("Fizz");
+			}else if(i % 5 == 0){
+				System.out.println("Buzz");
+			}else{
+				System.out.println(i);
+			}
+		}
+	}
+}
+----
+
+Even this trivial task reveals some interesting differences in the
+programming approach.
+
+Conditionals::
+Programming errors are more likely to appear the more conditionals are in the code.
+In nested conditionals the probability of errors increases exponentially
+(at least for me).
+
+Operators::
+The more operators there are in my code, the more likely errors
+creep in. With combination of operators the probability of errors
+increases exponentially (at least for me).
+
+Maintainability::
+* What pieces of the code do you have to change to show some other part of the
+fizzbuzz sequence?
+* How much code do you have to touch when not printing to stdout but to stderr?
+* How much code do you have to touch when a rule changes? What if there are new rules?
+
+Specification::
+How well is the specification reflected in the implementation?
+
+In his seminal paper "Why functional programming matters", John Hughes makes the point that
+one main benefit is *improved modularity* by separating production from usage of data and
+combining simple pieces of logic.
+The fizzbuzz task is an compelling evidence for that claim. +
+http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf

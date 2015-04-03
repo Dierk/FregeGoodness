@@ -545,10 +545,6 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_who_is_more_explicit">Who is more explicit?</a></li>
 <li><a href="#_the_fundamental_difference">The fundamental difference</a></li>
 <li><a href="#_summary">Summary</a></li>
-</ul>
-</li>
-<li><a href="#_list_and_path">List and path</a>
-<ul class="sectlevel2">
 <li><a href="#_the_domain_model">The domain model</a></li>
 <li><a href="#_how_big_is_the_bank">How big is the bank?</a></li>
 <li><a href="#_the_do_notation_and_comprehension">The "do" notation and comprehension</a></li>
@@ -565,6 +561,14 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_the_do_notation_again">The "do" notation, again</a></li>
 <li><a href="#_comparing_approaches">Comparing approaches</a></li>
 <li><a href="#_references_6">References</a></li>
+</ul>
+</li>
+<li><a href="#fizzbuzz">FizzBuzz</a>
+<ul class="sectlevel2">
+<li><a href="#_the_pieces">The pieces</a></li>
+<li><a href="#_combining_rules">Combining rules</a></li>
+<li><a href="#_combine_with_numbers">Combine with numbers</a></li>
+<li><a href="#_considerations">Considerations</a></li>
 </ul>
 </li>
 </ul>
@@ -1643,16 +1647,11 @@ how the first function can pass its result as an argument to the second function
 <p>Functional code can look like imperative code without sacrificing its functional nature.</p>
 </li>
 <li>
-<p>Do-notation is your friend in the presence of side effects.</p>
+<p>Do-notation is your friend in the presence of side effects.
+== List and path</p>
 </li>
 </ul>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_list_and_path">List and path</h2>
-<div class="sectionbody">
 <div class="paragraph">
 <p>Lists are the predominant data structure in Frege and it will come at no surprise
 that there are lots of clever ways of dealing with them.</p>
@@ -1661,6 +1660,7 @@ that there are lots of clever ways of dealing with them.</p>
 <p>We will start with a data model that is a dramatically simplified version of what you
 may find in real life. From there we will explore various ways of
 querying the data.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_the_domain_model">The domain model</h3>
@@ -2401,10 +2401,234 @@ Java 8 Optionals
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="fizzbuzz">FizzBuzz</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There is a children&#8217;s game that is sometimes used as a simple programming
+task and it goes like so:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>count the numbers 1, 2, 3, &#8230;&#8203;</p>
+</li>
+<li>
+<p>instead of every third number say "fizz"</p>
+</li>
+<li>
+<p>instead of every fifth number say "buzz"</p>
+</li>
+<li>
+<p>when fizz and buzz fall together, say "fizzbuzz".</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>While this is a rather trivial task, it can still reveal some insight about
+functional design and modularity.</p>
+</div>
+<div class="sect2">
+<h3 id="_the_pieces">The pieces</h3>
+<div class="paragraph">
+<p>There are many ways to solve the task and we will follow a path that may
+seem a bit unfamiliar when you come from imperative, object oriented
+programming: we will combine infinite productions.</p>
+</div>
+<div class="paragraph">
+<p>First, we need an infinite production of numbers. In Frege that is
+used so often that it has it&#8217;s own idiom:</p>
+</div>
+<div class="listingblock">
+<div class="title">All numbers</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">[1..]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Second, we need a pattern like "every third item" for the fizzes.
+We model this as an endless repetition of strings, which are
+all empty, except every third one is "fizz".</p>
+</div>
+<div class="listingblock">
+<div class="title">The infinite fizz pattern</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">fizzes = cycle [&quot;&quot;, &quot;&quot;, &quot;fizz&quot;]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By now, you will have guessed what the buzzes pattern looks like.</p>
+</div>
+<div class="listingblock">
+<div class="title">The infinite buzz pattern</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">buzzes = cycle [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;buzz&quot;]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These are all the pieces we need. Note how naturally they follow from the
+specification.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_combining_rules">Combining rules</h3>
+<div class="paragraph">
+<p>Now we have to combine the parts. First, we have to create a pattern
+that combines fizzes and buzzes such that we get a pattern like<br>
+<code>"", "", "fizz", "", "buzz", "fizz", "", ...</code></p>
+</div>
+<div class="paragraph">
+<p>It can be created by simply concatenating fizzes and buzzes item-wise,
+to create a new, endless production:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>fizzes:  "", "", "fizz", "", "",     "fizz", "", ...
+buzzes:  "", "", "",     "", "buzz", "",     "", ...
+(++)  :  "", "", "fizz", "", "buzz", "fizz", "", ...</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">The infinite fizz-buzz pattern</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">pattern = zipWith (++) fizzes buzzes</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>One can view this pattern as a new <em>rule</em> that is constructed as
+a combination of the previous primitive rules.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">For the Geeks</div>
+<div class="paragraph">
+<p>We make use of the fact that concatenating the empty string at the
+front or at the rear leaves a string unchanged.
+Strings actually form a <em>Monoid</em> under concatenation with ""
+as the neutral element. The operation is also
+associative, which would be required
+if we combined three or more rules.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>We now have an infinite fizzbuzz pattern.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_combine_with_numbers">Combine with numbers</h3>
+<div class="paragraph">
+<p>Now we can superimpose the pattern on the infinite list of numbers
+to get the final infinite production.</p>
+</div>
+<div class="listingblock">
+<div class="title">The final fizzbuzz solution</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">fizzes   = cycle [&quot;&quot;, &quot;&quot;, &quot;fizz&quot;]
+buzzes   = cycle [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;buzz&quot;]
+pattern  = zipWith (++) fizzes buzzes
+fizzbuzz = zipWith combine pattern [1..] where
+    combine word number = if null word
+                             then show number
+                             else word</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These infinite productions are very versatile to use.
+We have already seen twice how to combine them, but they
+can also easily filtered and selected from.</p>
+</div>
+<div class="listingblock">
+<div class="title">Showing parts of the infinite production</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">main _ = do
+    println $ take 5 $ drop 200 fizzbuzz
+
+--  [&quot;fizz&quot;, &quot;202&quot;, &quot;203&quot;, &quot;fizz&quot;, &quot;buzz&quot;]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_considerations">Considerations</h3>
+<div class="paragraph">
+<p>When searching the web, you will find solutions like the one below, which has
+actually been the #1 hit.</p>
+</div>
+<div class="listingblock">
+<div class="title">FizzBuzz in Java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">FizzBuzz</span>{
+        <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args){
+                <span class="keyword">for</span>(<span class="type">int</span> i= <span class="integer">1</span>; i &lt;= <span class="integer">100</span>; i++){
+                        <span class="keyword">if</span>(i % <span class="integer">15</span> == <span class="integer">0</span>){
+                                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">FizzBuzz</span><span class="delimiter">&quot;</span></span>);
+                        }<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="integer">3</span> == <span class="integer">0</span>){
+                                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">Fizz</span><span class="delimiter">&quot;</span></span>);
+                        }<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="integer">5</span> == <span class="integer">0</span>){
+                                <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">Buzz</span><span class="delimiter">&quot;</span></span>);
+                        }<span class="keyword">else</span>{
+                                <span class="predefined-type">System</span>.out.println(i);
+                        }
+                }
+        }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Even this trivial task reveals some interesting differences in the
+programming approach.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Conditionals</dt>
+<dd>
+<p>Programming errors are more likely to appear the more conditionals are in the code.
+In nested conditionals the probability of errors increases exponentially
+(at least for me).</p>
+</dd>
+<dt class="hdlist1">Operators</dt>
+<dd>
+<p>The more operators there are in my code, the more likely errors
+creep in. With combination of operators the probability of errors
+increases exponentially (at least for me).</p>
+</dd>
+<dt class="hdlist1">Maintainability</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>What pieces of the code do you have to change to show some other part of the
+fizzbuzz sequence?</p>
+</li>
+<li>
+<p>How much code do you have to touch when not printing to stdout but to stderr?</p>
+</li>
+<li>
+<p>How much code do you have to touch when a rule changes? What if there are new rules?</p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1">Specification</dt>
+<dd>
+<p>How well is the specification reflected in the implementation?</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>In his seminal paper "Why functional programming matters", John Hughes makes the point that
+one main benefit is <strong>improved modularity</strong> by separating production from usage of data and
+combining simple pieces of logic.
+The fizzbuzz task is an compelling evidence for that claim.<br>
+<a href="http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf" class="bare">http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf</a></p>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-30 22:33:45 MESZ
+Last updated 2015-04-03 18:55:00 MESZ
 </div>
 </div>
 </body>
