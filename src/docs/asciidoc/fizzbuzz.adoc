@@ -160,8 +160,8 @@ Frege: 1__
 Sequencing::
 What can go wrong if I get the sequence of operations wrong? +
 __Java: I *must* first handle the % 15 case, then the % 3 and %5 cases, then the number case.
-Any other sequence is *wrong*!. +
-Frege: *any* order of the lines is
+Any other sequence is *wrong*! +
+Frege: *any* ordering of the lines is
 *equally correct*! (Referential transparency).__
 
 Maintainability::
@@ -173,7 +173,7 @@ Frege: change one number__
 __Java: 4 lines +
 Frege: 1 line__
 * How much code do you have to touch when a rule changes? What if there are new rules? +
-__Java: everything must be reworked! +
+__Java: everything must be reworked (and correct sequencing will be tricky) +
 Frege: small, localized change__
 
 Specification::
