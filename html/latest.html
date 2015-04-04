@@ -721,14 +721,24 @@ intertwined the imperative solution is compared to the simple, modular one in Fr
 <p>Programming errors are more likely to appear the more conditionals are in the code.
 In nested conditionals the probability of errors increases exponentially
 (at least for me).<br>
-<em>Java: 4 conditionals, 3 nested. Frege: 1.</em></p>
+<em>Java: 4 conditionals, 3 of them nested (complexity 3)<br>
+Frege: 1 conditional (compexity 0)</em></p>
 </dd>
 <dt class="hdlist1">Operators</dt>
 <dd>
 <p>The more operators there are in my code, the more likely errors
 creep in. With combination of operators the probability of errors
 increases exponentially (at least for me).<br>
-<em>Java: 7, Frege 1.</em></p>
+<em>Java: 7 (it would be 10 when using i % 3 == 0 &amp;&amp; i % 5 == 0)<br>
+Frege: 1</em></p>
+</dd>
+<dt class="hdlist1">Sequencing</dt>
+<dd>
+<p>What can go wrong if I get the sequence of operations wrong?<br>
+<em>Java: I <strong>must</strong> first handle the % 15 case, then % 3, then %5.
+Any other sequence is <strong>wrong</strong>!.<br>
+Frege: <strong>any</strong> order of the lines is
+<strong>equally correct</strong>! (Referential transparency).</em></p>
 </dd>
 <dt class="hdlist1">Maintainability</dt>
 <dd>
@@ -737,15 +747,18 @@ increases exponentially (at least for me).<br>
 <li>
 <p>What pieces of the code do you have to change to show some other part of the
 fizzbuzz sequence? <br>
-<em>Java: have to rework the loop, Frege: one number.</em></p>
+<em>Java: have to rework the loop<br>
+Frege: change one number</em></p>
 </li>
 <li>
 <p>How much code do you have to touch when not printing to stdout but to stderr?<br>
-<em>Java: 4 lines, Frege: 1 line.</em></p>
+<em>Java: 4 lines<br>
+Frege: 1 line</em></p>
 </li>
 <li>
 <p>How much code do you have to touch when a rule changes? What if there are new rules?<br>
-<em>Java: everything must be reworked, Frege: small, localized change.</em></p>
+<em>Java: everything must be reworked!<br>
+Frege: small, localized change</em></p>
 </li>
 </ul>
 </div>
@@ -753,30 +766,39 @@ fizzbuzz sequence? <br>
 <dt class="hdlist1">Specification</dt>
 <dd>
 <p>How well is the specification reflected in the implementation?<br>
-<em>Java: very indirectly (where is modulo 15 in the spec?), Frege: exact one-to-one correspondence.</em></p>
+<em>Java: very indirectly (where is modulo 15 in the spec?)<br>
+Frege: exact one-to-one correspondence</em></p>
 </dd>
 </dl>
 </div>
 <div class="paragraph">
 <p>In his seminal paper "Why functional programming matters", John Hughes makes the point that
 one main benefit is <strong>improved modularity</strong> by separating production of data from its usage and
-combining simple pieces of logic.
+combining simple pieces of logic.<br>
 The fizzbuzz task is an compelling evidence for that claim.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_references">References</h3>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">Why FP matters</dt>
-<dd>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+Why FP matters
+</td>
+<td class="hdlist2">
 <p><a href="http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf" class="bare">http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf</a></p>
-</dd>
-<dt class="hdlist1">Simplicity</dt>
-<dd>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Simplicity
+</td>
+<td class="hdlist2">
 <p>Rich Hickey, RailsConf Keynote 2012 <a href="https://www.youtube.com/watch?v=rI8tNMsozo0" class="bare">https://www.youtube.com/watch?v=rI8tNMsozo0</a></p>
-</dd>
-</dl>
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
