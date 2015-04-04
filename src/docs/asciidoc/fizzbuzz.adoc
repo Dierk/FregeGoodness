@@ -159,7 +159,7 @@ Frege: 1__
 
 Sequencing::
 What can go wrong if I get the sequence of operations wrong? +
-__Java: I *must* first handle the % 15 case, then % 3, then %5.
+__Java: I *must* first handle the % 15 case, then the % 3 and %5 cases, then the number case.
 Any other sequence is *wrong*!. +
 Frege: *any* order of the lines is
 *equally correct*! (Referential transparency).__
