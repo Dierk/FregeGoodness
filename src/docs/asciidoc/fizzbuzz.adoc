@@ -194,3 +194,6 @@ http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf
 Simplicity::
 Rich Hickey, RailsConf Keynote 2012 https://www.youtube.com/watch?v=rI8tNMsozo0
 
+RxJava::
+An interesting solution by Tim Yates https://gist.github.com/timyates/0d6b47e429023630a750
+
