@@ -148,7 +148,7 @@ Programming errors are more likely to appear the more conditionals are in the co
 In nested conditionals the probability of errors increases exponentially
 (at least for me). +
 __Java: 4 conditionals, 3 of them nested (complexity 3) +
-Frege: 1 conditional (compexity 0)__
+Frege: 1 conditional (complexity 0)__
 
 Operators::
 The more operators there are in my code, the more likely errors
