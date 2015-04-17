@@ -119,7 +119,7 @@ main _ = do
 When searching the web, you will find solutions like the one below, which has
 actually been the #1 hit.
 
-.FizzBuzz in Java
+.Imperative FizzBuzz
 [source, java]
 ----
 public class FizzBuzz{
@@ -147,19 +147,19 @@ Conditionals::
 Programming errors are more likely to appear the more conditionals are in the code.
 In nested conditionals the probability of errors increases exponentially
 (at least for me). +
-__Java: 4 conditionals, 3 of them nested (complexity 3) +
+__Imperative: 4 conditionals, 3 of them nested (complexity 3) +
 Frege: 1 conditional (complexity 0)__
 
 Operators::
 The more operators there are in my code, the more likely errors
 creep in. With combination of operators the probability of errors
 increases exponentially (at least for me). +
-__Java: 7 (it would be 10 when using i % 3 == 0 && i % 5 == 0) +
+__Imperative: 7 (it would be 10 when using i % 3 == 0 && i % 5 == 0) +
 Frege: 1__
 
 Sequencing::
 What can go wrong if I get the sequence of operations wrong? +
-__Java: I *must* first handle the % 15 case, then the % 3 and %5 cases, then the number case.
+__Imperative: I *must* first handle the % 15 case, then the % 3 and %5 cases, then the number case.
 Any other sequence is *wrong*! +
 Frege: *any* ordering of the lines is
 *equally correct*! (Referential transparency).__
@@ -167,19 +167,19 @@ Frege: *any* ordering of the lines is
 Maintainability::
 * What pieces of the code do you have to change to show some other part of the
 fizzbuzz sequence?  +
-__Java: have to rework the loop +
+__Imperative: have to rework the loop +
 Frege: change one number__
 * How much code do you have to touch when not printing to `stdout` but to `stderr`? +
-__Java: 4 lines +
+__Imperative: 4 lines +
 Frege: 1 line__
 * How much code do you have to touch when a rule changes? What if there are new
 multiples that need to be included? +
-__Java: everything must be reworked (and correct sequencing will be tricky) +
+__Imperative: everything must be reworked (and correct sequencing will be tricky) +
 Frege: small, localized change__
 
 Specification::
 How well is the specification reflected in the implementation? +
-__Java: very indirectly (where is modulo 15 in the spec?) +
+__Imperative: very indirectly (where is modulo 15 in the spec?) +
 Frege: exact one-to-one correspondence__
 
 In his seminal paper "Why functional programming matters", John Hughes makes the point that
@@ -197,4 +197,11 @@ Rich Hickey, RailsConf Keynote 2012 https://www.youtube.com/watch?v=rI8tNMsozo0
 
 RxJava::
 An interesting solution by Tim Yates https://gist.github.com/timyates/0d6b47e429023630a750
+
+Java 8::
+The Scalarian has correctly pointed out that with Java 8 there is a much less imperative solution
+https://github.com/thescalarian/FregeGoodness/blob/patch-1/src/docs/asciidoc/fizzbuzz.adoc
+
+FizzBuzz Solutions::
+http://c2.com/cgi/wiki?FizzBuzzTest
 
