@@ -576,6 +576,15 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_references_7">References</a></li>
 </ul>
 </li>
+<li><a href="#dot_notation">The power of the dot</a>
+<ul class="sectlevel2">
+<li><a href="#_the_module_system">The module system</a></li>
+<li><a href="#_data_types">Data types</a></li>
+<li><a href="#_typeclasses">Typeclasses</a></li>
+<li><a href="#_summary_2">Summary</a></li>
+<li><a href="#_references_8">References</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -2704,10 +2713,242 @@ FizzBuzz Solutions
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="dot_notation">The power of the dot</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When being asked what feature of Object-Oriented languages he would like to
+see in Haskell, Simon Peyton Jones likes to mention "the power of the dot".
+In languages like Java and Groovy there is very convenient IDE support for
+finding the right method when they are called in the form of</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">receiver.myMethod(arg1);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>That is because the IDE knows the type of <code>receiver</code>, can look up the
+available methods, and can present them to the programmer for selection right
+after he entered the dot.</p>
+</div>
+<div class="paragraph">
+<p>The situation is less convenient in most functional programming language since
+one typically enters the function name first and the IDE has no useful context
+to suggest alternatives.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="haskell">myFunction receiver arg1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Luckily, Frege has a nice dot notation that combines the power of both approaches
+and can be used by IDEs for providing great support.</p>
+</div>
+<div class="paragraph">
+<p>The basis for Frege&#8217;s dot notation are the module system, type declarations, and
+typeclasses. Let&#8217;s see how that works.</p>
+</div>
+<div class="sect2">
+<h3 id="_the_module_system">The module system</h3>
+<div class="paragraph">
+<p>Frege uses the notion of <em>modules</em> to provide namespaces.
+A module can be seen as a Java class with only static methods and fields.</p>
+</div>
+<div class="paragraph">
+<p>A module can export data types (type constructors and value constructors),
+typeclasses, and functions.</p>
+</div>
+<div class="paragraph">
+<p>For using a module, one needs an import statement (with an optional qualification)
+and after that one can use the imported types and functions with a prefix.</p>
+</div>
+<div class="listingblock">
+<div class="title">A simple module import and module namespace usage</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">import fregefx.javafx.scene.control.TextArea
+-- later
+TextArea.getCaretPosition inputArea</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here, we see a first usage of the dot: the <code>getCaretPosition</code> function
+comes from the <code>TextArea</code> module and Frege uses the dot to locate and
+disambiguate the function.</p>
+</div>
+<div class="paragraph">
+<p>The function takes one argument (the <code>inputArea</code>), which is of type <code>TextArea</code>.
+Now, it is often the case that Frege already knows that type because it is declared or can be inferred.
+In that case, the dot notation allows us to write <code>inputArea.getCaretPosition</code>.
+Below is an example from the source code of the
+<a href="https://github.com/Dierk/frepl-gui/blob/master/client/src/main/frege/org/frege/Application.fr#L112">Frege JavaFX REPL</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Very close to OO notation</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">insert :: TextArea -&gt; String -&gt; IO ()
+insert inputArea text = do
+    pos &lt;- inputArea.getCaretPosition
+    inputArea.insertText pos text</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This not only reads nicely and familiar, it also opens the door for great IDE support.</p>
+</div>
+<div class="paragraph">
+<p>And there is more.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_data_types">Data types</h3>
+<div class="paragraph">
+<p>In a former post, we had used the data type <code>Position</code> with the record syntax like so:</p>
+</div>
+<div class="listingblock">
+<div class="title">Note the use of <em>position.ticker</em></div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">data Ticker = GOOG | MSFT | APPL | CANO | NOOB
+derive Eq Ticker
+
+data Position = Position  { soMany :: Int, ticker :: Ticker }
+
+-- later:
+
+value position = calculate $ lookup position.ticker prices where
+    -- more here...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the record syntax, <code>ticker</code> looks like a field (and is sometimes called so)
+but it is actually a function: the accessor function to the ticker value, analogous
+to a Java getter method.</p>
+</div>
+<div class="paragraph">
+<p>We can refer to this function in two equivalent ways:</p>
+</div>
+<div class="listingblock">
+<div class="title">Two equivalent notations</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">Position.ticker position            -- &quot;getter&quot;
+position.ticker</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And there are more options for setting or updating "fields":</p>
+</div>
+<div class="listingblock">
+<div class="title">Setting and updating equivalents with dot notation</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">Position.{soMany = } position 1     -- &quot;setter&quot;
+position.{soMany = } 1
+
+Position.{soMany &lt;-} position (+1)  -- update
+position.{soMany &lt;-} (+1)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Again, the notation is very object-like and IDE friendly.</p>
+</div>
+<div class="paragraph">
+<p>It goes without saying that <em>setter</em> and <em>update</em> are not
+changing the value in place but return a new immutable value - as always.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_typeclasses">Typeclasses</h3>
+<div class="paragraph">
+<p>The story proceeds when typeclasses come into play.
+Below we introduce a class of types that can somehow
+duplicate its value and we make String an instance of that class.</p>
+</div>
+<div class="listingblock">
+<div class="title">Dot notation for instances of a typeclass</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">class Doubleable a where
+    twice :: a -&gt; a
+
+instance Doubleable String where
+    twice s = s ++ s
+
+main args = do
+    println $ Doubleable.twice &quot;a&quot;
+    println   &quot;a&quot;.twice</code></pre>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Extending closed types</div>
+<div class="paragraph">
+<p>For the object-oriented programmer it is interesting to see how
+even the type <em>String</em> can be extended with a new function <em>twice</em>
+- in a 100% typesafe manner.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_summary_2">Summary</h3>
+<div class="paragraph">
+<p>Frege provides many options for IDEs to support the programmer
+with code completion through its many usages of the dot notation.
+These options still wait to be exploited in most IDEs.</p>
+</div>
+<div class="paragraph">
+<p>Dot notation is also a feature that should make it easier for OO programmers to
+feel at home in the purely functional world since it reads very familiar.</p>
+</div>
+<div class="paragraph">
+<p>If "the power of the dot" is the most compelling feature that Haskell would
+like to borrow from OO languages, then Frege has found a nice solution to
+give you both without compromising any other language feature.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_references_8">References</h3>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+Vote IDE support
+</td>
+<td class="hdlist2">
+<p><a href="https://youtrack.jetbrains.com/issue/IDEABKL-7108" class="bare">https://youtrack.jetbrains.com/issue/IDEABKL-7108</a></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Simon Peyton Jones
+</td>
+<td class="hdlist2">
+<p><a href="https://www.youtube.com/watch?v=dI6kWwZTOKM" class="bare">https://www.youtube.com/watch?v=dI6kWwZTOKM</a> , ff to Conclusions at the end</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Marimuthu on record syntax
+</td>
+<td class="hdlist2">
+<p><a href="http://mmhelloworld.github.io/blog/2014/03/15/frege-record-accessors-and-mutators/" class="bare">http://mmhelloworld.github.io/blog/2014/03/15/frege-record-accessors-and-mutators/</a></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Frege Language Reference
+</td>
+<td class="hdlist2">
+<p><a href="http://www.frege-lang.org/doc/Language.pdf" class="bare">http://www.frege-lang.org/doc/Language.pdf</a> , section 3.2 "Primary Expression"</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-04-03 18:55:00 MESZ
+Last updated 2015-05-06 22:20:46 MESZ
 </div>
 </div>
 </body>
