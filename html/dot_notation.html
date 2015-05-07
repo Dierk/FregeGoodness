@@ -538,8 +538,8 @@ available methods, and can present them to the programmer for selection right
 after he entered the dot.</p>
 </div>
 <div class="paragraph">
-<p>The situation is less convenient in most functional programming language since
-one typically enters the function name first and the IDE has no useful context
+<p>The situation is less convenient in most functional programming languages since
+one typically enters the function name first and the IDE has little useful context
 to suggest alternatives.</p>
 </div>
 <div class="listingblock">
@@ -550,6 +550,11 @@ to suggest alternatives.</p>
 <div class="paragraph">
 <p>Luckily, Frege has a nice dot notation that combines the power of both approaches
 and can be used by IDEs for providing great support.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">receiver.myFunction arg1</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p>The basis for Frege&#8217;s dot notation are the module system, type declarations, and
@@ -614,7 +619,6 @@ insert inputArea text = do
 <div class="title">Note the use of 'position.ticker'</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="frege">data Ticker = GOOG | MSFT | APPL | CANO | NOOB
-derive Eq Ticker
 
 data Position = Position  { soMany :: Int, ticker :: Ticker }
 
@@ -635,7 +639,7 @@ to a Java getter method.</p>
 <div class="listingblock">
 <div class="title">Two equivalent notations</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">Position.ticker position            -- &quot;getter&quot;
+<pre class="CodeRay highlight"><code data-lang="frege">Position.ticker position  -- &quot;getter&quot;
 position.ticker</code></pre>
 </div>
 </div>
@@ -645,10 +649,10 @@ position.ticker</code></pre>
 <div class="listingblock">
 <div class="title">Setting and updating equivalents with dot notation</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="frege">Position.{soMany = } position 1     -- &quot;setter&quot;
+<pre class="CodeRay highlight"><code data-lang="frege">Position.{soMany = } position 1  -- &quot;setter&quot;
 position.{soMany = } 1
 
-Position.{soMany &lt;-} position (+1)  -- update
+Position.{soMany &lt;-} position (+1) -- update
 position.{soMany &lt;-} (+1)</code></pre>
 </div>
 </div>
@@ -657,7 +661,7 @@ position.{soMany &lt;-} (+1)</code></pre>
 </div>
 <div class="paragraph">
 <p>It goes without saying that <em>setter</em> and <em>update</em> are not
-changing the value in place but return a new immutable value - as always.</p>
+changing the value in place but - as always - return a new immutable value.</p>
 </div>
 </div>
 <div class="sect2">
@@ -686,7 +690,7 @@ main args = do
 <div class="title">Extending closed types</div>
 <div class="paragraph">
 <p>For the object-oriented programmer it is interesting to see how
-even the type <em>String</em> can be extended with a new function <em>twice</em>
+even the type <em>String</em> (which is a final Java String) can be extended with a new function like <em>twice</em>
 - in a 100% typesafe manner.</p>
 </div>
 </div>
@@ -697,7 +701,8 @@ even the type <em>String</em> can be extended with a new function <em>twice</em>
 <div class="paragraph">
 <p>Frege provides many options for IDEs to support the programmer
 with code completion through its many usages of the dot notation.
-These options still wait to be exploited in most IDEs.</p>
+These options still wait to be exploited in most IDEs.
+<strong><a href="https://youtrack.jetbrains.com/issue/IDEABKL-7108">Please cast your vote</a>!</strong></p>
 </div>
 <div class="paragraph">
 <p>Dot notation is also a feature that should make it easier for OO programmers to
@@ -706,7 +711,8 @@ feel at home in the purely functional world since it reads very familiar.</p>
 <div class="paragraph">
 <p>If "the power of the dot" is the most compelling feature that Haskell would
 like to borrow from OO languages, then Frege has found a nice solution to
-give you both without compromising any other language feature.</p>
+give you both, the benefits of purely functional programming and the convenience
+of object notation at the same time.</p>
 </div>
 </div>
 <div class="sect2">
@@ -753,7 +759,7 @@ Frege Language Reference
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-05-06 23:54:18 MESZ
+Last updated 2015-05-07 14:34:47 MESZ
 </div>
 </div>
 </body>

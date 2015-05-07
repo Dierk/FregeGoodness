@@ -16,8 +16,8 @@ That is because the IDE knows the type of `receiver`, can look up the
 available methods, and can present them to the programmer for selection right
 after he entered the dot.
 
-The situation is less convenient in most functional programming language since
-one typically enters the function name first and the IDE has no useful context
+The situation is less convenient in most functional programming languages since
+one typically enters the function name first and the IDE has little useful context
 to suggest alternatives.
 
 [source,haskell]
@@ -27,6 +27,11 @@ myFunction receiver arg1
 
 Luckily, Frege has a nice dot notation that combines the power of both approaches
 and can be used by IDEs for providing great support.
+
+[source,frege]
+----
+receiver.myFunction arg1
+----
 
 The basis for Frege's dot notation are the module system, type declarations, and
 typeclasses. Let's see how that works.
@@ -81,7 +86,6 @@ In a former post, we had used the data type `Position` with the record syntax li
 [source,frege]
 ----
 data Ticker = GOOG | MSFT | APPL | CANO | NOOB
-derive Eq Ticker
 
 data Position = Position  { soMany :: Int, ticker :: Ticker }
 
@@ -100,7 +104,7 @@ We can refer to this function in two equivalent ways:
 .Two equivalent notations
 [source,frege]
 ----
-Position.ticker position            -- "getter"
+Position.ticker position  -- "getter"
 position.ticker
 ----
 
@@ -109,17 +113,17 @@ And there are more options for setting or updating "fields":
 .Setting and updating equivalents with dot notation
 [source,frege]
 ----
-Position.{soMany = } position 1     -- "setter"
+Position.{soMany = } position 1  -- "setter"
 position.{soMany = } 1
 
-Position.{soMany <-} position (+1)  -- update
+Position.{soMany <-} position (+1) -- update
 position.{soMany <-} (+1)
 ----
 
 Again, the notation is very object-like and IDE friendly.
 
 It goes without saying that _setter_ and _update_ are not
-changing the value in place but return a new immutable value - as always.
+changing the value in place but - as always - return a new immutable value.
 
 === Typeclasses
 
@@ -144,7 +148,7 @@ main args = do
 .Extending closed types
 ****
 For the object-oriented programmer it is interesting to see how
-even the type _String_ can be extended with a new function _twice_
+even the type _String_ (which is a final Java String) can be extended with a new function like _twice_
 - in a 100% typesafe manner.
 ****
 
@@ -153,13 +157,15 @@ even the type _String_ can be extended with a new function _twice_
 Frege provides many options for IDEs to support the programmer
 with code completion through its many usages of the dot notation.
 These options still wait to be exploited in most IDEs.
+*https://youtrack.jetbrains.com/issue/IDEABKL-7108[Please cast your vote]!*
 
 Dot notation is also a feature that should make it easier for OO programmers to
 feel at home in the purely functional world since it reads very familiar.
 
 If "the power of the dot" is the most compelling feature that Haskell would
 like to borrow from OO languages, then Frege has found a nice solution to
-give you both without compromising any other language feature.
+give you both, the benefits of purely functional programming and the convenience
+of object notation at the same time.
 
 === References
 [horizontal]
