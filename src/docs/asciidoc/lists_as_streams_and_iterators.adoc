@@ -190,7 +190,7 @@ unevens = iterate (+2) 1
 ----
 
 Now, to get the _n_'th square number, we need to add up the first
-_n_ uneven number by folding them with the plus function.
+_n_ uneven numbers by folding them with the plus function.
 
 .Adding up the first n uneven numbers
 [source,frege]
@@ -246,7 +246,7 @@ stairs = iterate step start
 ----
 
 The doodle itself needs a graphics context for drawing
-(and thus the FregeFX REPL) and the doodling itself is just the sequence connecting the calculated steps:
+(and thus the FregeFX REPL) and the doodling itself is just the sequence of connecting the calculated steps:
 
 [source,frege]
 ----

@@ -162,5 +162,5 @@ Frege Language Reference::
 http://www.frege-lang.org/doc/Language.pdf
 
 Declaration of the $ function::
-https://github.com/Frege/frege/blob/master/frege/prelude/PreludeBase.fr#L109-109
+https://github.com/Frege/frege/blob/master/frege/prelude/PreludeBase.fr#L109-109 +
 where line numbers might change

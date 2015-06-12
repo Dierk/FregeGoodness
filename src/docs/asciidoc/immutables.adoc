@@ -34,7 +34,7 @@ thinks in a certain programming language.
     javaDierk   = Person "Dierk" "König" "Java"
 ----
 
-When we create a the `javaDierk` value of that `Person` type it is automatically immutable!
+When we create the `javaDierk` value of that `Person` type it is automatically immutable!
 
 There are actually two separate features of the language that we see here:
 
@@ -97,7 +97,7 @@ The small price we pay is a little bit of temporary memory and some extra time f
 
 .Immutable by default
 [IMPORTANT]
-The best of all: we did not write a single character to make that all work! +
+The best of all: we did not write a single character to make all that work! +
 We did not invest a single brain cycle. It is all automatic.
 
 === More Considerations
