@@ -225,7 +225,7 @@ connecting points and edges such that you get the illusion of a never-ending
 staircase.
 
 .Stairs doodle
-image:Stairs_doodle.png[ "stairs doodle",width=128, link="Stairs_doodle.png"]
+image:Stairs_doodle.png[ "stairs doodle",width=256, link="Stairs_doodle.png"]
 
 Given a starting point and the logic how to calculate the next step, the code is literally (!)
 
