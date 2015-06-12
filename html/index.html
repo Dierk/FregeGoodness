@@ -3109,10 +3109,10 @@ This is <strong>never</strong> the case in Frege. Lists are immutable.</p>
 </div>
 <div class="paragraph">
 <p>Java 8 streams work destructively: calling <code>skip(1)</code> on a stream
-will modify the stream and the respective element is gone from the stream.
+will modify the stream and the respective element is lost from the stream.
 Not so in Frege where the following functions can be called on a
-list just like their equivalent on Java streams but return an efficient
-copy of the list. The original never changes.</p>
+list just like their equivalents on Java streams but return an efficient
+"copy" or "view" of the list. The original never changes.</p>
 </div>
 <div class="listingblock">
 <div class="title">Lists as non-destructive streams</div>
@@ -3123,6 +3123,20 @@ map    (+1)  [0..10]
 filter (&lt;10) [0..10]
 fold   (+) 0 [0..10]</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Efficiency comes from the fact that the original list is immutable and thus
+views on a sublist rarely have to copy anything. For example <code>drop 2</code> only
+needs to set the starting point of the view two elements down the tail.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>But lists are not only lazy collections and streams at the same time,
