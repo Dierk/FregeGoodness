@@ -663,11 +663,16 @@ The collection functions have a catch, though.</p>
 <div class="paragraph">
 <p>Calling <code>head</code> or <code>last</code> on an empty list or indexing outside the
 list bounds cannot return a value.
-It is undefined.</p>
+It is undefined and you never want have those at runtime.</p>
 </div>
 <div class="paragraph">
 <p>Calling <code>length</code> on an infinite list cannot work either.
-On very large lists, it may be very slow or cause an stack overflow.</p>
+On very large lists, it may be very slow or cause an stack overflow.
+It is linear in the list length.</p>
+</div>
+<div class="paragraph">
+<p>Even the !! operator needs consideration when the index may get large.
+It is linear in the index value.</p>
 </div>
 </div>
 </div>

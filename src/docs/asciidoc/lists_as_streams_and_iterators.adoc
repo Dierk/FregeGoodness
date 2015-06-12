@@ -96,10 +96,14 @@ The collection functions have a catch, though.
 ****
 Calling `head` or `last` on an empty list or indexing outside the
 list bounds cannot return a value.
-It is undefined.
+It is undefined and you never want have those at runtime.
 
 Calling `length` on an infinite list cannot work either.
 On very large lists, it may be very slow or cause an stack overflow.
+It is linear in the list length.
+
+Even the !! operator needs consideration when the index may get large.
+It is linear in the index value.
 ****
 
 Collection-like functions are often better replaced with approaches like pattern matching
