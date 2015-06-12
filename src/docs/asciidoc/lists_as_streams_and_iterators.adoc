@@ -111,7 +111,7 @@ The typical Java way to work with lists is to change them in-place.
 This is *never* the case in Frege. Lists are immutable.
 
 Java 8 streams work destructively: calling `skip(1)` on a stream
-will modify the stream and the respective element is lost from the stream.
+will modify the stream and the respective element is lost.
 Not so in Frege where the following functions can be called on a
 list just like their equivalents on Java streams but return an efficient
 "copy" or "view" of the list. The original never changes.
@@ -130,6 +130,8 @@ fold   (+) 0 [0..10]
 Efficiency comes from the fact that the original list is immutable and thus
 views on a sublist rarely have to copy anything. For example `drop 2` only
 needs to set the starting point of the view two elements down the tail.
+In addition comes laziness such that `map (+1)` will never be calculated
+if the mapped value is never asked for.
 
 But lists are not only lazy collections and streams at the same time,
 they can also be seen as iterators and sequences.

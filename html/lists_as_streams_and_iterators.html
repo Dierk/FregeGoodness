@@ -667,7 +667,7 @@ This is <strong>never</strong> the case in Frege. Lists are immutable.</p>
 </div>
 <div class="paragraph">
 <p>Java 8 streams work destructively: calling <code>skip(1)</code> on a stream
-will modify the stream and the respective element is lost from the stream.
+will modify the stream and the respective element is lost.
 Not so in Frege where the following functions can be called on a
 list just like their equivalents on Java streams but return an efficient
 "copy" or "view" of the list. The original never changes.</p>
@@ -692,6 +692,8 @@ fold   (+) 0 [0..10]</code></pre>
 Efficiency comes from the fact that the original list is immutable and thus
 views on a sublist rarely have to copy anything. For example <code>drop 2</code> only
 needs to set the starting point of the view two elements down the tail.
+In addition comes laziness such that <code>map (+1)</code> will never be calculated
+if the mapped value is never asked for.
 </td>
 </tr>
 </table>
@@ -894,7 +896,7 @@ Code of stairs doodle
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-06-12 17:29:08 MESZ
+Last updated 2015-06-12 17:37:16 MESZ
 </div>
 </div>
 </body>
