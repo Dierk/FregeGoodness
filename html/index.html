@@ -585,6 +585,17 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_references_8">References</a></li>
 </ul>
 </li>
+<li><a href="#lists_as_streams_and_iterators">Lists are Streams and Iterators</a>
+<ul class="sectlevel2">
+<li><a href="#_memory_consumption">Memory consumption</a></li>
+<li><a href="#_access_and_modify">Access and modify</a></li>
+<li><a href="#_lists_are_immutable">Lists are immutable</a></li>
+<li><a href="#_lists_as_iterators">Lists as iterators</a></li>
+<li><a href="#_putting_it_all_together">Putting it all together</a></li>
+<li><a href="#_a_closing_example">A closing example</a></li>
+<li><a href="#_references_9">References</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -2951,10 +2962,367 @@ Frege Language Reference
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="lists_as_streams_and_iterators">Lists are Streams and Iterators</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Lists are the most common data structure in Frege (just like in Haskell).</p>
+</div>
+<div class="paragraph">
+<p>Coming from a Java background, one may expect a number of properties about
+lists:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>how much space they take up in memory</p>
+</li>
+<li>
+<p>how they can be accessed</p>
+</li>
+<li>
+<p>how they can be modified</p>
+</li>
+<li>
+<p>what features are available</p>
+</li>
+<li>
+<p>how they can be iterated over</p>
+</li>
+<li>
+<p>how they relate to streams, iterators, sequences, and collections.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Many of these properties are profoundly different in Frege.
+They are much more versatile and powerful. They can be infinitely large,
+they can be used as streams, and they replace iterators and
+sequences.</p>
+</div>
+<div class="sect2">
+<h3 id="_memory_consumption">Memory consumption</h3>
+<div class="paragraph">
+<p>Frege lists often use hardly any memory at all.
+The most obvious example is the infinite list of all positive whole
+numbers:</p>
+</div>
+<div class="listingblock">
+<div class="title">An infinite list</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">integers = [1..]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Though infinite, the <code>integers</code> list does <strong>not</strong> exhaust the memory.
+Neither do other large lists of that kind:</p>
+</div>
+<div class="listingblock">
+<div class="title">A large list</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">large = [1..100_000_000]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Well, you might think that this special feature only works for
+range-like lists but thanks to laziness, it is a feature that works
+for all lists where the individual values are somehow derived:</p>
+</div>
+<div class="listingblock">
+<div class="title">Other infinite lists</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">-- derive next value from predecessor
+cardinals = iterate (+1) 1
+
+-- derive by repeating
+toggles   = cycle [true, false]
+
+-- derive by mapping
+data BigData    = BigData { number :: Integer }
+infiniteBigData = map BigData [1..]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It takes some practice for the Java programmer to let go his
+innate worries about large lists and collective data structures in
+general.</p>
+</div>
+<div class="paragraph">
+<p><em>First</em>: as long as the list is not evaluated, it takes up
+only as much memory as the piece of logic ("thunk") that defines it.
+This is almost no space at all.</p>
+</div>
+<div class="paragraph">
+<p><em>Second</em>: elements are only created when needed, e.g. asking for the
+1000th element of <code>infiniteBigData</code> will only create <em>one</em>
+BigData value (not 1000 of them).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_access_and_modify">Access and modify</h3>
+<div class="paragraph">
+<p>It should come at no surprise that you can use the functions below
+to get access to elements in the list. Access to a value at a given
+index uses the <code>!!</code> operator.</p>
+</div>
+<div class="listingblock">
+<div class="title">List functions that mostly do what you think they do</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">head   [0..10]
+last   [0..10]
+length [0..10]
+[0..10] !! 5
+
+-- pattern match with cases
+doWithHead []            = ... -- when empty
+doWithHead (head : tail) = ... -- use head</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can see that Frege lists can be used like collections.
+The collection functions have a catch, though.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Know your lists</div>
+<div class="paragraph">
+<p>Calling <code>head</code> or <code>last</code> on an empty list or indexing outside the
+list bounds cannot return a value.
+It is undefined.</p>
+</div>
+<div class="paragraph">
+<p>Calling <code>length</code> on an infinite list cannot work either.
+On very large lists, it may be very slow or cause an stack overflow.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Collection-like functions are often better replaced with approaches like pattern matching
+with case discrimination. Those are always safe.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_lists_are_immutable">Lists are immutable</h3>
+<div class="paragraph">
+<p>The typical Java way to work with lists is to change them in-place.
+This is <strong>never</strong> the case in Frege. Lists are immutable.</p>
+</div>
+<div class="paragraph">
+<p>Java 8 streams work destructively: calling <code>skip(1)</code> on a stream
+will modify the stream and the respective element is gone from the stream.
+Not so in Frege where the following functions can be called on a
+list just like their equivalent on Java streams but return an efficient
+copy of the list. The original never changes.</p>
+</div>
+<div class="listingblock">
+<div class="title">Lists as non-destructive streams</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">drop 2 [0..10]
+take 5 [0..10]
+map    (+1)  [0..10]
+filter (&lt;10) [0..10]
+fold   (+) 0 [0..10]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But lists are not only lazy collections and streams at the same time,
+they can also be seen as iterators and sequences.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_lists_as_iterators">Lists as iterators</h3>
+<div class="paragraph">
+<p>Iterators pass each element, one at a time, to a function that uses that element.</p>
+</div>
+<div class="listingblock">
+<div class="title">Print the numbers 1 to 10</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">for [1..10] println</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The <code>for</code> alias for <code>forM_</code> is available since version 3.22.524.
+It has the additional benefit that it works not only on lists but
+on any <em>ListSource</em> (those have a <code>toList</code> function).
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>But there is more.</p>
+</div>
+<div class="paragraph">
+<p>When a list contains actions (values of type <code>IO()</code>), then they become
+essentially sequences of these actions with the help of the
+<code>sequence</code> function.</p>
+</div>
+<div class="listingblock">
+<div class="title">Executing all actions in sequence</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">actions = map println [1..3]
+sequence actions</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_putting_it_all_together">Putting it all together</h3>
+<div class="paragraph">
+<p>Let&#8217;s print square numbers by using the techniques from above.
+To make things a bit more interesting, we will calculate them
+in a very basic way
+by pure counting (without multiplication).</p>
+</div>
+<div class="paragraph">
+<p>The trick is that any square number is a sum of uneven numbers
+so we need those first. While there is a built-in facility in
+Frege for that purpose (<code>[1,3..]</code>), let&#8217;s for the fun of it
+create our own stream of uneven numbers.</p>
+</div>
+<div class="paragraph">
+<p>Starting at number 1, we get the next uneven number by adding
+2 to the previous one.</p>
+</div>
+<div class="listingblock">
+<div class="title">The stream of uneven numbers</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">unevens = iterate (+2) 1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, to get the <em>n</em>'th square number, we need to add up the first
+<em>n</em> uneven number by folding them with the plus function.</p>
+</div>
+<div class="listingblock">
+<div class="title">Adding up the first n uneven numbers</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">square n = fold (+) 0 $ take n unevens</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Using the <code>sum</code> function would have been shorter but less interesting.
+</td>
+</tr>
+</table>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>This would be a good time to think about what actually happens when you execute <code>square 3</code>.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Using the <em>square</em> function (that works on the stream of <em>unevens</em>) we can now create a
+stream of all squares by mapping the stream of all whole numbers to their squares.</p>
+</div>
+<div class="listingblock">
+<div class="title">An infinite stream of squares</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">squares = map square [1..]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For printing the <em>squares</em>, we could just evaluate them in the shell, which does the
+printing for us. Otherwise, we can use the <em>squares</em> themselves as the iterator
+that we need for printing. Printing an infinite stream is not a good idea, though,
+and therefore we limit the iteration to any slice that we are interested in.</p>
+</div>
+<div class="listingblock">
+<div class="title">Iterate over an interesting slice</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">for (take 10 $ drop 100 squares) println</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_a_closing_example">A closing example</h3>
+<div class="paragraph">
+<p>Thinking of Frege lists not only in terms of a collection but also as
+streams, iterators, and sequences first takes a bit to get used to.
+It is needed, though, to harness their full power.</p>
+</div>
+<div class="paragraph">
+<p>The other day, I was trying to let Frege paint some paper doodle. It is about
+connecting points and edges such that you get the illusion of a never-ending
+staircase.</p>
+</div>
+<div class="paragraph">
+<div class="title">Stairs doodle</div>
+<p><span class="image"><a class="image" href="Stairs_doodle.png"><img src="Stairs_doodle.png" alt="stairs doodle" width="128"></a></span></p>
+</div>
+<div class="paragraph">
+<p>Given a starting point and the logic how to calculate the next step, the code is literally (!)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">stairs = iterate step start</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The doodle itself needs a graphics context for drawing
+(and thus the FregeFX REPL) and the doodling itself is just the sequence connecting the calculated steps:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">doodle ctx = map (connect ctx) stairs</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that up to this point, we are still <em>purely</em> functional!
+We have merely created an infinite list/stream/iteration of actions.</p>
+</div>
+<div class="paragraph">
+<p>The effective painting is then done by limiting the sequence to a useful slice and passing it for
+execution to the <em>paint</em> function: <code>paint (sequence_ . take 500 . doodle)</code>.</p>
+</div>
+<div class="paragraph">
+<p>It was this very example that made me appreciate the versatility of lists. It allows separating the
+specification of <em>what to do</em> from executing that specification. My first reaction was: "But that
+may lead to large, memory-consuming lists!" and it took me a bit to understand why this is not the case.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_references_9">References</h3>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+The FregeFX REPL
+</td>
+<td class="hdlist2">
+<p><a href="https://github.com/Dierk/frepl-gui" class="bare">https://github.com/Dierk/frepl-gui</a><br>
+The latest Version contains the stairs doodle as an example of how to load code from the web.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Code of stairs doodle
+</td>
+<td class="hdlist2">
+<p><a href="https://github.com/Dierk/frepl-gui/blob/master/Stairs.fr" class="bare">https://github.com/Dierk/frepl-gui/blob/master/Stairs.fr</a></p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-05-06 22:20:46 MESZ
+Last updated 2015-06-12 15:30:15 MESZ
 </div>
 </div>
 </body>
