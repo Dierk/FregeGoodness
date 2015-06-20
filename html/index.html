@@ -596,6 +596,13 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_references_9">References</a></li>
 </ul>
 </li>
+<li><a href="#what">Fun with numbers</a>
+<ul class="sectlevel2">
+<li><a href="#_double_is_nice">Double is nice</a></li>
+<li><a href="#_have_we_broken_math">Have we broken math?</a></li>
+<li><a href="#_references_10">References</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -3340,10 +3347,213 @@ Code of stairs doodle
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="what">Fun with numbers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Many programming languages - especially the "practical" ones - have their weird
+corner cases and inconsistencies when dealing with numbers as nicely pointed out by
+this <a href="http://xkcd.com/1537/">xkcd comic</a>.</p>
+</div>
+<div class="paragraph">
+<p>This comes to a large extend from using numerical operators with non-numerical values
+(think <code>+</code> for String concatenation) and automatic coercion between number types and
+between numbers and Strings. These issues do not occur in Frege (nor in Haskell) where
+operators never work on a mixture of types.</p>
+</div>
+<div class="listingblock">
+<div class="title">No surprises with types</div>
+<div class="content">
+<pre> 1  +  1  -- Int plus
+ 1  + "1" -- Type error: "String is not an instance of Num"
+"1" + []  -- Type error</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>However, there is some clever inference going on at compile time to make a
+programmer&#8217;s life easier. The type system would in principle not allow to
+write</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>1 + 1.0</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>because <code>1</code> is an <code>Int</code> and <code>1.0</code> is a <code>Double</code> and <code>+</code> requires both operands
+to be of the same type.</p>
+</div>
+<div class="paragraph">
+<p>The compiler is smart enough to not insist on you writing <code>1.0 + 1.0</code> for this
+simple case of number literals. It sees what you meant by resolving the
+type constraints in the expression that <code>1</code> is used in.
+Let&#8217;s see another example that is a just a bit more advanced:</p>
+</div>
+<div class="listingblock">
+<div class="title">What type is this?</div>
+<div class="content">
+<pre>1 / 2</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Again, <code>1</code> and <code>2</code> would be <code>Int</code> literals but the division operator is not
+defined for the <code>Int</code> type (or any other <em>Integral</em> type) in Frege.
+It requires a number type of the <code>Real</code>
+typeclass for both operands and Frege chooses the concrete type <code>Double</code>
+for you in this case (unlike Haskell, this default is fix).
+It follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>1 / 2 == 0.5  -- type is Double</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+This is very much unlike Java where <code>1/2</code> evaluates to <code>0</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This has some interesting consequences since the Java <code>Double</code> type
+handles many special cases in a nice manner.</p>
+</div>
+<div class="sect2">
+<h3 id="_double_is_nice">Double is nice</h3>
+<div class="paragraph">
+<p>The most common special case is division by zero. How is this handled in Frege?</p>
+</div>
+<div class="listingblock">
+<div class="title">Division by zero</div>
+<div class="content">
+<pre>1 / 0  -- Infinity</pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+The String representation of a number is not always made up from
+digits only. Developers are usually aware that there are dots, minus, and the <code>E</code> character
+to consider but they often forget about <code>Infinity</code> and <code>NaN</code> (not a number).
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Double</code> even goes around some problematic cases
+where fractions would not properly add up due to lack of precision:</p>
+</div>
+<div class="listingblock">
+<div class="title">Fractions add up</div>
+<div class="content">
+<pre>1 / (1 - 1/3 + 2/3) -- Infinity</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And how do we calculate with Infinity? Well, when you add to infinity,
+the result is equally infinite. You can even add infinities to infinities.
+Division is not defined, though.</p>
+</div>
+<div class="listingblock">
+<div class="title">Calculating with Infinity</div>
+<div class="content">
+<pre>(1/0) + 1     -- Infinity
+(1/0) * 3     -- Infinity
+(1/0) + (1/0) -- Infinity
+(1/0) * (1/0) -- Infinity
+(1/0) / (1/0) -- NaN</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And what do we gain from having <code>Infinity</code> as opposed to <code>NaN</code>?
+Well, with <code>Infinity</code> you have a chance of coming back to numbers that you
+can do normal calculations with:</p>
+</div>
+<div class="listingblock">
+<div class="title">Divide by Infinity</div>
+<div class="content">
+<pre>1 / (1/0)   -- 0.0</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Wow, this is now definitely interesting and makes us ask for other
+corner cases of mathematics:</p>
+</div>
+<div class="listingblock">
+<div class="title">Corner cases</div>
+<div class="content">
+<pre>0 / 0       -- NaN
+(1/0) / 0   -- Infinity
+0 ^ 0       -- 1</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This looks like we have violated some rules of mathematics.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_have_we_broken_math">Have we broken math?</h3>
+<div class="paragraph">
+<p>In mathematics, division by zero is undefined. Likewise is
+division by infinity or zero to the power of zero.</p>
+</div>
+<div class="paragraph">
+<p>However, computers calculate with approximations, they do <em>applied</em> numeric math at best.
+We use <code>Math.PI</code> and <code>Math.E</code> with limited precision. Heck, even square roots are only
+approximations:</p>
+</div>
+<div class="listingblock">
+<div class="title">The square of the root</div>
+<div class="content">
+<pre>import frege.prelude.Math
+Math.sqrt 2 * Math.sqrt 2  -- 2.0000000000000004</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And given that we have to deal with limited precision anyway, we can just as well
+take liberty to make operations like division by zero not blowing up our programs
+but behaving reasonably well within computational bounds.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_references_10">References</h3>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+XKCD
+</td>
+<td class="hdlist2">
+<p><a href="http://xkcd.com/1537/" class="bare">http://xkcd.com/1537/</a></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Numberphile on zero
+</td>
+<td class="hdlist2">
+<p><a href="https://www.youtube.com/watch?v=BRRolKTlF6Q" class="bare">https://www.youtube.com/watch?v=BRRolKTlF6Q</a></p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-06-12 15:30:15 MESZ
+Last updated 2015-06-20 23:56:06 MESZ
 </div>
 </div>
 </body>

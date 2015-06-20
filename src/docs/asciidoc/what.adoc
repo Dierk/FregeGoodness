@@ -1,0 +1,140 @@
+
+[[what]]
+
+== Fun with numbers
+
+Many programming languages - especially the "practical" ones - have their weird
+corner cases and inconsistencies when dealing with numbers as nicely pointed out by
+this http://xkcd.com/1537/[xkcd comic].
+
+This comes to a large extend from using numerical operators with non-numerical values
+(think `+` for String concatenation) and automatic coercion between number types and
+between numbers and Strings. These issues do not occur in Frege (nor in Haskell) where
+operators never work on a mixture of types.
+
+.No surprises with types
+----
+ 1  +  1  -- Int plus
+ 1  + "1" -- Type error: "String is not an instance of Num"
+"1" + []  -- Type error
+----
+
+However, there is some clever inference going on at compile time to make a
+programmer's life easier. The type system would in principle not allow to
+write
+
+----
+1 + 1.0
+----
+because `1` is an `Int` and `1.0` is a `Double` and `+` requires both operands
+to be of the same type.
+
+The compiler is smart enough to not insist on you writing `1.0 + 1.0` for this
+simple case of number literals. It sees what you meant by resolving the
+type constraints in the expression that `1` is used in.
+Let's see another example that is a just a bit more advanced:
+
+.What type is this?
+----
+1 / 2
+----
+
+Again, `1` and `2` would be `Int` literals but the division operator is not
+defined for the `Int` type (or any other _Integral_ type) in Frege.
+It requires a number type of the `Real`
+typeclass for both operands and Frege chooses the concrete type `Double`
+for you in this case (unlike Haskell, this default is fix).
+It follows:
+
+----
+1 / 2 == 0.5  -- type is Double
+----
+
+[NOTE]
+This is very much unlike Java where `1/2` evaluates to `0`.
+
+This has some interesting consequences since the Java `Double` type
+handles many special cases in a nice manner.
+
+=== Double is nice
+
+The most common special case is division by zero. How is this handled in Frege?
+
+.Division by zero
+----
+1 / 0  -- Infinity
+----
+
+[WARNING]
+The String representation of a number is not always made up from
+digits only. Developers are usually aware that there are dots, minus, and the `E` character
+to consider but they often forget about `Infinity` and `NaN` (not a number).
+
+`Double` even goes around some problematic cases
+where fractions would not properly add up due to lack of precision:
+
+.Fractions add up
+----
+1 / (1 - 1/3 + 2/3) -- Infinity
+----
+
+And how do we calculate with Infinity? Well, when you add to infinity,
+the result is equally infinite. You can even add infinities to infinities.
+Division is not defined, though.
+
+.Calculating with Infinity
+----
+(1/0) + 1     -- Infinity
+(1/0) * 3     -- Infinity
+(1/0) + (1/0) -- Infinity
+(1/0) * (1/0) -- Infinity
+(1/0) / (1/0) -- NaN
+----
+
+And what do we gain from having `Infinity` as opposed to `NaN`?
+Well, with `Infinity` you have a chance of coming back to numbers that you
+can do normal calculations with:
+
+.Divide by Infinity
+----
+1 / (1/0)   -- 0.0
+----
+
+Wow, this is now definitely interesting and makes us ask for other
+corner cases of mathematics:
+
+.Corner cases
+----
+0 / 0       -- NaN
+(1/0) / 0   -- Infinity
+0 ^ 0       -- 1
+----
+
+This looks like we have violated some rules of mathematics.
+
+=== Have we broken math?
+
+In mathematics, division by zero is undefined. Likewise is
+division by infinity or zero to the power of zero.
+
+However, computers calculate with approximations, they do _applied_ numeric math at best.
+We use `Math.PI` and `Math.E` with limited precision. Heck, even square roots are only
+approximations:
+
+.The square of the root
+----
+import frege.prelude.Math
+Math.sqrt 2 * Math.sqrt 2  -- 2.0000000000000004
+----
+
+And given that we have to deal with limited precision anyway, we can just as well
+take liberty to make operations like division by zero not blowing up our programs
+but behaving reasonably well within computational bounds.
+
+=== References
+[horizontal]
+XKCD::
+http://xkcd.com/1537/
+
+Numberphile on zero::
+https://www.youtube.com/watch?v=BRRolKTlF6Q
