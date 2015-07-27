@@ -603,6 +603,14 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_references_10">References</a></li>
 </ul>
 </li>
+<li><a href="#mini_dsl">A mini DSL with type classes</a>
+<ul class="sectlevel2">
+<li><a href="#_the_initial_goal">The Initial Goal</a></li>
+<li><a href="#_initial_implementation">Initial Implementation</a></li>
+<li><a href="#_considerations_2">Considerations</a></li>
+<li><a href="#_references_11">References</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -3550,10 +3558,144 @@ Numberphile on zero
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="mini_dsl">A mini DSL with type classes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Frege makes it easy to embed mini DSLs (domain specific languages)
+into the application.
+The language construct that we will use to achieve this are type classes.</p>
+</div>
+<div class="sect2">
+<h3 id="_the_initial_goal">The Initial Goal</h3>
+<div class="paragraph">
+<p>Let&#8217;s assume that our DSL models measurements of distance such that
+ten meters should appear as <code>10.m</code> and we want to do arithmetic
+with it like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">10.m - 20.cm + 10.mm - 3.cm  == 9780.mm</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>with <code>m</code>, <code>cm</code>, and <code>mm</code> having the usual meaning in the metric system.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The example is shamelessly stolen from <a href="https://github.com/Dierk/GroovyInAction">Groovy in Action</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_initial_implementation">Initial Implementation</h3>
+<div class="paragraph">
+<p>The initial implementation idea is to represent measurements with the <code>Int</code> type where
+the value of <code>1</code> represents one millimeter. This gives us arithmetic for free at the expense
+of not having much type support. We will refine that in a future post.</p>
+</div>
+<div class="paragraph">
+<p>How can we make <code>1.mm</code> into a value <code>1</code>?</p>
+</div>
+<div class="paragraph">
+<p>In "<a href="#dot_notation">The power of the dot</a>" we have seen that <code>1.mm</code> is just the dot notation for <code>XXX.mm 1</code> where <em>XXX</em>
+can be the type or a type class of the following value <code>1</code>. Our actual <code>Int</code> type has no
+<code>mm</code> function so we are left with using a type class.</p>
+</div>
+<div class="listingblock">
+<div class="title">The definition of a Millimeter type class for an integral type "a"</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">class Millimeter (Integral a) =&gt; a  where
+    mm :: a -&gt; a
+    cm :: a -&gt; a
+    m  :: a -&gt; a</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can read this definition as follows:</p>
+</div>
+<div class="paragraph">
+<p>Any type "a" (provided that it is an <em>Integral</em> type like <code>Int</code> or <code>Integer</code>)
+can be made a type of class <em>Millimeter</em> by defining functions
+<code>mm</code>, <code>cm</code>, and <code>m</code> that for a given "a" value return a value of type "a" in millimeters.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The "a" is called a <em>type variable</em>. It stands in for a <em>type</em>. Like all variables it must be lowercase.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now that we have the type class defined, all we need to do is making <code>Int</code> an instance of this class.</p>
+</div>
+<div class="listingblock">
+<div class="title">Making the Int type an instance of the Millimeter type class</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">instance Millimeter Int where
+    mm i = i
+    cm i = i.mm * 10
+    m  i = i.cm * 100</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And voilà, from now on we can do metrical calculations with ease.</p>
+</div>
+<div class="listingblock">
+<div class="title">Using the embedded mini-DSL</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">main args = do
+    println $ 10.m - 20.cm + 10.mm - 3.cm  == 9780.mm</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_considerations_2">Considerations</h3>
+<div class="paragraph">
+<p>By making the <code>Int</code> type a member of the class of <code>Millimeter</code> types we have given it a new
+capability. This was an <em>non-intrusive, incremental</em> change. There was no need for doing any change
+to existing code. This is important because we can be sure that we haven&#8217;t broken anything.</p>
+</div>
+<div class="paragraph">
+<p>In a future post, we will build on this initial understanding of type classes and
+do even more sophisticated modeling to
+cover not only distance but also time and velocity for proper, type-safe modeling of measurements.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_references_11">References</h3>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+Dierk König
+</td>
+<td class="hdlist2">
+<p>Why functional programming <em>really</em> matters:
+<a href="http://www.canoo.com/blog/fp1">incremental development</a></p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-06-20 23:56:06 MESZ
+Last updated 2015-07-27 16:10:15 MESZ
 </div>
 </div>
 </body>

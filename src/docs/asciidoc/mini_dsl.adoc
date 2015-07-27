@@ -1,0 +1,88 @@
+
+[[mini_dsl]]
+
+== A mini DSL with type classes
+
+Frege makes it easy to embed mini DSLs (domain specific languages)
+into the application.
+The language construct that we will use to achieve this are type classes.
+
+=== The Initial Goal
+
+Let's assume that our DSL models measurements of distance such that
+ten meters should appear as `10.m` and we want to do arithmetic
+with it like
+
+[source,frege]
+----
+10.m - 20.cm + 10.mm - 3.cm  == 9780.mm
+----
+
+with `m`, `cm`, and `mm` having the usual meaning in the metric system.
+
+NOTE: The example is shamelessly stolen from https://github.com/Dierk/GroovyInAction[Groovy in Action].
+
+=== Initial Implementation
+
+The initial implementation idea is to represent measurements with the `Int` type where
+the value of `1` represents one millimeter. This gives us arithmetic for free at the expense
+of not having much type support. We will refine that in a future post.
+
+How can we make `1.mm` into a value `1`?
+
+In "xref:dot_notation[The power of the dot]" we have seen that `1.mm` is just the dot notation for `XXX.mm 1` where _XXX_
+can be the type or a type class of the following value `1`. Our actual `Int` type has no
+`mm` function so we are left with using a type class.
+
+.The definition of a Millimeter type class for an integral type "a"
+[source,frege]
+----
+class Millimeter (Integral a) => a  where
+    mm :: a -> a
+    cm :: a -> a
+    m  :: a -> a
+----
+
+You can read this definition as follows:
+
+Any type "a" (provided that it is an _Integral_ type like `Int` or `Integer`)
+can be made a type of class _Millimeter_ by defining functions
+`mm`, `cm`, and `m` that for a given "a" value return a value of type "a" in millimeters.
+
+NOTE: The "a" is called a _type variable_. It stands in for a _type_. Like all variables it must be lowercase.
+
+Now that we have the type class defined, all we need to do is making `Int` an instance of this class.
+
+.Making the Int type an instance of the Millimeter type class
+[source,frege]
+----
+instance Millimeter Int where
+    mm i = i
+    cm i = i.mm * 10
+    m  i = i.cm * 100
+----
+
+And voilà, from now on we can do metrical calculations with ease.
+
+.Using the embedded mini-DSL
+[source,frege]
+----
+main args = do
+    println $ 10.m - 20.cm + 10.mm - 3.cm  == 9780.mm
+----
+
+=== Considerations
+
+By making the `Int` type a member of the class of `Millimeter` types we have given it a new
+capability. This was an _non-intrusive, incremental_ change. There was no need for doing any change
+to existing code. This is important because we can be sure that we haven't broken anything.
+
+In a future post, we will build on this initial understanding of type classes and
+do even more sophisticated modeling to
+cover not only distance but also time and velocity for proper, type-safe modeling of measurements.
+
+=== References
+[horizontal]
+Dierk König::
+Why functional programming _really_ matters:
+http://www.canoo.com/blog/fp1[incremental development]
