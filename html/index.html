@@ -611,6 +611,14 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_references_11">References</a></li>
 </ul>
 </li>
+<li><a href="#unit_dsl">Enhancing the DSL for type safety</a>
+<ul class="sectlevel2">
+<li><a href="#_the_new_goal">The New Goal</a></li>
+<li><a href="#_step_1_refactoring">Step 1: Refactoring</a></li>
+<li><a href="#_step_2_adding_durations">Step 2: Adding Durations</a></li>
+<li><a href="#_putting_it_all_together_2">Putting it all together</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -3692,10 +3700,237 @@ Dierk König
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="unit_dsl">Enhancing the DSL for type safety</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In "<a href="#mini_dsl">A mini DSL</a>" we have used the <code>Int</code> type to represent a millimeter
+in our DSL of measurements. That was nice to begin with but also somewhat limiting since we
+cannot use the <code>Int</code> type again for other purposes and still expect type-safe expressions.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see how we can improve the situation.</p>
+</div>
+<div class="sect2">
+<h3 id="_the_new_goal">The New Goal</h3>
+<div class="paragraph">
+<p>We would still like to use the DSL to work for units of distance as before
+but also for units of duration. The combination of both naturally leads to
+units of velocity.</p>
+</div>
+<div class="listingblock">
+<div class="title">What we try to achieve with our DSL of units</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">10.m   -- distance in meters
+10.sec -- duration in seconds
+1000.m `per` 60.min == 1.kmh  -- velocity</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The type system shall disallow improper operations like adding a duration to a distance.</p>
+</div>
+<div class="paragraph">
+<p>The implementation strategy is to first (intrusively) refactor the old solution to a point where it still works
+exactly like before but allows adding durations as a non-intrusive increment.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_1_refactoring">Step 1: Refactoring</h3>
+<div class="paragraph">
+<p>In the old code, we made <code>Int</code> an instance of the <code>Millimeter</code> type class. We will now
+generalize and make <code>Millimeter</code> an instance of the <code>Num</code> type class such that we can
+do arithmetic operations on it.</p>
+</div>
+<div class="listingblock">
+<div class="title">The compiler tells us what functions to implement to satisfy Num</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">data Millimeter = MM Int
+
+instance Num Millimeter where
+    zero = MM 0
+    one  = MM 1
+    (MM a) + (MM b) = MM (a+b)
+    (MM a) - (MM b) = MM (a-b)
+    (MM a) * (MM b) = MM (a*b)
+    MM a  &lt;=&gt; MM b  = a &lt;=&gt; b
+    hashCode (MM a) = hashCode a
+    fromInt     a   = MM a
+    fromInteger a   = MM a.fromIntegral</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This means that we can now calculate in terms of millimeters:</p>
+</div>
+<div class="listingblock">
+<div class="title">Calculating in millimeters</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">MM 10 + MM 10 == MM 20</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For making <code>10.mm</code> the value <code>MM 10</code>, we just make our <code>Metric</code> type class
+using <code>Millimeter</code> as the return type instead of <code>Int</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Update return types from Int to Millimeter</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">class Metric (Integral a)  =&gt; a  where
+    mm :: a -&gt; Millimeter
+    cm :: a -&gt; Millimeter
+    m  :: a -&gt; Millimeter
+
+instance Metric Int where
+    mm i = MM i
+    cm i = i.mm * 10
+    m  i = i.cm * 100</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And voilà, after the refactoring all old code still works like before.</p>
+</div>
+<div class="listingblock">
+<div class="title">Proceed. Here is nothing to see. It&#8217;s all like before&#8230;&#8203;</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">main args = do
+    println $ 10.m - 20.cm + 10.mm - 3.cm  == 9780.mm</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So why the effort?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>We get a new level of type safety.</p>
+</li>
+<li>
+<p>We can now add new units of measurement.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_2_adding_durations">Step 2: Adding Durations</h3>
+<div class="paragraph">
+<p>The next step is to apply a <em>non-intrusive</em> increment where we do not touch exiting code
+at all but add the new feature of calculating with durations.
+We follow the same strategy as before.</p>
+</div>
+<div class="listingblock">
+<div class="title">The full solution for durations in one go</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">data Seconds = SEC Int
+
+instance Num Seconds where
+    zero = SEC 0
+    one  = SEC 1
+    (SEC a) + (SEC b) = SEC (a+b)
+    (SEC a) - (SEC b) = SEC (a-b)
+    (SEC a) * (SEC b) = SEC (a*b)
+    SEC a  &lt;=&gt; SEC b  = a &lt;=&gt; b
+    hashCode (SEC a)  = hashCode a
+    fromInt     a     = SEC a
+    fromInteger a     = SEC a.fromIntegral
+
+class Time (Integral a)  =&gt; a  where
+    sec     :: a -&gt; Seconds
+    minutes :: a -&gt; Seconds
+    h       :: a -&gt; Seconds
+
+main args = do
+    println $ 3.sec + 1.h - 30.minutes == 1803.sec</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see what this gives us.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_putting_it_all_together_2">Putting it all together</h3>
+<div class="paragraph">
+<p>With this new structure, we have some serious benefits.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>We can no longer accidentally write <code>10.m + 10.sec</code> since the compiler rejects that with
+<code>Type error in expression "sec 10". Type is Seconds used as Millimeter</code>.
+Now, that is a nice and telling error message! Is Frege reading my mind?</p>
+</li>
+<li>
+<p>We can <em>still</em> mix <code>Int</code> values into the calculation and they will be <em>safely promoted to
+the right type</em>!
+<code>10.mm + 3 == 13.mm</code> is just as correct and type-safe as <code>10.sec + 3 == 13.sec</code>.
+This is controlled by the <code>fromInt</code> implementation of the <code>Num</code> type class.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>And now we can go even further and mix distances and duration to describe velocity.</p>
+</div>
+<div class="listingblock">
+<div class="title">Describing velocity as the quotient of distance over duration</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="frege">data Velocity = KMH Double
+derive Eq Velocity
+
+class Unit (Real a)  =&gt; a  where
+    kmh :: a -&gt; Velocity
+
+instance Unit Double where
+    kmh val = KMH val
+
+per (MM mm) (SEC sec) =
+    KMH (( mm.fromIntegral / sec.fromIntegral) * 0.0036)
+
+main args = do
+    println $ (500.m * 3) `per` (3000.sec + 600)  == 1.5.kmh</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Our DSL is really shaping up nicely. It supports us with</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>full type safety,</p>
+</li>
+<li>
+<p>full type inference, and</p>
+</li>
+<li>
+<p>excellent error messages.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It is still easy enough to read and write.</p>
+</div>
+<div class="paragraph">
+<p>The main workhorses for creating the DSL were type classes in combination
+with the dot-syntax. We mainly did non-intrusive increments with one
+intrusive refactoring in-between.</p>
+</div>
+<div class="paragraph">
+<p>All modifications were <strong>robust</strong>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>non-intrusive increments are robust by definition and</p>
+</li>
+<li>
+<p>the type system supported us to do a <strong>robust</strong> refactoring when needed.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-07-27 16:10:15 MESZ
+Last updated 2015-08-06 17:55:10 MESZ
 </div>
 </div>
 </body>
