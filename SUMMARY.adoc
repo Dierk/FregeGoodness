@@ -1,0 +1,3 @@
+= Summary
+
+. link:src/docs/asciidoc/magical_trick.adoc[]
