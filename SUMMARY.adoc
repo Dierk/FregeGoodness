@@ -1,6 +1,6 @@
 = Summary
 
-. link:src/docs/asciidoc/magical_trick.adoc[]
+. link:src/docs/asciidoc/magical_trick.adoc[A magical trick]
 . link:src/docs/asciidoc/qc_property.adoc[]
 . link:src/docs/asciidoc/silence.adoc[]
 . link:src/docs/asciidoc/immutables.adoc[]
