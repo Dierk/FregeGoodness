@@ -7,4 +7,4 @@ The last post:
 http://dierk.github.io/FregeGoodness/html/latest.html
 
 All posts:
-http://dierk.github.io/FregeGoodness/html/index.html
+http://dierk.github.io/FregeGoodness/html/index.html 
