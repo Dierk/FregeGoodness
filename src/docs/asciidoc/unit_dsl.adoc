@@ -1,7 +1,7 @@
 
 [[unit_dsl]]
 
-== Enhancing the DSL for type safety
+== Enhancing the DSL for Type Safety
 
 In "xref:mini_dsl[A mini DSL]" we have used the `Int` type to represent a millimeter
 in our DSL of measurements. That was nice to begin with but also somewhat limiting since we

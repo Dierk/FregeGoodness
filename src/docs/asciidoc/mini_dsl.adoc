@@ -1,7 +1,7 @@
 
 [[mini_dsl]]
 
-== A mini DSL with type classes
+== A mini DSL with Type Classes
 
 Frege makes it easy to embed mini DSLs (domain specific languages)
 into the application.

@@ -1,7 +1,7 @@
 
 [[what]]
 
-== Fun with numbers
+== Fun with Numbers
 
 Many programming languages - especially the "practical" ones - have their weird
 corner cases and inconsistencies when dealing with numbers as nicely pointed out by

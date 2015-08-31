@@ -1,6 +1,6 @@
 [[dot_notation]]
 
-== The power of the dot
+== The Power of the Dot
 
 When being asked what feature of Object-Oriented languages he would like to
 see in Haskell, Simon Peyton Jones likes to mention "the power of the dot".

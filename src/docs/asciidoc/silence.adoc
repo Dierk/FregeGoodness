@@ -1,5 +1,5 @@
 [[silence]]
-== Silent notation
+== Silent Notation
 
 In a language that is built from functions and expressions, one can reasonably
 expect to see a lot of parentheses. It is no coincidence that LISP is humorously known

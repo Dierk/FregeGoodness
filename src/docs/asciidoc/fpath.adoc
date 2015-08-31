@@ -1,6 +1,6 @@
 [[fpath]]
 
-== List and path
+== List and Path
 
 Lists are the predominant data structure in Frege and it will come at no surprise
 that there are lots of clever ways of dealing with them.

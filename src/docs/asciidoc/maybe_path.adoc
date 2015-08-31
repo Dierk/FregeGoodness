@@ -1,5 +1,5 @@
 [[maybe_path]]
-== The Maybe path
+== The Maybe Path
 
 In "xref:fpath[Lists and path]" we have experienced how to construct path expressions
 that are made up of list structures. We have also seen the `Maybe` type that signals
