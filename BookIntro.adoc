@@ -1,1 +1,28 @@
-under construction
+== Welcome to Frege Goodness
+
+The purpose of this book is to assemble a series of
+_posts_ or _chapters_ that are both reasonably quick to
+write and to read.
+
+The gitbook system is an ideal place for this purpose.
+You, the reader, get instant updates as soon as there is new
+content available but unlike a blog, you also have the full
+series in your hand.
+
+The Frege Goodness format is inspired by @MrHaki, who runs his
+Groovy-/Grails-/Gradle-
+Goodness series since a long time. I follow his example for the
+topic of the Frege programming language.
+
+=== For the advanced beginner
+
+The chapters currently do _not_ cover the very first steps into
+Frege, how to download, install, set up the compiler, and run
+programs. Also basic syntax is not explained. There are many
+excellent Haskell books that do that job.
+
+I assume that you have some experience in programming, most
+likely in Java.
+
+My goal is to share information that inspires an _advanced beginner_
+to explore each topic even further.
