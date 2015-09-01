@@ -2,7 +2,7 @@
 
 The purpose of this book is to assemble a series of
 _posts_ or _chapters_ that are both reasonably quick to
-write and to read.
+write and to read. They typically span over 2-3 PDF pages.
 
 The gitbook system is an ideal place for this purpose.
 You, the reader, get instant updates as soon as there is new

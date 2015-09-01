@@ -132,5 +132,9 @@ Phil Wadler::
 Tech Mesh 2012 - Faith, Evolution, and Programming Languages: from Haskell to Java
 https://www.youtube.com/watch?v=NZeDRs6snm0
 
+Bartosz Milewski::
+The Yoneda Lemma
+http://bartoszmilewski.com/2015/09/01/the-yoneda-lemma/
+
 Functor::
 http://en.wikipedia.org/wiki/Functor
