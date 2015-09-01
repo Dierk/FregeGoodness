@@ -14,11 +14,11 @@ Lets start with function application.
 
 [source,frege]
 ----
-    f(x)    -- as known from many languages
-    f x     -- Frege style (like linear functions in mathematics)
-    f $ x   -- explicit function application with the $ operator
-    f(x,y)  -- taking a tuple as an argument
-    f x y   -- same as ((f x) y)
+f(x)    -- as known from many languages
+f x     -- Frege style (like linear functions in mathematics)
+f $ x   -- explicit function application with the $ operator
+f(x,y)  -- taking a tuple as an argument
+f x y   -- same as ((f x) y)
 ----
 
 Frege uses the blank character - the most silent one in the character set -
@@ -46,8 +46,8 @@ the dollar sign.
 
 [source,frege]
 ----
-    foo (bar (baz (buz x)))  -- deeply nested style
-    foo $ bar $ baz $ buz x  -- flat $ style
+foo (bar (baz (buz x)))  -- deeply nested style
+foo $ bar $ baz $ buz x  -- flat $ style
 ----
 
 Interestingly, the _$_ operator is not a language construct. It is an ordinary
@@ -69,8 +69,8 @@ the dot-operator is. It it the operator for _function composition_:
 
 [source,frege]
 ----
-    (foo . bar . baz . buz) x  -- function composition with dot
-    (foo • bar • baz • buz) x  -- Frege also allows unicode 2022
+(foo . bar . baz . buz) x  -- function composition with dot
+(foo • bar • baz • buz) x  -- Frege also allows unicode 2022
 ----
 
 ****
@@ -102,8 +102,8 @@ There are two equivalent ways of writing this:
 
 [source,frege]
 ----
-    inc x = x + 1           -- usual function definition
-    inc   = \x -> x + 1     -- equivalent lambda style
+inc x = x + 1           -- usual function definition
+inc   = \x -> x + 1     -- equivalent lambda style
 ----
 
 === Point-free style
@@ -113,8 +113,8 @@ in the definition of _f_ and relay the argument.
 
 [source,frege]
 ----
-    f x   = inc x           -- f should be like inc
-    f     = inc             -- point-free style, "cancel x"
+f x   = inc x           -- f should be like inc
+f     = inc             -- point-free style, "cancel x"
 ----
 
 But we can even cancel down the _x_ such that _f_ looks like an alias
@@ -122,9 +122,9 @@ for _inc_. And here is proof that this is a valid transformation:
 
 [source,frege]
 ----
-    f     = inc             -- beta reduction =>
-    f     = \x -> x + 1     -- replace formal lambda parameter with free variable =>
-    f x   = x + 1           -- same as definition of inc
+f     = inc             -- beta reduction =>
+f     = \x -> x + 1     -- replace formal lambda parameter with free variable =>
+f x   = x + 1           -- same as definition of inc
 ----
 
 This finally leaves us with four ways of defining our function:
@@ -132,10 +132,10 @@ This finally leaves us with four ways of defining our function:
 .The final overview of all four styles
 [source,frege]
 ----
-    f x =  foo (bar (baz (buz x)))    -- deeply nested style
-    f x =  foo $ bar $ baz $ buz x    -- flat $ style
-    f x = (foo . bar . baz . buz) x   -- function composition
-    f   =  foo . bar . baz . buz      -- point-free style
+f x =  foo (bar (baz (buz x)))    -- deeply nested style
+f x =  foo $ bar $ baz $ buz x    -- flat $ style
+f x = (foo . bar . baz . buz) x   -- function composition
+f   =  foo . bar . baz . buz      -- point-free style
 ----
 
 Keeping the above equivalence in mind should help you to become

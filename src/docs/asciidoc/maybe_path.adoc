@@ -17,9 +17,9 @@ portfolio with the most heeded position being - you guessed it - the optional _s
 .Stars in a simplified banking domain
 [ditaa,maybe_path_domain]
 ----
-     +------+?  +--------+?  +-----------+?  +----------+
-     | Bank +-->| Client +-->| Portfolio +-->| Position |
-     +------+   +--------+   +-----------+   +----------+
+ +------+?  +--------+?  +-----------+?  +----------+
+ | Bank +-->| Client +-->| Portfolio +-->| Position |
+ +------+   +--------+   +-----------+   +----------+
 ----
 
 Modeled with record syntax, the domain is easily expressed as below.

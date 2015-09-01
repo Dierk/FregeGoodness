@@ -6,7 +6,7 @@ First, think of a function _f_ that maps a lists of arbitrary element types to a
 In Frege terms, such a function _f_ is declared as
 [source,frege]
 ----
-    f :: [a] -> [a]
+f :: [a] -> [a]
 ----
 .Assume nothing
 NOTE: We cannot assume anything about the features of _a_.
@@ -21,8 +21,8 @@ For example, you can choose:
 .An example for _g_ as a function from Int to String
 [source,frege]
 ----
-    g :: Int -> String
-    g x = show x ++ show x ++ show x
+g :: Int -> String
+g x = show x ++ show x ++ show x
 ----
 That is, `g 1` would return the String `"111"`.
 
@@ -50,29 +50,29 @@ _This is what you had in mind anyway, right?_
 Starting with
 [source,frege]
 ----
-    [1, 2, 3]
+[1, 2, 3]
 ----
 
 applied to _reverse_ is
 [source,frege]
 ----
-    reverse [1,2,3]
+reverse [1,2,3]
 ----
 
 fed into `map g` and successively substituting the definitions gives us
 [source,frege]
 ----
-    map g (reverse [1,2,3])
-    map g [3, 2, 1]
-    ["333", "222", "111"]
+map g (reverse [1,2,3])
+map g [3, 2, 1]
+["333", "222", "111"]
 ----
 
 Now the other way around: first mapping, then reversing
 [source,frege]
 ----
-    reverse (map g [1, 2, 3])
-    reverse ["111", "222", "333"]
-    ["333", "222", "111"]
+reverse (map g [1, 2, 3])
+reverse ["111", "222", "333"]
+["333", "222", "111"]
 ----
 *Voilà, same result!*
 

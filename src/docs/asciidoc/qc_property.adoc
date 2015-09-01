@@ -8,23 +8,23 @@ In the post "xref:magical_trick[A magical trick]" we worked with these functions
 
 [source,frege]
 ----
-    f :: [a] -> [a]  -- we should think of any such function
-    f  = reverse     -- that was our pick
+f :: [a] -> [a]  -- we should think of any such function
+f  = reverse     -- that was our pick
 
-    g :: Int -> String
-    g x = show x ++ show x ++ show x
+g :: Int -> String
+g x = show x ++ show x ++ show x
 ----
 
 We found that we can freely choose between
 
 [source,frege]
 ----
-    map g (f [1, 2, 3])
+map g (f [1, 2, 3])
 ----
 and
 [source,frege]
 ----
-    f (map g [1, 2, 3])
+f (map g [1, 2, 3])
 ----
 to arrive at the same result.
 
@@ -44,16 +44,16 @@ Here is how we can define a property in Frege with QuickCheck:
 
 [source,frege]
 ----
-    import frege.test.QuickCheck
+import frege.test.QuickCheck
 
-    commutativity xs = property ( map g (f xs) == f (map g xs) )
+commutativity xs = property ( map g (f xs) == f (map g xs) )
 ----
 
 Having defined this property, we can quickly check whether it holds:
 
 [source,frege]
 ----
-    quickCheck commutativity
+quickCheck commutativity
 ----
 
 Which yields us
@@ -67,8 +67,8 @@ The clever Frege type inference comes into play here.
 
 To see the inferred type of _commutativity_ we can ask the REPL:
 ----
-    :t commutativity
-    [Int] -> Bool
+:t commutativity
+[Int] -> Bool
 ----
 
 Let's follow through what the Frege type inference engine must have considered:

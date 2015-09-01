@@ -16,23 +16,23 @@ Here is the code for comparison.
 .The Java method
 [source,java]
 ----
-    // Java
-    void print123() {
-        System.out.println("1");
-        System.out.println("2");
-        System.out.println("3");
-    }
+// Java
+void print123() {
+    System.out.println("1");
+    System.out.println("2");
+    System.out.println("3");
+}
 ----
 
 .The Groovy method
 [source,groovy]
 ----
-    // Groovy
-    def print123() {
-        println "1"
-        println "2"
-        println "3"
-    }
+// Groovy
+def print123() {
+    println "1"
+    println "2"
+    println "3"
+}
 ----
 The Groovy developer has a lot of choices. He can use the exact same syntax as in the
 Java version and it will be valid Groovy. Here is a rather compact version.
@@ -40,11 +40,11 @@ Java version and it will be valid Groovy. Here is a rather compact version.
 .The Frege function
 [source,frege]
 ----
-    -- Frege
-    print123 = do
-        println "1"
-        println "2"
-        println "3"
+-- Frege
+print123 = do
+    println "1"
+    println "2"
+    println "3"
 ----
 
 Surprisingly, *the Frege function is the shortest* of all three, even slightly shorter
@@ -101,7 +101,7 @@ The return type of _bind_ is the return type of its second argument. In our case
 .Returns IO () since (println "3") return IO ()
 [source,pseudo]
 ----
-    bind (println "2") (println "3")
+bind (println "2") (println "3")
 ----
 
 And, of course, the same is true for `println "1"`.
@@ -109,7 +109,7 @@ And, of course, the same is true for `println "1"`.
 .Returns IO () since ... you get it, right?
 [source,pseudo]
 ----
-    bind (println "1")  (bind (println "2") (println "3"))
+bind (println "1")  (bind (println "2") (println "3"))
 ----
 
 So the whole function body that looked so imperative boils down to a single expression and
@@ -137,15 +137,15 @@ So `bind a b` appears as `a >>= b` (and there are a few variants that we will co
 
 As an aside, using _bind_ like an infix operator
 ----
-    a `bind`
-    b `bind`
-    c
+a `bind`
+b `bind`
+c
 ----
 reveals an interesting analogy. This is just like writing the imperative style of
 ----
-    a ;
-    b ;
-    c
+a ;
+b ;
+c
 ----
 This is why _bind_ is also humorously known as _the programmable semicolon_.
 It provides the logic how two functions compose in a given context and - as we will see later -

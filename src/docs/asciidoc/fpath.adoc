@@ -18,9 +18,9 @@ portfolio.
 .A simplified banking domain
 [ditaa,fpath_domain]
 ----
-     +------+*  +--------+*  +-----------+*  +----------+
-     | Bank +-->| Client +-->| Portfolio +-->| Position |
-     +------+   +--------+   +-----------+   +----------+
+ +------+*  +--------+*  +-----------+*  +----------+
+ | Bank +-->| Client +-->| Portfolio +-->| Position |
+ +------+   +--------+   +-----------+   +----------+
 ----
 
 The tickers are easily modeled with an enumeration

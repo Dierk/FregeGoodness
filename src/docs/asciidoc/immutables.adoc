@@ -29,9 +29,9 @@ thinks in a certain programming language.
 .A simple Person data type
 [source,frege]
 ----
-    data Person = Person { firstname, lastname, language :: String }
+data Person = Person { firstname, lastname, language :: String }
 
-    javaDierk   = Person "Dierk" "König" "Java"
+javaDierk   = Person "Dierk" "König" "Java"
 ----
 
 When we create the `javaDierk` value of that `Person` type it is automatically immutable!
@@ -46,8 +46,8 @@ There are actually two separate features of the language that we see here:
 .Changing a field creates a copy
 [source,frege]
 ----
-    groovyDierk = javaDierk.{ language = "Groovy" }
-    fregeDierk  = javaDierk.{ language = "Frege"  }
+groovyDierk = javaDierk.{ language = "Groovy" }
+fregeDierk  = javaDierk.{ language = "Frege"  }
 ----
 
 [NOTE]
