@@ -1,5 +1,8 @@
 {
     "structure": {
         "readme": "BookIntro.adoc"
+    },
+    "styles": {
+        "website": "webstyle.css"
     }
 }
