@@ -1,5 +1,5 @@
 [[magical_trick]]
-== A magical trick
+== A Magical Trick
 
 First, think of a function _f_ that maps a lists of arbitrary element types to another list of the exact same type.
 
