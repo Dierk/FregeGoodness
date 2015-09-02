@@ -47,19 +47,19 @@ IMPORTANT: You will arrive at the same result again!
 Let's try with an example. Assume we had chosen the `reverse` function for _f_. +
 _This is what you had in mind anyway, right?_
 
-Starting with
+We start with
 [source,frege]
 ----
 [1, 2, 3]
 ----
 
-applied to _reverse_ is
+apply it to _reverse_
 [source,frege]
 ----
 reverse [1,2,3]
 ----
 
-fed into `map g` and successively substituting the definitions gives us
+and feed it into `map g`. Successively reducing the terms gives us
 [source,frege]
 ----
 map g (reverse [1,2,3])
@@ -98,9 +98,9 @@ It even works when _g_ returns an IO type like `IO ()` when g was the function `
 The result would be a list of (yet unperformed) IO actions in that case, which can still be reversed
 like any other list.
 
-The situation is different for _f_. There are not so many functions that map `[a]` to `[a]`.
+The situation is different for _f_. There are few functions that map `[a]` to `[a]`.
 But when you _hoogle_ for the
-type, a few interesting ones show up. Beside `reverse`, there is of course `id` but also
+type, some interesting ones show up. Beside `reverse`, there is of course `id` but also
 `tail` (all but the first element), `init` (all but the last element), and `cycle`,
 which produces an infinite list by endlessly repeating the current list.
 
