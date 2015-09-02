@@ -88,7 +88,7 @@ image:functor_composition.png[ "Commutative diagram for functor composition", li
 We start at the upper left corner to reach the lower right one. We can go either way (first right, then down or
 first down, then right) to arrive at the same result.
 
-The +///+ in the diagram is the mathematical notation to say that that the diagram _commutes_. +
+The +///+ in the diagram is the mathematical notation to say that the diagram _commutes_. +
 _When we covered this in school math, I assumed this would never be of any practical relevance
 to me. Boy, was I wrong!_
 
