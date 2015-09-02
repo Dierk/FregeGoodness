@@ -15,12 +15,7 @@ client (think "Warren Buffet"). He may have a favorite, best performing portfoli
 portfolio with the most heeded position being - you guessed it - the optional _star_ position.
 
 .Stars in a simplified banking domain
-[ditaa,maybe_path_domain]
-----
- +------+?  +--------+?  +-----------+?  +----------+
- | Bank +-->| Client +-->| Portfolio +-->| Position |
- +------+   +--------+   +-----------+   +----------+
-----
+image:maybe_path_domain.png[ "Stars in a simplified banking domain", link="maybe_path_domain.png"]
 
 Modeled with record syntax, the domain is easily expressed as below.
 Note the similarity to the domain in "xref:fpath[Lists and path]".

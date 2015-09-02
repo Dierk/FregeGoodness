@@ -16,12 +16,7 @@ financial instrument (let's assume stock shares for a given ticker) are in that
 portfolio.
 
 .A simplified banking domain
-[ditaa,fpath_domain]
-----
- +------+*  +--------+*  +-----------+*  +----------+
- | Bank +-->| Client +-->| Portfolio +-->| Position |
- +------+   +--------+   +-----------+   +----------+
-----
+image:fpath_domain.png[ "A simplified banking domain", link="fpath_domain.png"]
 
 The tickers are easily modeled with an enumeration
 

@@ -83,20 +83,8 @@ TIP: This is a pretty interesting theorem that only holds in the purely function
 Here is a graphical representation of the theorem.
 
 .Commutative diagram for functor composition.
-[ditaa,functor_composition]
-----
-     +-----+    f     +-----+
-     | [a] +--------->| [a] |
-     +--+--+          +--+--+
-        |                |
-        |                |
-  map g |      ///       | map g
-        |                |
-        V                V
-     +-----+          +-----+
-     | [b] +--------->| [b] |
-     +-----+    f     +-----+
-----
+image:functor_composition.png[ "Commutative diagram for functor composition", link="functor_composition.png"]
+
 We start at the upper left corner to reach the lower right one. We can go either way (first right, then down or
 first down, then right) to arrive at the same result.
 
