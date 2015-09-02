@@ -506,3 +506,8 @@ code.language-frege {
     font-family: 'Open Sans', 'DejaVu Sans', sans-serif;
 }
 */
+
+.title {
+    font-family:"Noto Serif","DejaVu Serif",serif;
+    font-style:italic
+}
