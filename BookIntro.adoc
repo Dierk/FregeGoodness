@@ -1,7 +1,7 @@
 == Welcome to Frege Goodness
 
 The purpose of this book is to assemble a series of
-_posts_ or _chapters_ that are conveniently quick to
+_posts_ or _chapters_ that are conveniently quick
 to read and expose one single characteristic of Frege.
 They typically span over 2-3 PDF pages.
 
