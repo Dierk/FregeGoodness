@@ -1,7 +1,4 @@
 = Glossary
 
-== Magic
-Sufficiently advanced technology, beyond the understanding of the observer producing a sense of wonder.
-
-== PHP
-An atrocious language, invented for the sole purpose of inflicting pain and suffering amongst the programming wizards of this world.
+== Key
+Value

@@ -16,7 +16,7 @@ I assume that you are an _advanced beginner_. You may have
 worked through the excellent books or online tutorials that
 introduce the Haskell syntax that Frege builds upon.
 
-The purpose of this book is ignite curiosity for topics that
+The purpose of this book is to ignite curiosity for topics that
 come after the initial steps: What can I do next?
 What are typical and idiomatic ways to use Frege?
 Why should I use Frege for a certain use case?
@@ -24,7 +24,7 @@ How can I make practical use of Frege in places where purely functional programm
 is traditionally considered less suitable?
 Where do I hit the sweet spot?
 
-In short, it is all about using Frege to its full potential.
+In short, it is all about using Frege to its full potential!
 
 === Credits
 
