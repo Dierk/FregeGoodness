@@ -142,7 +142,7 @@ value position       -- Position  -> Int
 Hm, something interesting becomes apparent here: *each function returns a list
 of elements that the next function needs as single elements*.
 So maybe we can generalize over this pattern and _bind_ the functions
-like we did in "xref:easy_io[Easy IO]".
+like we did in "anchor:easy_io[Easy IO]".
 
 So binding <1> and <2> would be
 ----
@@ -160,7 +160,7 @@ As you see, there is a general pattern behind it such that _bind_ has the type: 
 `[a] -> (a -> [b]) -> [b]`
 
 You will be glad to hear that this _bind_ function is already available and just like in the
-case of "xref:easy_io[Easy IO]", it is denoted with the `>>=` operator.
+case of "anchor:easy_io[Easy IO]", it is denoted with the `>>=` operator.
 
 So combining <1> and <2> becomes
 `bank.clients >>= Client.portfolios`
@@ -188,7 +188,7 @@ assetsUnderManagement1 = sum $
 
 === The "do" notation and comprehension
 
-Another lesson from "xref:easy_io[Easy IO]" was that _bind_ allows us to use the "do" notation, which
+Another lesson from "anchor:easy_io[Easy IO]" was that _bind_ allows us to use the "do" notation, which
 leads to the following code.
 
 .Assets under management with "do" notation

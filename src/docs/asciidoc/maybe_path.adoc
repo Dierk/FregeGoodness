@@ -1,7 +1,7 @@
 [[maybe_path]]
 == The Maybe Path
 
-In "xref:fpath[Lists and path]" we have experienced how to construct path expressions
+In "anchor:fpath[Lists and path]" we have experienced how to construct path expressions
 that are made up of list structures. We have also seen the `Maybe` type that signals
 the (un-) availability of a value.
 
@@ -18,7 +18,7 @@ portfolio with the most heeded position being - you guessed it - the optional _s
 image:maybe_path_domain.png[ "Stars in a simplified banking domain", link="maybe_path_domain.png"]
 
 Modeled with record syntax, the domain is easily expressed as below.
-Note the similarity to the domain in "xref:fpath[Lists and path]".
+Note the similarity to the domain in "anchor:fpath[Lists and path]".
 We only replace _list of_ types with _Maybe_ and adapt the names.
 
 .The core domain data structures
@@ -107,7 +107,7 @@ While this approach works, we can certainly do better.
 
 Let's step back and reconsider what we are doing here.
 
-Looking at the involved functions and their types we see a similar pattern as in "xref:fpath[Lists and path]".
+Looking at the involved functions and their types we see a similar pattern as in "anchor:fpath[Lists and path]".
 
 ----
 bank.star        --              Maybe Client    <1>
@@ -136,7 +136,7 @@ As you see, there is a general pattern behind it such that _bind_ has the type: 
 `Maybe a -> (a -> Maybe b) -> Maybe b`
 
 You will be glad to hear that this _bind_ function is already available and just like in the
-cases of "xref:easy_io[Easy IO]" and "xref:fpath[Lists and path]", it is denoted with the `>>=` operator.
+cases of "anchor:easy_io[Easy IO]" and "anchor:fpath[Lists and path]", it is denoted with the `>>=` operator.
 
 So combining <1> and <2> becomes
 `bank.star >>= Client.star`
@@ -166,7 +166,7 @@ But this variant is more realistic, since there can never be a position without 
 It is also instructive to see this variant where the argument that is passed to the function
 is captured in the lambda parameter.
 
-We can simply follow the types. As we have seen in "xref:silence[Silent notation]"
+We can simply follow the types. As we have seen in "anchor:silence[Silent notation]"
 ----
 \position -> Just position.ticker   -- Position -> Maybe Ticker
 ----

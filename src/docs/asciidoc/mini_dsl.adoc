@@ -30,7 +30,7 @@ of not having much type support. We will refine that in a future post.
 
 How can we make `1.mm` into a value `1`?
 
-In "xref:dot_notation[The power of the dot]" we have seen that `1.mm` is just the dot notation for `XXX.mm 1` where _XXX_
+In "anchor:dot_notation[The power of the dot]" we have seen that `1.mm` is just the dot notation for `XXX.mm 1` where _XXX_
 can be the type or a type class of the following value `1`. Our actual `Int` type has no
 `mm` function so we are left with using a type class.
 

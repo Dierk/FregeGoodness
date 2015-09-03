@@ -4,7 +4,7 @@
 Frege comes with a testing facility that enables _property-based_ testing. +
 Let's have a first glance on what we can do with it.
 
-In the post "xref:magical_trick[A magical trick]" we worked with these functions _f_ and _g_.
+In the post "anchor:magical_trick[A magical trick]" we worked with these functions _f_ and _g_.
 
 [source,frege]
 ----
