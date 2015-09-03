@@ -121,8 +121,8 @@ Tech Mesh 2012 - Faith, Evolution, and Programming Languages: from Haskell to Ja
 https://www.youtube.com/watch?v=NZeDRs6snm0
 
 Bartosz Milewski::
-The Yoneda Lemma
-http://bartoszmilewski.com/2015/09/01/the-yoneda-lemma/
+http://bartoszmilewski.com/2015/04/07/natural-transformations/[Natural Transformations],
+http://bartoszmilewski.com/2015/09/01/the-yoneda-lemma[The Yoneda Lemma]
 
 Functor::
 http://en.wikipedia.org/wiki/Functor
