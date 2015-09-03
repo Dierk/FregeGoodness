@@ -3,7 +3,7 @@
 
 == Enhancing the DSL for Type Safety
 
-In "anchor:mini_dsl[A mini DSL]" we have used the `Int` type to represent a millimeter
+In "<<mini_dsl.adoc#mini_dsl,A mini DSL>>" we have used the `Int` type to represent a millimeter
 in our DSL of measurements. That was nice to begin with but also somewhat limiting since we
 cannot use the `Int` type again for other purposes and still expect type-safe expressions.
 

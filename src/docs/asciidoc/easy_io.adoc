@@ -119,7 +119,7 @@ At this point, we have everything collapsed to a single expression until the `do
 is calling the _bind_ function of that single expression. Since our expression is
 of type `IO`, the `IO.bind` will be used.
 
-We have seen before, for example in "anchor:silence[Silent Notation]", that functional programming
+We have seen before, for example in "<<silence.adoc#silence,Silent Notation>>", that functional programming
 sometimes means to read backwards. This is again true for the do-notation. This time it is not
 right-to-left but bottom-to-top to find the overall result type.
 

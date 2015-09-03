@@ -136,7 +136,7 @@ As you see, there is a general pattern behind it such that _bind_ has the type: 
 `Maybe a -> (a -> Maybe b) -> Maybe b`
 
 You will be glad to hear that this _bind_ function is already available and just like in the
-cases of "anchor:easy_io[Easy IO]" and "<<fpath.adoc#fpath,List and Path>>", it is denoted with the `>>=` operator.
+cases of "<<easy_io.adoc#easy_io,Easy IO>>" and "<<fpath.adoc#fpath,List and Path>>", it is denoted with the `>>=` operator.
 
 So combining <1> and <2> becomes
 `bank.star >>= Client.star`
@@ -166,7 +166,7 @@ But this variant is more realistic, since there can never be a position without 
 It is also instructive to see this variant where the argument that is passed to the function
 is captured in the lambda parameter.
 
-We can simply follow the types. As we have seen in "anchor:silence[Silent notation]"
+We can simply follow the types. As we have seen in "<<silence.adoc#silence,Silent notation>>"
 ----
 \position -> Just position.ticker   -- Position -> Maybe Ticker
 ----
