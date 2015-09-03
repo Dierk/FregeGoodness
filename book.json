@@ -3,6 +3,7 @@
         "readme": "BookIntro.adoc"
     },
     "styles": {
-        "website": "webstyle.css"
+        "website": "webstyle.css",
+        "pdf": "webstyle.css"
     }
 }

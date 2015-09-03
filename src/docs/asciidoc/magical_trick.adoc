@@ -76,7 +76,8 @@ reverse ["111", "222", "333"]
 ----
 *Voilà, same result!*
 
-TIP: This is a pretty interesting theorem that only holds in the purely functional world.
+TIP: This is a pretty interesting theorem ("a square of natural transformations for the
+     list functor") that only holds in the purely functional world.
      If we had any kind of assignments, state, or effects, we could not possibly hope for
      a theorem that allows us *safe reordering*.
 
