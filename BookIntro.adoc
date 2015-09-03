@@ -1,8 +1,8 @@
 == Welcome to Frege Goodness
 
 The purpose of this book is to assemble a series of
-_posts_ or _chapters_ where each one exposes a single characteristic of Frege.
-The chapters are so short that you should be able to read a complete one
+_posts_ or _chapters_ where each chapter exposes a single characteristic of Frege.
+The chapters are deliberately short. You should be able to read a complete one
 while riding the commuter train or while having lunch.
 
 The gitbook system is an ideal medium for this purpose.
@@ -31,7 +31,8 @@ In short, it is all about using Frege to its full potential!
 This book lives on github. If you have any feedback, questions, or suggestions for
 improvement, please https://github.com/Dierk/FregeGoodness/issues[file an issue].
 
-I'm also happy to take pull requests from those who would like to contribute to the book.
+I'm also happy to take https://github.com/Dierk/FregeGoodness/pulls[pull requests] from
+those who would like to contribute to the book.
 
 === Credits
 
