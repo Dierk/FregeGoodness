@@ -1,14 +1,14 @@
 == Welcome to Frege Goodness
 
 The purpose of this book is to assemble a series of
-_posts_ or _chapters_ that are conveniently quick
-to read and expose one single characteristic of Frege.
-They typically span over 2-3 PDF pages.
+_posts_ or _chapters_ where each one exposes a single characteristic of Frege.
+The chapters are so short that you should be able to read a complete one
+while riding the commuter train or while having lunch.
 
 The gitbook system is an ideal medium for this purpose.
-You, the reader, get instant updates as soon as there is new
-content. But unlike a blog, you also have the full
-series in your hand.
+You can subscribe for instant updates and get the newest content as soon
+as it is available. But unlike a blog, you also have the full
+series in your hand for browsing and searching.
 
 === For the advanced beginner
 
@@ -25,6 +25,13 @@ is traditionally considered less suitable?
 Where do I hit the sweet spot?
 
 In short, it is all about using Frege to its full potential!
+
+=== Collaboration
+
+This book lives on github. If you have any feedback, questions, or suggestions for
+improvement, please https://github.com/Dierk/FregeGoodness/issues[file an issue].
+
+I'm also happy to take pull requests from those who would like to contribute to the book.
 
 === Credits
 
