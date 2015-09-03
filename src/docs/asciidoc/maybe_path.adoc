@@ -1,7 +1,7 @@
 [[maybe_path]]
 == The Maybe Path
 
-In "<<fpath,Lists and path>>" we have experienced how to construct path expressions
+In "<<fpath>>" we have experienced how to construct path expressions
 that are made up of list structures. We have also seen the `Maybe` type that signals
 the (un-) availability of a value.
 
