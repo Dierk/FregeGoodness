@@ -186,9 +186,9 @@ just around the corner.
 [source,frege]
 ----
 starTicker bank = do
-    warrenBuffet  <- bank.star
-    starPortfolio <- warrenBuffet.star
-    starPosition  <- starPortfolio.star
+    warrenBuffet  &lt;- bank.star
+    starPortfolio &lt;- warrenBuffet.star
+    starPosition  &lt;- starPortfolio.star
     Just starPosition.ticker
 ----
 

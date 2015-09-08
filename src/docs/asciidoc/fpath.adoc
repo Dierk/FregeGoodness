@@ -195,8 +195,8 @@ leads to the following code.
 ----
 assetsUnderManagement2 = sum $
     map value do
-        client    <- bank.clients
-        portfolio <- client.portfolios
+        client    &lt;- bank.clients
+        portfolio &lt;- client.portfolios
         portfolio.positions
 ----
 
@@ -208,9 +208,9 @@ But wait! This looks and sounds utterly familiar and even has the same meaning a
 ----
 assetsUnderManagement3 = sum
     [value position |
-        client    <- bank.clients,
-        portfolio <- client.portfolios,
-        position  <- portfolio.positions
+        client    &lt;- bank.clients,
+        portfolio &lt;- client.portfolios,
+        position  &lt;- portfolio.positions
     ]
 ----
 
@@ -227,9 +227,9 @@ to do and yields another interesting analogy to SQL queries.
 ----
 allCanoo3 = sum
     [value position |                       -- SELECT
-        client    <- bank.clients,          -- FROM
-        portfolio <- client.portfolios,
-        position  <- portfolio.positions,
+        client    &lt;- bank.clients,          -- FROM
+        portfolio &lt;- client.portfolios,
+        position  &lt;- portfolio.positions,
         position.ticker == CANO             -- WHERE
     ]
 ----
@@ -246,8 +246,8 @@ looks with filters as where-clauses:
 ----
 allCanoo2 = sum $
     map value do
-        client    <- bank.clients
-        portfolio <- client.portfolios
+        client    &lt;- bank.clients
+        portfolio &lt;- client.portfolios
         filter canoo portfolio.positions
     where
         canoo position = position.ticker == CANO

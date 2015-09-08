@@ -70,7 +70,7 @@ https://github.com/Dierk/frepl-gui/blob/master/client/src/main/frege/org/frege/A
 ----
 insert :: TextArea -> String -> IO ()
 insert inputArea text = do
-    pos <- inputArea.getCaretPosition
+    pos &lt;- inputArea.getCaretPosition
     inputArea.insertText pos text
 ----
 
@@ -116,8 +116,8 @@ And there are more options for setting or updating "fields":
 Position.{soMany = } position 1  -- "setter"
 position.{soMany = } 1
 
-Position.{soMany <-} position (+1) -- update
-position.{soMany <-} (+1)
+Position.{soMany &lt;-} position (+1) -- update
+position.{soMany &lt;-} (+1)
 ----
 
 Again, the notation is very object-like and IDE friendly.
