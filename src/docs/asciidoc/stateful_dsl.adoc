@@ -6,7 +6,7 @@
 Following up on the chapter "<<mini_dsl.adoc#mini_dsl,A mini DSL>>",
 I would like to include two new features in our DSL today:
 
-* command expressions like `move rover 20 meters forward` that read like plain english
+* command expressions like `move rover 20 meters forward` that read like plain english and
 * a sequence of such commands for the same rover
 
 === Step 1: Command Expressions
@@ -23,7 +23,7 @@ Let's find out how we could implement the following example:
 move rover 20 meters forward
 ----
 
-Now, this is just a simple function `move` with four arguments! _Done._
+Now, this is just a simple `move` function with four arguments! _Done._
 
 Well, almost done. We need to find out what type `rover` should be and what the other
 arguments are. Here is a proposal: just make `rover` a _Position_ with some nice record
@@ -41,7 +41,7 @@ forward = 1.0
 
 move :: Position -> Double -> Double -> Double -> Position
 move position distance unit direction =
-    position.{x <- (+ distance * unit * direction) }  -- #1
+    position.{x &lt;- (+ distance * unit * direction) }  -- #1
 ----
 
 This should all be familiar, where at (#1) we modify the _x_ position in a fashion
@@ -50,7 +50,7 @@ that we already encountered in "<<dot_notation.adoc#dot_notation, The Power of t
 .Homework I
 ****
 The energetic reader may want to improve the solution by re-using the
-type-safe units of length that we defined in "<<unit_dsl.adoc#unit_dsl, Enhancing the DSL for Type Safety>>"
+type-safe units of length that we defined in "<<unit_dsl.adoc#unit_dsl, Enhancing the DSL for Type Safety>>".
 ****
 
 Ok, this works nicely, but as soon as we try to do multiple moves in sequence, the code becomes
@@ -63,15 +63,15 @@ pos1 = move rover ...
 pos2 = move pos1  ...
 ----
 
-It would all be so much easier if we could modify the position...
+It would all be so much easier if we could just modify the position...
 
 === Step 2: Introducing State
 
-Luckily, there is a _State_ type in Frege and it perfectly fits our requirements.
+Luckily, there is a _State_ type in Frege and it perfectly fits our needs.
 
 * We can use a `State Position` type, meaning "state for a _Position_ type".
 * `State` has a `modify` operation that takes a high-order function, which knows how to
-  update a position. Ha, this is exactly our new `move`!
+  update a position. Ha, this will be our new `move`!
 * `State` also has an `execState` that runs our stateful computations (doing the moves)
   starting from an initial position. Perfect.
 
@@ -83,8 +83,8 @@ the position state from one move function to the next - exactly the same structu
 we have seen for `IO`, `Maybe`, and lists.
 ****
 
-Where there is "bind" (in the form of the `>>=` operator) there is also the do-nation that
-we are using in the final solution. Here it is.
+When there is "bind" (in the form of the `>>=` operator) then we can also use the do-nation
+and we will do so in the final solution. Here it is.
 
 .Moving the rover through command expressions
 [source,frege]
@@ -104,7 +104,7 @@ back    = -1.0
 
 move ∷ Double → Double -> Double → State Position ()  -- #1
 move distance unit direction = State.modify update where
-    update pos = pos.{x <- (+ distance * unit * direction) }
+    update pos = pos.{x &lt;- (+ distance * unit * direction) }
 
 with start f = State.execState f start   -- #2
 
@@ -125,16 +125,16 @@ A few remarks about the code where it is not entirely obvious:
 
 At (#1) we see in the type signature `State Position ()`. Why the "()" unit? Well, in full
 generality, `State` has not only one type parameter  but two:
-`State s a`, where `s` is the type of the managed state (in our case `Position`) and `a` is the type that
+`State s a`, where `s` is the type of the managed state - in our case `Position` - and `a` is the type that
 stateful computations can _evaluate_ to. We make no use of `a` in our solution since we
 are only interested in the state change. If you ever use
 `runState` or `evalState` you will see the differences.
 
 (#2) introduced the small convenience function `with` to flip the parameter positions
 of `execState` just because that makes the do-notation easier to use. I think it also
-reads nicer. (There also is a `flip` function to do this in-place but I felt that to be distracting.)
+reads nicer. There is a `flip` function to do this in-place but I found it distracting.
 
-At (#3) we see that `rover` has gone. It is now in the state. This is even more compelling as a DSL!
+At (#3) we see that `rover` has gone! It is now in the state. This is even more compelling as a DSL!
 And this works all fully typesafe without implicit delegates (this is for the language geeks).
 
 .Homework II
