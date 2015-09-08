@@ -77,16 +77,15 @@ Luckily, there is a _State_ type in Frege and it perfectly fits our needs.
 
 ."bind" again
 ****
-Running the "stateful computations" technically means that we provide a many _move_ functions.
+Running stateful computations technically means that we provide many _move_ functions.
 These functions must be called in strict sequence and `execState` must _bind_
-the position state from one move function to the next - exactly the same structure that
-we have seen for `IO`, `Maybe`, and lists.
+the result position from one move function to the next.
 ****
 
 When there is "bind" (in the form of the `>>=` operator) then we can also use the do-nation
 and we will do so in the final solution. Here it is.
 
-.Moving the rover through command expressions
+.Moving the rover by command expressions
 [source,frege]
 ----
 module CommandExpressionRover where
@@ -135,7 +134,7 @@ of `execState` just because that makes the do-notation easier to use. I think it
 reads nicer. There is a `flip` function to do this in-place but I found it distracting.
 
 At (#3) we see that `rover` has gone! It is now in the state. This is even more compelling as a DSL!
-And this works all fully typesafe without implicit delegates (this is for the language geeks).
+And this works 100% typesafe without implicit delegates (this is for the language geeks).
 
 .Homework II
 ****
@@ -161,3 +160,14 @@ Using `State` is still purely functional.
 
 You may also have recognized that we got the plain `endPosition` without the `State` context as a result value.
 This is only possible because `State` is pure.
+
+=== References
+[horizontal]
+Haskell Wikibook::
+https://en.wikibooks.org/wiki/Haskell/Understanding_monads/State
+
+Frege Language Reference::
+http://www.frege-lang.org/doc/Language.pdf , section 3.2 "Primary Expression"
+
+Groovy Mars Rover DSL::
+http://www.infoq.com/presentations/groovy-dsl-mars
