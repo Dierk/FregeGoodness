@@ -1,0 +1,163 @@
+
+[[stateful_dsl]]
+
+== Stateful Commands for the Mars Rover
+
+Following up on the chapter "<<mini_dsl.adoc#mini_dsl,A mini DSL>>",
+I would like to include two new features in our DSL today:
+
+* command expressions like `move rover 20 meters forward` that read like plain english
+* a sequence of such commands for the same rover
+
+=== Step 1: Command Expressions
+
+Command expressions make code read like plain english, which is helpful (or just cool)
+in many DSLs.
+They require that we get rid of all punctuation and
+this can be really difficult in many languages. Luckily, it is a piece of cake in Frege.
+Let's find out how we could implement the following example:
+
+.A single command expression
+[source,frege]
+----
+move rover 20 meters forward
+----
+
+Now, this is just a simple function `move` with four arguments! _Done._
+
+Well, almost done. We need to find out what type `rover` should be and what the other
+arguments are. Here is a proposal: just make `rover` a _Position_ with some nice record
+syntax and use _Double_ for all remaining arguments. The return value is the new position.
+
+.Making the command expression work
+[source,frege]
+----
+data Position = Pos { x, y :: Double }
+derive Show Position
+
+rover   = Pos 0 0
+meters  = 1.0
+forward = 1.0
+
+move :: Position -> Double -> Double -> Double -> Position
+move position distance unit direction =
+    position.{x <- (+ distance * unit * direction) }  -- #1
+----
+
+This should all be familiar, where at (#1) we modify the _x_ position in a fashion
+that we already encountered in "<<dot_notation.adoc#dot_notation, The Power of the Dot>>".
+
+.Homework I
+****
+The energetic reader may want to improve the solution by re-using the
+type-safe units of length that we defined in "<<unit_dsl.adoc#unit_dsl, Enhancing the DSL for Type Safety>>"
+****
+
+Ok, this works nicely, but as soon as we try to do multiple moves in sequence, the code becomes
+rather unwieldy. We would have to pass the updated position around such that the result of the last move
+becomes an argument to the next move.
+
+[source, pseudo]
+----
+pos1 = move rover ...
+pos2 = move pos1  ...
+----
+
+It would all be so much easier if we could modify the position...
+
+=== Step 2: Introducing State
+
+Luckily, there is a _State_ type in Frege and it perfectly fits our requirements.
+
+* We can use a `State Position` type, meaning "state for a _Position_ type".
+* `State` has a `modify` operation that takes a high-order function, which knows how to
+  update a position. Ha, this is exactly our new `move`!
+* `State` also has an `execState` that runs our stateful computations (doing the moves)
+  starting from an initial position. Perfect.
+
+."bind" again
+****
+Running the "stateful computations" technically means that we provide a many _move_ functions.
+These functions must be called in strict sequence and `execState` must _bind_
+the position state from one move function to the next - exactly the same structure that
+we have seen for `IO`, `Maybe`, and lists.
+****
+
+Where there is "bind" (in the form of the `>>=` operator) there is also the do-nation that
+we are using in the final solution. Here it is.
+
+.Moving the rover through command expressions
+[source,frege]
+----
+module CommandExpressionRover where
+
+import frege.control.monad.State
+
+data Position = Pos { x, y :: Double }
+derive Show Position
+
+rover   = Pos 0 0
+feet    = 0.305
+meters  = 1.0
+forward = 1.0
+back    = -1.0
+
+move ∷ Double → Double -> Double → State Position ()  -- #1
+move distance unit direction = State.modify update where
+    update pos = pos.{x <- (+ distance * unit * direction) }
+
+with start f = State.execState f start   -- #2
+
+main = do
+    endPosition = with rover do
+        move 20 meters forward  -- #3
+        move 10 feet back
+    println $ "moved the rover around, ending at " ++ show endPosition
+----
+
+This code prints
+
+----
+moved the rover around, ending at Pos 16.95 0.0
+----
+
+A few remarks about the code where it is not entirely obvious:
+
+At (#1) we see in the type signature `State Position ()`. Why the "()" unit? Well, in full
+generality, `State` has not only one type parameter  but two:
+`State s a`, where `s` is the type of the managed state (in our case `Position`) and `a` is the type that
+stateful computations can _evaluate_ to. We make no use of `a` in our solution since we
+are only interested in the state change. If you ever use
+`runState` or `evalState` you will see the differences.
+
+(#2) introduced the small convenience function `with` to flip the parameter positions
+of `execState` just because that makes the do-notation easier to use. I think it also
+reads nicer. (There also is a `flip` function to do this in-place but I felt that to be distracting.)
+
+At (#3) we see that `rover` has gone. It is now in the state. This is even more compelling as a DSL!
+And this works all fully typesafe without implicit delegates (this is for the language geeks).
+
+.Homework II
+****
+Add functions to change the direction of the next move, e.g. `turn 90 degrees`.
+For the geeks: check out https://github.com/Frege/FregeFX[FregeFX] and paint the moves on a canvas.
+****
+
+=== Stateless State
+
+Many people claim that using state in a purely functional language is hard - and I concede that
+it takes a bit more consideration than just writing `position.x += distance * unit * direction`.
+However, the code above is reasonably legible.
+
+On the other hand: isn't state undermining our purity goals?
+Have we silently converted to the dark side? No!
+
+.Staying pure
+****
+Even though the code above looks like it would operate on mutable state, that really isn't the case.
+`State` transfers immutable values from one function to the next *but never ever mutates any state*!
+Using `State` is still purely functional.
+****
+
+You may also have recognized that we got the plain `endPosition` without the `State` context as a result value.
+This is only possible because `State` is pure.
