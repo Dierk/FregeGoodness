@@ -101,6 +101,7 @@ The return type of _bind_ is the return type of its second argument. In our case
 .Returns IO () since (println "3") return IO ()
 [source,pseudo]
 ----
+-- pseudocode
 bind (println "2") (println "3")
 ----
 
@@ -109,10 +110,15 @@ And, of course, the same is true for `println "1"`.
 .Returns IO () since ... you get it, right?
 [source,pseudo]
 ----
+-- pseudocode
 bind (println "1")  (bind (println "2") (println "3"))
 ----
 
-So the whole function body that looked so imperative boils down to a single expression and
+NOTE: The _bind_ does not appear as a function name in the IO type class -
+      only its operator symbol `>>=`, which is pronounced "bind".
+      So our pseudocode `bind a b` appears in real code as `a >>= b`.
+
+The whole function body that looked so imperative boils down to a single expression and
 type inference becomes a piece of cake.
 
 At this point, we have everything collapsed to a single expression until the `do` keyword, which
@@ -129,14 +135,9 @@ It took me a while to understand how these mechanics work and in particular how 
 which _bind_ to use. There are many explanations around but that part was always missing for me -
 probably because it was so obvious to everybody else.
 
-.By the way
-****
-When looking for the _bind_ function, you will see that it is written as the `>>=` infix operator.
-So `bind a b` appears as `a >>= b` (and there are a few variants that we will cover later).
-****
-
 As an aside, using _bind_ like an infix operator
 ----
+-- pseudocode
 a `bind`
 b `bind`
 c
@@ -149,7 +150,7 @@ c
 ----
 This is why _bind_ is also humorously known as _the programmable semicolon_.
 It provides the logic how two functions compose in a given context and - as we will see later -
-how the first function can pass its result as an argument to the second function.
+how the first function can _bind_ its result to the argument of the second function.
 
 === Summary
 
