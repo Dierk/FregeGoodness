@@ -14,3 +14,4 @@
 . link:src/docs/asciidoc/mini_dsl.adoc[A mini DSL with Type Classes]
 . link:src/docs/asciidoc/unit_dsl.adoc[Enhancing the DSL for Type Safety]
 . link:src/docs/asciidoc/stateful_dsl.adoc[Stateful Commands for the Mars Rover]
+. link:src/docs/asciidoc/incremental_episode1.adoc[Incremental Development]
