@@ -4,7 +4,7 @@
 This is why functional programming _really_ matters:
 _it provides new options for incremental development_.
 
-After all, how do we create software? _ One line at a time_. +
+After all, how do we create software? _One line at a time_. +
 All software development is incremental.
 
 We can approach this task in two ways: _intrusively_ or _non-intrusively_.
@@ -39,14 +39,18 @@ The paper is now 25 years old but still one of the best motivations for function
 The examples are presented in the Miranda language, the predecessor of Haskell.
 His line of argumentation accumulates in the last example: a generic solution for playing board games.
 
-We take this very example and implement it in Frege, following the steps as explained in the paper.
-You may want to read it in parallel.
+We take this very example and implement it in Frege over the course of 4 episodes,
+following the steps as explained in the paper.
+You may want to read it in parallel to better understand what we are doing, to deepen your understanding,
+but first of all because it is just a joy to read.
+
 As the specific board game we choose tic-tac-toc (aka noughts and crosses). It is pretty easy to visualize and
-has simple rules that do not distract too much from the purpose of exercise:
+has simple rules that do not distract too much from the purpose of the exercise:
 experiencing incremental development in Frege.
 
 .The tic-tac-toe game.
 image:tictactoe.png["The tic-tac-toe game", link="tictactoe.png"]
+
 https://klondike.canoo.com/tictactoe/game[Play the game.]
 
 So let's begin with the first of four episodes.
@@ -55,7 +59,7 @@ So let's begin with the first of four episodes.
 
 A board game is a series of mutual moves, each resulting in a new board position. 
 Since there are many possible moves and for every move a number of possible reactions by the opponent,
-the possible unfoldings of the game form a tree of board positions.
+the possible evolutions of the game form a tree of board positions.
 
 Depending on the game rules, such a game tree can become infinitely large.
 
