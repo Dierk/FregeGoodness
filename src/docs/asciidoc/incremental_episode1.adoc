@@ -1,0 +1,123 @@
+[[incremental_episode1]]
+== Incremental Development
+
+This is why functional programming _really_ matters:
+_it provides new options for incremental development_.
+
+After all, how do we create software? _ One line at a time_. +
+All software development is incremental.
+
+We can approach this task in two ways: _intrusively_ or _non-intrusively_.
+When we have to change and recompile existing code in order to proceed, we call this approach _intrusive_.
+
+Of course, the best would be if we could apply increments _non-intrusively_, without touching any existing code at all
+and without any fear of breaking existing code!
+This is sometimes possible.
+
+.Options for non-intrusive increments today
+* Modular architectures allow to just add new components or services.
+* In object-oriented systems we can use subtyping to add new implementations for existing abstractions.
+* With dynamic languages, we can add new capabilities to existing classes.
+
+But all of these options have their limitations.
+They either work only for anticipated extensions or they come at the expense of increased complexity
+or weakened type safety, which in the future makes it harder to extend the extensions again.
+
+We would certainly profit if we had more ways of extending software safely.
+
+Functional programming comes with such new options as John Hughes has shown in his seminal paper
+http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf["Why functional programming matters"].
+He puts it in terms of _modularity_ and new _glue_ for combining modules: high-order functions and lazy evaluation.
+
+.Why do we strive for modularity?
+****
+Modularity is not an end in itself. It helps us constrain the effect of changes to a single module and lets us add and
+remove modules without touching others. It allows us to work incrementally.
+****
+
+The paper is now 25 years old but still one of the best motivations for functional programming.
+The examples are presented in the Miranda language, the predecessor of Haskell.
+His line of argumentation accumulates in the last example: a generic solution for playing board games.
+
+We take this very example and implement it in Frege, following the steps as explained in the paper.
+You may want to read it in parallel.
+As the specific board game we choose tic-tac-toc (aka noughts and crosses). It is pretty easy to visualize and
+has simple rules that do not distract too much from the purpose of exercise:
+experiencing incremental development in Frege.
+
+.The tic-tac-toe game.
+image:tictactoe.png["The tic-tac-toe game", link="tictactoe.png"]
+https://klondike.canoo.com/tictactoe/game[Play the game.]
+
+So let's begin with the first of four episodes.
+
+=== Episode One: Be infinitely lazy and defer all work
+
+A board game is a series of mutual moves, each resulting in a new board position. 
+Since there are many possible moves and for every move a number of possible reactions by the opponent,
+the possible unfoldings of the game form a tree of board positions.
+
+Depending on the game rules, such a game tree can become infinitely large.
+
+The natural way of modeling this in a lazy functional language like Frege or Haskell is to not care
+about the size of the tree at all but only about how to construct it.
+We stay focused on generation task and defer the limitation work to later.
+
+Here is the construction for an arbitrary payload "a".
+Children of each node recursively arise from making Nodes for all the payloads that "a" can `unfold` to.
+[source, frege]
+----
+buildTree :: (a -&gt; [a]) -&gt; a -&gt; Tree a
+buildTree unfold a = Node a children where 
+    children = map (buildTree unfold) (unfold a)  
+----
+
+We do not care about a base case to stop the recursion or limit the size of the tree
+but note that calling `buildTree` will neither exhaust memory nor computation time.
+Laziness in the language cares for constructing children only when needed.
+
+This is now something that we can specialize for a given data type `Board` and a function `moves` 
+that unfolds to all boards that result from applying a valid move.
+[source, frege]
+----
+gameTree :: Board -&gt; Tree Board
+gameTree board = buildTree moves board
+----
+
+The specialization needs no subtyping and is yet fully type-safe.
+We have extended the system _non-intrusively_ and we will do so again for limiting the size of the game tree.
+
+When an evaluation of the tree shall be limited to a depth "n" we simply prune the tree at that depth.
+That code is independent of our special game use case and can therefore work on nodes of arbitrary trees.
+Here is the recursive definition.
+[source, frege]
+----
+prune 0 (Node a children) = Node a []
+prune n (Node a children) = Node a (map (prune (n-1)) children)
+----
+
+To make a pruned game tree we use function composition (.) for the generation:
+[source, frege]
+----
+prunedTree = prune 5 . gameTree
+----
+
+Note that we still haven't materialized the tree!
+A user of the pruned tree can never look below level 5.
+No children below that level are ever evaluated, and thus - thanks to laziness - never get constructed.
+
+Laziness allows us to work _incrementally_ not only from generic tree generation to specialized logic and data types.
+We even apply pruning conditions _non-intrusively_ "from the outside". We didn't need to anticipate the need for pruning.
+
+We never had to go back to previous code to change it. We did not even re-compile!
+
+This is it for episode one. Stay tuned for episode two.
+
+=== References
+[horizontal]
+John Hughes::
+http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf[Why functional programming matters]
+
+Tic Tac Toe::
+https://klondike.canoo.com/tictactoe/game[live game],
+https://github.com/Dierk/fregePluginApp/blob/game_only/src/frege/fregepluginapp/Minimax.fr[full source code]
