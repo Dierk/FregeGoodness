@@ -1,0 +1,88 @@
+After having written episodes <a title="Why functional programming really matters – episode one" href="http://www.canoo.com/blog/2015/01/12/fp1/">1</a>, <a title="Why functional programming really matters – episode two" href="http://www.canoo.com/blog/2015/01/17/fp2/">2</a>, and <a title="Why functional programming really matters – episode three" href="http://www.canoo.com/blog/2015/01/19/fp3/">3</a>, I planned to close the series with some parting thoughts about what we have achieved and where I struggled along the way. But in the process of writing down my findings, it occurred to me that we have achieved an unusual state that we can leverage to our advantage:
+<p style="text-align: center;"><strong>All our code is <em>purely</em> functional</strong></p>
+1) There is <em>not a single assignment</em> in the code, <em>no state</em> that needs to get updated, and therefore also no shared mutable state that could impose any issues when going parallel.
+<blockquote>When recognizing a = sign in the code the casual reader may be misinterpret this as an assignment, which it is not. It is a one-time definition that never changes. All is safe.</blockquote>
+2) There are <em>no side effects</em> in the code.
+
+3) You cannot imagine my surprise when I recognized that <strong><em>we don't even have to consider 1) and 2)</em></strong> for the total of our code because the Frege type system <em>validates our assumptions about purity automatically!</em>
+
+One often advertised advantage of functional programming is it's improved support for parallel execution when compared to imperative solutions. And that claim is true - to some degree. The point is that "a <strong>little</strong> bit of functional style" only helps very <strong>little</strong> when going parallel. As long as you cannot guarantee that all your code that you are going to execute in parallel is MT safe, the ability of calling parallel versions of higher-order functions like map, filter, reduce, etc. is only of <strong>superficial</strong> syntactial help. With that approach, <em>it remains the obligation of the programmer</em> to inspect <em>the whole call chain</em> from all methods that are called from a inside concurrent operation (like <em>map</em>) <em>down to their very last primitive statement</em> to <em>validate</em> them for <em>MT safety</em>. And even if all the code is safe at the time of introducing the concurrent use, how about later changes where the maintainer is not aware that he has to keep that characteristic?
+
+[caption id="attachment_8992" align="alignright" width="200"]<a href="https://klondike.canoo.com/tictactoe/game"><img class="wp-image-8992" src="https://www.canoo.com/blog/wp-content/uploads/2015/01/Bildschirmfoto-2015-01-20-um-13.16.07.png" alt="Tic Tac Toe in parallel" width="200" height="538" /></a> Tic Tac Toe in parallel[/caption]
+
+This is where the <strong>big difference</strong> between
+"<em>functional style</em>" and
+"<em>pure functional</em>" programming
+becomes not only undeniably apparent but also of utmost <em>practical</em> relevance.
+
+<strong>A new requirement comes up: go parallel</strong>
+
+Let's try to evaluate our <a title="tic tac toe game" href="https://klondike.canoo.com/tictactoe/game" target="_blank">Tic Tac Toe</a> moves in parallel. There is one line where we map all boards that can arise from making a valid move to their evaluation, where <em>probe</em> is a function that is used for both, using the minimax algorithm for finding the <em>best</em> board and for returning the <em>forecast</em>:
+<pre class="lang:haskell decode:true">evaluatedMoves = map (probe lookahead) possibleMoves</pre>
+In order to make the mapping parallel, we can use the <em>mapP</em> function from the <em>frege.lib.ForkJoin</em> module:
+<pre class="lang:haskell decode:true ">evaluatedMoves = mapP (probe lookahead) possibleMoves</pre>
+The superficial syntactical advantage is the opportunity to make the code parallel with <em>one</em> (!) additional character in the code.
+
+While this is kind of cool in itself, the really impressive effect is that this change is <em>guaranteed to be safe</em>! This is <strong>fundamental</strong> and it works because of the way that <strong>purity</strong> is handled through the <strong>type system</strong>.
+
+And this comes so: the type signature of <em>map</em> is
+
+<tt>map :: ( α -&gt; β ) -&gt; [α] -&gt; [β]</tt>
+
+Let's start with the first argument <em>( α -&gt; β )</em>.
+
+It means that <em>map</em>'s first argument is a function from any unconstrained type <em>α</em> to any unconstrained type <em>β</em>. Let's call that function <em>f</em>. The <em>map</em> function applies its argument function <em>f</em> to all elements of a list of <em>α</em>s to produce a list of <em>β</em>s.
+In our case <em>f</em> is <tt>(probe lookahead)</tt>.
+If <tt>(probe lookahead)</tt> would use any kind of <strong>state</strong> or use any kind of <strong>side effect</strong>, then type α or type β (or both types) would need to have a type constraint like <em>State α</em> or <em>IO β</em> .
+In such a case, <tt>map (probe lookahead)</tt> would simply <strong>fail</strong> to compile.
+
+In other words: <strong>the signature of <em>map</em> requires purity of <em>f</em></strong> and the Frege <strong>type system</strong> enforces this <em>down the whole</em> <em>call chain</em>! We do not have to go back and check ourselves nor can any later intrusive change by a maintainer undermine our foundation.
+
+Now, what happens when we go from <em>map</em> to <em>mapP</em> ? Here is the type signature of <em>mapP</em> :
+
+<tt>mapP :: ( α -&gt; β ) -&gt; [α] -&gt; [β]</tt>
+
+That is <strong>exactly the same</strong>! The whole line of argumentation from above persists!
+
+<hr />
+<p style="text-align: center;"><strong>Let that sink in for a minute.</strong></p>
+
+
+<hr />
+
+With Frege, we can again apply a <em>non-intrusive increment</em>: from <em>sequential</em> to <em>parallel</em> execution in an absolutely safe manner. Purity and its handling in the type system make that possible.
+In all other popular JVM languages this would have been an <strong><em>immensely</em></strong> intrusive change (even if old code was not edited at all - changing its mode of operation is intrusive) with a <em>huge</em> potential to introduce hard-to-detect errors.
+And again, we were able to apply this non-intrusive increment <em>without having planned for it</em>. We just did what is usual in Frege and it turned out to just fit.
+
+We can almost always safely go from <em>map</em> to <em>mapP</em>.
+
+There are two <em>considerations</em>, that one should apply before blindly making all calls to <em>map</em> parallel:
+<strong>1) Granularity</strong>
+We applied parallel execution on the top-most layer of the evaluation only, not down to all splits of possible boards. That is a usual performance concern for data-parallel concurrency where we weigh the relative overhead of thread scheduling against the size of the unit of work.
+<strong>2) Infinite data structures</strong>
+Parallel execution makes usually no sense to be done <em>lazily</em> since new threads should start working early enough to have the result ready when requested. But that approach would never finish when applied to <em>infinite</em> data structures on the top-most level of expressions. Therefore, <em>mapP</em> enforces the weak-head-normal-form (<a title="weak head normal form" href="https://wiki.haskell.org/Weak_head_normal_form" target="_blank">WHNF</a>) of the given list. That still allows laziness at lower levels.
+
+But those considerations are fully inside our mental context when applying our increment. We are in the position to decide about granularity and we know that <em>possibleMoves</em> is a finite list. It is all on one line and we do not have to go further.
+
+My personal experience was very strange when I applied concurrceny to the tic tac toe game. I went from <em>map</em> to <em>mapP</em>,  let the code run, and enjoyed the speedup. Then I fell back into my old habit of paranoid concurrency thinking: <strong><em>what could possibly go wrong</em></strong>?
+
+And for the first time ever in such a situation, I couldn't think of any possible issue.
+
+I still have trouble believing it.
+
+In the next episode, we may finally come to the parting thoughts.
+
+Dierk König
+@mittie
+
+<hr />
+
+Links:
+
+<a title="Episode 1" href="%20http://www.canoo.com/fp1/">Episode 1</a>
+<a title="Episode 2" href="%20http://www.canoo.com/fp2/">Episode 2</a>
+<a title="Episode 3" href="%20http://www.canoo.com/fp3/">Episode 3</a>
+<a title="Episode 4" href="%20http://www.canoo.com/fp4/">Episode 4</a>
+The paper <a title="why functional programming matters" href="http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf" target="_blank">Why functional programming matters</a>
+
+The full <a title="minimax" href="https://github.com/Dierk/fregePluginApp/blob/game_only/src/frege/fregepluginapp/Minimax.fr" target="_blank">source code</a>. Play the game <a title="tic tac toe" href="https://klondike.canoo.com/tictactoe/game" target="_blank">here</a>.

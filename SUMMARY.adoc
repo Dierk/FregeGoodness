@@ -14,4 +14,6 @@
 . link:src/docs/asciidoc/mini_dsl.adoc[A mini DSL with Type Classes]
 . link:src/docs/asciidoc/unit_dsl.adoc[Enhancing the DSL for Type Safety]
 . link:src/docs/asciidoc/stateful_dsl.adoc[Stateful Commands for the Mars Rover]
-. link:src/docs/asciidoc/incremental_episode1.adoc[Incremental Development]
+. link:src/docs/asciidoc/incremental_head.adoc[Incremental Development]
+.. link:src/docs/asciidoc/incremental_episode1.adoc[Episode One: Be infinitely lazy and defer all work]
+.. link:src/docs/asciidoc/incremental_episode2.adoc[Episode Two: Designing with functions and composition]
