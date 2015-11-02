@@ -44,7 +44,7 @@ following the steps as explained in the paper.
 You may want to read it in parallel to better understand what we are doing, to deepen your understanding,
 but first of all because it is just a joy to read.
 
-As the specific board game we choose tic-tac-toc (aka noughts and crosses). It is pretty easy to visualize and
+As the specific board game we choose tic-tac-toe (aka noughts and crosses). It is pretty easy to visualize and
 has simple rules that do not distract too much from the purpose of the exercise:
 experiencing incremental development in Frege.
 

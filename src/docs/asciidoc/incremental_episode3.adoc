@@ -6,6 +6,9 @@ What we will do now is changing code from the last increment.
 
 image:stack_of_increments.png https://www.canoo.com/blog/wp-content/uploads/2015/01/Untitled-Drawing.png
 
+.A stack of increments
+image:stack_of_increments.png[ "A stack of increments", link="stack_of_increments.png"]
+
 
 Changing code is what we declared as being _intrusive_  but changing the _last_ increment is allowed.
 
@@ -48,12 +51,12 @@ for _non-intrusive increments_.
 
 === A new requirement comes up: predicting the future
 
-https://www.canoo.com/blog/wp-content/uploads/2015/01/Bildschirmfoto-2015-01-20-um-13.16.07.png" alt="Tic Tac Toe with forecast"
-</a> Computer knows he will win[/caption]
-
 It appears that playing the game is fun but sometimes it is difficult to understand why the computer does a certain move.
 It would be interesting if we had a some insight and could show what the computer is considering.
 The idea is that we display a forecast: the final board that the computer thinks the game will develop into.
+
+.Computer knows he will win.
+image:ttt_with_forecast.png[ "Tic Tac Toe with forecast", link="ttt_with_forecast.png"]
 
 To this end, we need to capture the board that led to the minimax value. It turns out that this is easier than expected.
 We can use _evaluateBy_ but we do not pass the _static_ function any more.
