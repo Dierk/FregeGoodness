@@ -15,11 +15,8 @@ li > p {
     -webkit-margin-after: 0px;
 }
 
-.sidebarblock .comments-section {
+.sidebarblock {
     background-color: papayawhip;
     padding: 4%;
 }
 
-.sidebarblock .title {
-    padding: 4%;
-}
