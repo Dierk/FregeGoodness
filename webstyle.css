@@ -17,5 +17,9 @@ li > p {
 
 .sidebarblock .comments-section {
     background-color: papayawhip;
-    padding-left: 10%;
+    padding: 4%;
+}
+
+.sidebarblock .title {
+    padding: 4%;
 }
