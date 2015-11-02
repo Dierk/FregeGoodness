@@ -28,7 +28,7 @@ myFunction receiver arg1
 Luckily, Frege has a nice dot notation that combines the power of both approaches
 and can be used by IDEs for providing great support.
 
-[source,frege]
+[source,haskell]
 ----
 receiver.myFunction arg1
 ----
@@ -48,7 +48,7 @@ For using a module, one needs an import statement (with an optional qualificatio
 and after that one can use the imported types and functions with a prefix.
 
 .A simple module import and module namespace usage
-[source,frege]
+[source,haskell]
 ----
 import fregefx.javafx.scene.control.TextArea
 -- later
@@ -66,7 +66,7 @@ Below is an example from the source code of the
 https://github.com/Dierk/frepl-gui/blob/master/client/src/main/frege/org/frege/Application.fr#L112[Frege JavaFX REPL].
 
 .Very close to OO notation
-[source,frege]
+[source,haskell]
 ----
 insert :: TextArea -> String -> IO ()
 insert inputArea text = do
@@ -83,7 +83,7 @@ And there is more.
 In a former post, we had used the data type `Position` with the record syntax like so:
 
 .Note the use of 'position.ticker'
-[source,frege]
+[source,haskell]
 ----
 data Ticker = GOOG | MSFT | APPL | CANO | NOOB
 
@@ -102,7 +102,7 @@ to a Java getter method.
 We can refer to this function in two equivalent ways:
 
 .Two equivalent notations
-[source,frege]
+[source,haskell]
 ----
 Position.ticker position  -- "getter"
 position.ticker
@@ -111,7 +111,7 @@ position.ticker
 And there are more options for setting or updating "fields":
 
 .Setting and updating equivalents with dot notation
-[source,frege]
+[source,haskell]
 ----
 Position.{soMany = } position 1  -- "setter"
 position.{soMany = } 1
@@ -132,7 +132,7 @@ Below we introduce a class of types that can somehow
 duplicate its value and we make String an instance of that class.
 
 .Dot notation for instances of a typeclass
-[source,frege]
+[source,haskell]
 ----
 class Doubleable a where
     twice :: a -> a

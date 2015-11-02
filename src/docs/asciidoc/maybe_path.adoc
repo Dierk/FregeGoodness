@@ -22,7 +22,7 @@ Note the similarity to the domain in "<<fpath.adoc#fpath,List and Path>>".
 We only replace _list of_ types with _Maybe_ and adapt the names.
 
 .The core domain data structures
-[source,frege]
+[source,haskell]
 ----
 data Bank       = Bank      { star   :: Maybe Client     }
 data Client     = Client    { star   :: Maybe Portfolio  }
@@ -36,7 +36,7 @@ NOTE: A `Position` always has a ticker, even though that makes our live a little
 Now let's create an example bank with all optional values being available.
 
 .The bank with all stars
-[source,frege]
+[source,haskell]
 ----
 starBank = Bank {
     star = Just Client {
@@ -51,7 +51,7 @@ But there may be other banks, where either no star client is known or he doesn't
 preferred portfolio or there is no special position worth considering.
 
 .Poor banks (hypothetical)
-[source,frege]
+[source,haskell]
 ----
 noStarBank      = Bank { star = Nothing }
 noPortfolioBank = Bank { star = Just Client { star = Nothing } }
@@ -77,7 +77,7 @@ There are a number of straightforward ways of implementing this
 lead to an intricate solution similar to the one below.
 
 .Works but is difficult to read
-[source,frege]
+[source,haskell]
 ----
 starTicker bank = starPortfolio bank.star where
     starPortfolio Nothing = Nothing
@@ -92,7 +92,7 @@ Let's see whether this works as expected. Remember that _Nothing_ may appear any
 in the process and we need to make sure that we never fall off the ship.
 
 .Testing
-[source,frege]
+[source,haskell]
 ----
 import Test.QuickCheck
 
@@ -155,7 +155,7 @@ portfolio of the optional star client!
 To complete the task, here is the solution in a single path.
 
 .Chaining Maybe values in a path
-[source,frege]
+[source,haskell]
 ----
 starTicker bank =
     bank.star >>= Client.star >>= Portfolio.star >>= \position -> Just position.ticker
@@ -183,7 +183,7 @@ Meanwhile it should come at no surprise that where there is _bind_, the "do" not
 just around the corner.
 
 .The star ticker with "do" notation
-[source,frege]
+[source,haskell]
 ----
 starTicker bank = do
     warrenBuffet  &lt;- bank.star

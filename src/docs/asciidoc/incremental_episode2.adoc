@@ -87,7 +87,7 @@ Remember that the tree is not materialized! Only on demand when we access the ch
 And so it is as well for the `static` function: nothing gets evaluated before we access the payload via `static board`.
 
 The function that calculates the maximum value for a board is again a composition:
-[source,frege]
+[source,haskell]
 ----
 maximize . valueTree
 ----

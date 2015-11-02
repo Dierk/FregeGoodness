@@ -4,7 +4,7 @@
 First, think of a function _f_ that maps a lists of arbitrary element types to another list of the exact same type.
 
 In Frege terms, such a function _f_ is declared as
-[source,frege]
+[source,haskell]
 ----
 f :: [a] -> [a]
 ----
@@ -19,7 +19,7 @@ Second, think of any _specific_ function _g_ with type `a -> b` that for a given
 For example, you can choose:
 
 .An example for _g_ as a function from Int to String
-[source,frege]
+[source,haskell]
 ----
 g :: Int -> String
 g x = show x ++ show x ++ show x
@@ -48,19 +48,19 @@ Let's try with an example. Assume we had chosen the `reverse` function for _f_. 
 _This is what you had in mind anyway, right?_
 
 We start with
-[source,frege]
+[source,haskell]
 ----
 [1, 2, 3]
 ----
 
 apply it to _reverse_
-[source,frege]
+[source,haskell]
 ----
 reverse [1,2,3]
 ----
 
 and feed it into `map g`. Successively reducing the terms gives us
-[source,frege]
+[source,haskell]
 ----
 map g (reverse [1,2,3])
 map g [3, 2, 1]
@@ -68,7 +68,7 @@ map g [3, 2, 1]
 ----
 
 Now the other way around: first mapping, then reversing
-[source,frege]
+[source,haskell]
 ----
 reverse (map g [1, 2, 3])
 reverse ["111", "222", "333"]

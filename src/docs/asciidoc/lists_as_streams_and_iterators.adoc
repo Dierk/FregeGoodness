@@ -26,7 +26,7 @@ The most obvious example is the infinite list of all positive whole
 numbers:
 
 .An infinite list
-[source,frege]
+[source,haskell]
 ----
 integers = [1..]
 ----
@@ -35,7 +35,7 @@ Though infinite, the `integers` list does *not* exhaust the memory.
 Neither do other large lists of that kind:
 
 .A large list
-[source,frege]
+[source,haskell]
 ----
 large = [1..100_000_000]
 ----
@@ -45,7 +45,7 @@ range-like lists but thanks to laziness, it is a feature that works
 for all lists where the individual values are somehow derived:
 
 .Other infinite lists
-[source,frege]
+[source,haskell]
 ----
 -- derive next value from predecessor
 cardinals = iterate (+1) 1
@@ -77,7 +77,7 @@ to get access to elements in the list. Access to a value at a given
 index uses the `!!` operator.
 
 .List functions that mostly do what you think they do
-[source,frege]
+[source,haskell]
 ----
 head   [0..10]
 last   [0..10]
@@ -121,7 +121,7 @@ list just like their equivalents on Java streams but return an efficient
 "copy" or "view" of the list. The original never changes.
 
 .Lists as non-destructive streams
-[source,frege]
+[source,haskell]
 ----
 drop 2 [0..10]
 take 5 [0..10]
@@ -145,7 +145,7 @@ they can also be seen as iterators and sequences.
 Iterators pass each element, one at a time, to a function that uses that element.
 
 .Print the numbers 1 to 10
-[source,frege]
+[source,haskell]
 ----
 for [1..10] println
 ----
@@ -162,7 +162,7 @@ essentially sequences of these actions with the help of the
 `sequence` function.
 
 .Executing all actions in sequence
-[source,frege]
+[source,haskell]
 ----
 actions = map println [1..3]
 sequence actions
@@ -184,7 +184,7 @@ Starting at number 1, we get the next uneven number by adding
 2 to the previous one.
 
 .The stream of uneven numbers
-[source,frege]
+[source,haskell]
 ----
 unevens = iterate (+2) 1
 ----
@@ -193,7 +193,7 @@ Now, to get the _n_'th square number, we need to add up the first
 _n_ uneven numbers by folding them with the plus function.
 
 .Adding up the first n uneven numbers
-[source,frege]
+[source,haskell]
 ----
 square n = fold (+) 0 $ take n unevens
 ----
@@ -209,7 +209,7 @@ Using the _square_ function (that works on the stream of _unevens_) we can now c
 stream of all squares by mapping the stream of all whole numbers to their squares.
 
 .An infinite stream of squares
-[source,frege]
+[source,haskell]
 ----
 squares = map square [1..]
 ----
@@ -220,7 +220,7 @@ that we need for printing. Printing an infinite stream is not a good idea, thoug
 and therefore we limit the iteration to any slice that we are interested in.
 
 .Iterate over an interesting slice
-[source,frege]
+[source,haskell]
 ----
 for (take 10 $ drop 100 squares) println
 ----
@@ -240,7 +240,7 @@ image:Stairs_doodle.png[ "stairs doodle",width=256, link="Stairs_doodle.png"]
 
 Given a starting point and the logic how to calculate the next step, the code is literally (!)
 
-[source,frege]
+[source,haskell]
 ----
 stairs = iterate step start
 ----
@@ -248,7 +248,7 @@ stairs = iterate step start
 The doodle itself needs a graphics context for drawing
 (and thus the FregeFX REPL) and the doodling itself is just the sequence of connecting the calculated steps:
 
-[source,frege]
+[source,haskell]
 ----
 doodle ctx = map (connect ctx) stairs
 ----

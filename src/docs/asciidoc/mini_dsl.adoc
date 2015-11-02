@@ -13,7 +13,7 @@ Let's assume that our DSL models measurements of distance such that
 ten meters should appear as `10.m` and we want to do arithmetic
 with it like
 
-[source,frege]
+[source,haskell]
 ----
 10.m - 20.cm + 10.mm - 3.cm  == 9780.mm
 ----
@@ -35,7 +35,7 @@ can be the type or a type class of the following value `1`. Our actual `Int` typ
 `mm` function so we are left with using a type class.
 
 .The definition of a Millimeter type class for an integral type "a"
-[source,frege]
+[source,haskell]
 ----
 class Millimeter (Integral a) => a  where
     mm :: a -> a
@@ -54,7 +54,7 @@ NOTE: The "a" is called a _type variable_. It stands in for a _type_. Like all v
 Now that we have the type class defined, all we need to do is making `Int` an instance of this class.
 
 .Making the Int type an instance of the Millimeter type class
-[source,frege]
+[source,haskell]
 ----
 instance Millimeter Int where
     mm i = i
@@ -65,7 +65,7 @@ instance Millimeter Int where
 And voilà, from now on we can do metrical calculations with ease.
 
 .Using the embedded mini-DSL
-[source,frege]
+[source,haskell]
 ----
 main args = do
     println $ 10.m - 20.cm + 10.mm - 3.cm  == 9780.mm

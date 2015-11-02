@@ -16,7 +16,7 @@ but also for units of duration. The combination of both naturally leads to
 units of velocity.
 
 .What we try to achieve with our DSL of units
-[source,frege]
+[source,haskell]
 ----
 10.m   -- distance in meters
 10.sec -- duration in seconds
@@ -35,7 +35,7 @@ generalize and make `Millimeter` an instance of the `Num` type class such that w
 do arithmetic operations on it.
 
 .The compiler tells us what functions to implement to satisfy Num
-[source,frege]
+[source,haskell]
 ----
 data Millimeter = MM Int
 
@@ -54,7 +54,7 @@ instance Num Millimeter where
 This means that we can now calculate in terms of millimeters:
 
 .Calculating in millimeters
-[source,frege]
+[source,haskell]
 ----
 MM 10 + MM 10 == MM 20
 ----
@@ -63,7 +63,7 @@ For making `10.mm` the value `MM 10`, we just make our `Metric` type class
 using `Millimeter` as the return type instead of `Int`.
 
 .Update return types from Int to Millimeter
-[source,frege]
+[source,haskell]
 ----
 class Metric (Integral a)  => a  where
     mm :: a -> Millimeter
@@ -79,7 +79,7 @@ instance Metric Int where
 And voilà, after the refactoring all old code still works like before.
 
 .Proceed. Here is nothing to see. It's all like before...
-[source,frege]
+[source,haskell]
 ----
 main args = do
     println $ 10.m - 20.cm + 10.mm - 3.cm  == 9780.mm
@@ -97,7 +97,7 @@ at all but add the new feature of calculating with durations.
 We follow the same strategy as before.
 
 .The full solution for durations in one go
-[source,frege]
+[source,haskell]
 ----
 data Seconds = SEC Int
 
@@ -138,7 +138,7 @@ With this new structure, we have some serious benefits.
 And now we can go even further and mix distances and duration to describe velocity.
 
 .Describing velocity as the quotient of distance over duration
-[source,frege]
+[source,haskell]
 ----
 data Velocity = KMH Double
 derive Eq Velocity

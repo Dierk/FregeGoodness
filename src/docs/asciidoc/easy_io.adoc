@@ -38,7 +38,7 @@ The Groovy developer has a lot of choices. He can use the exact same syntax as i
 Java version and it will be valid Groovy. Here is a rather compact version.
 
 .The Frege function
-[source,frege]
+[source,haskell]
 ----
 -- Frege
 print123 = do

@@ -27,7 +27,7 @@ Let's start with common, simple data structure: a `Person` that has a first name
 thinks in a certain programming language.
 
 .A simple Person data type
-[source,frege]
+[source,haskell]
 ----
 data Person = Person { firstname, lastname, language :: String }
 
@@ -44,7 +44,7 @@ There are actually two separate features of the language that we see here:
 * We cannot change the person value itself. But we can create new value, based on the given one.
 
 .Changing a field creates a copy
-[source,frege]
+[source,haskell]
 ----
 groovyDierk = javaDierk.{ language = "Groovy" }
 fregeDierk  = javaDierk.{ language = "Frege"  }

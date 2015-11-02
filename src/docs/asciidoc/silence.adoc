@@ -12,7 +12,7 @@ Lets start with function application.
 
 === Function application
 
-[source,frege]
+[source,haskell]
 ----
 f(x)    -- as known from many languages
 f x     -- Frege style (like linear functions in mathematics)
@@ -44,7 +44,7 @@ become an argument to _f_, which is not what we want. This can get unwieldy
 when the nesting gets deeper and therefore there is an alternative using
 the dollar sign.
 
-[source,frege]
+[source,haskell]
 ----
 foo (bar (baz (buz x)))  -- deeply nested style
 foo $ bar $ baz $ buz x  -- flat $ style
@@ -67,7 +67,7 @@ Now, even if we love to see dollars, the _$_ operator is certainly not very sile
 the dot-operator is. It it the operator for _function composition_:
 `f(g(x))` can - just like in school math - be written as `(f • g) x`.
 
-[source,frege]
+[source,haskell]
 ----
 (foo . bar . baz . buz) x  -- function composition with dot
 (foo • bar • baz • buz) x  -- Frege also allows unicode 2022
@@ -86,7 +86,7 @@ than function composition.
 Therefore, we need the parentheses above to prevent the binding between
 _buz_ and _x_. But, hey, we learned that dollar has lowest precedence,
 so putting that in between should also work, right? Yes it does.
-[source,frege]
+[source,haskell]
 ----
     foo . bar . baz . buz $ x  -- this is not used so often
 ----
@@ -100,7 +100,7 @@ Yes, but that needs a bit of background.
 Let's assume we have a method `inc` that just adds 1 to its argument.
 There are two equivalent ways of writing this:
 
-[source,frege]
+[source,haskell]
 ----
 inc x = x + 1           -- usual function definition
 inc   = \x -> x + 1     -- equivalent lambda style
@@ -111,7 +111,7 @@ inc   = \x -> x + 1     -- equivalent lambda style
 Now if we want a function _f_ to work like _inc_, we can use _inc_
 in the definition of _f_ and relay the argument.
 
-[source,frege]
+[source,haskell]
 ----
 f x   = inc x           -- f should be like inc
 f     = inc             -- point-free style, "cancel x"
@@ -120,7 +120,7 @@ f     = inc             -- point-free style, "cancel x"
 But we can even cancel down the _x_ such that _f_ looks like an alias
 for _inc_. And here is proof that this is a valid transformation:
 
-[source,frege]
+[source,haskell]
 ----
 f     = inc             -- beta reduction =>
 f     = \x -> x + 1     -- replace formal lambda parameter with free variable =>
@@ -130,7 +130,7 @@ f x   = x + 1           -- same as definition of inc
 This finally leaves us with four ways of defining our function:
 
 .The final overview of all four styles
-[source,frege]
+[source,haskell]
 ----
 f x =  foo (bar (baz (buz x)))    -- deeply nested style
 f x =  foo $ bar $ baz $ buz x    -- flat $ style

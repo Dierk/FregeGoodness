@@ -23,7 +23,7 @@ First, we need an infinite production of numbers. In Frege that is
 used so often that it has it's own idiom:
 
 .All numbers
-[source,frege]
+[source,haskell]
 ----
 [1..]
 ----
@@ -33,7 +33,7 @@ We model this as an endless repetition of strings, which are
 all empty, except every third one is "fizz".
 
 .The infinite fizz pattern
-[source,frege]
+[source,haskell]
 ----
 fizzes = cycle ["", "", "fizz"]
 ----
@@ -41,7 +41,7 @@ fizzes = cycle ["", "", "fizz"]
 By now, you will have guessed what the buzzes pattern looks like.
 
 .The infinite buzz pattern
-[source,frege]
+[source,haskell]
 ----
 buzzes = cycle ["", "", "", "", "buzz"]
 ----
@@ -64,7 +64,7 @@ buzzes:  "", "", "",     "", "buzz", "",     "", ...
 ----
 
 .The infinite fizz-buzz pattern
-[source,frege]
+[source,haskell]
 ----
 pattern = zipWith (++) fizzes buzzes
 ----
@@ -90,7 +90,7 @@ Now we can superimpose the pattern on the infinite list of numbers
 to get the final infinite production.
 
 .The final fizzbuzz solution
-[source,frege]
+[source,haskell]
 ----
 fizzes   = cycle ["", "", "fizz"]
 buzzes   = cycle ["", "", "", "", "buzz"]

@@ -19,7 +19,7 @@ image:fpath_domain.png[ "A simplified banking domain", link="fpath_domain.png"]
 
 The tickers are easily modeled with an enumeration
 
-[source,frege]
+[source,haskell]
 ----
 data Ticker = GOOG | MSFT | APPL | CANO | NOOB
 derive Eq Ticker
@@ -28,7 +28,7 @@ derive Eq Ticker
 The rest of the domain is just normal data structures in record syntax.
 
 .The core domain data structures
-[source,frege]
+[source,haskell]
 ----
 data Bank       = Bank      { clients       :: [Client]     }
 data Client     = Client    { portfolios    :: [Portfolio]  }
@@ -39,7 +39,7 @@ data Position   = Position  { soMany :: Int, ticker :: Ticker }
 Now let's create an example bank that has 1000 clients, each having 3 portfolios with various positions.
 
 .Domain sample data
-[source,frege]
+[source,haskell]
 ----
 bank = Bank { clients = replicate 1000
     Client { portfolios = replicate 3
@@ -66,7 +66,7 @@ Finally, we need some pricing information for our stock tickers for later valuat
 We use a simple association list.
 
 .Defining prices as an association list
-[source,frege]
+[source,haskell]
 ----
 prices = [ (GOOG, 100) , (MSFT, 200) , (APPL, 300) , (CANO, 400) ]
 ----
@@ -78,7 +78,7 @@ Let's do that right away with invariants that tell how to value a position:
 by multiplying the price of the ticker by how many we have of those.
 
 .Testing the valuation of positions
-[source,frege]
+[source,haskell]
 ----
 import Test.QuickCheck
 
@@ -97,7 +97,7 @@ When we go in this test-first style, the compiler will complain that there is no
 to find the price for the ticker.
 
 .Implementing the value function
-[source,frege]
+[source,haskell]
 ----
 import Data.List (lookup)
 
@@ -178,7 +178,7 @@ To finally drive the point home, here is the first version of calculating the as
 by using the _bind_, mapping positions to their values, and summing those up.
 
 .Assets under management, first version
-[source,frege]
+[source,haskell]
 ----
 assetsUnderManagement1 = sum $
     map value $
@@ -191,7 +191,7 @@ Another lesson from "<<easy_io.adoc#easy_io,Easy IO>>" was that _bind_ allows us
 leads to the following code.
 
 .Assets under management with "do" notation
-[source,frege]
+[source,haskell]
 ----
 assetsUnderManagement2 = sum $
     map value do
@@ -204,7 +204,7 @@ The single intermediate values must now be _drawn from_ the list by means of the
 But wait! This looks and sounds utterly familiar and even has the same meaning as in list comprehensions!
 
 .Assets under management with list comprehension
-[source,frege]
+[source,haskell]
 ----
 assetsUnderManagement3 = sum
     [value position |
@@ -223,7 +223,7 @@ of all Canoo shares in our bank. With a list comprehension, this is simple
 to do and yields another interesting analogy to SQL queries.
 
 .List comprehension as a query
-[source,frege]
+[source,haskell]
 ----
 allCanoo3 = sum
     [value position |                       -- SELECT
@@ -242,7 +242,7 @@ We said that "do" notation is equivalent. Here is how it
 looks with filters as where-clauses:
 
 .Do notation with filter
-[source,frege]
+[source,haskell]
 ----
 allCanoo2 = sum $
     map value do
@@ -258,7 +258,7 @@ One can see the subtle differences in style.
 Finally, the path version with filtering.
 
 .Path query with filter
-[source,frege]
+[source,haskell]
 ----
 allCanoo1 = sum $
     map value $

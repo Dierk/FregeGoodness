@@ -6,7 +6,7 @@ Let's have a first glance on what we can do with it.
 
 In the post "<<magical_trick.adoc#magical_trick,A magical trick>>" we worked with these functions _f_ and _g_.
 
-[source,frege]
+[source,haskell]
 ----
 f :: [a] -> [a]  -- we should think of any such function
 f  = reverse     -- that was our pick
@@ -17,12 +17,12 @@ g x = show x ++ show x ++ show x
 
 We found that we can freely choose between
 
-[source,frege]
+[source,haskell]
 ----
 map g (f [1, 2, 3])
 ----
 and
-[source,frege]
+[source,haskell]
 ----
 f (map g [1, 2, 3])
 ----
@@ -42,7 +42,7 @@ and - don't be afraid - one can still do single, hard-coded test cases to e.g. c
 
 Here is how we can define a property in Frege with QuickCheck:
 
-[source,frege]
+[source,haskell]
 ----
 import frege.test.QuickCheck
 
@@ -51,7 +51,7 @@ commutativity xs = property ( map g (f xs) == f (map g xs) )
 
 Having defined this property, we can quickly check whether it holds:
 
-[source,frege]
+[source,haskell]
 ----
 quickCheck commutativity
 ----

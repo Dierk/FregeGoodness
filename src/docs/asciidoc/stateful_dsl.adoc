@@ -18,7 +18,7 @@ this can be really difficult in many languages. Luckily, it is a piece of cake i
 Let's find out how we could implement the following example:
 
 .A single command expression
-[source,frege]
+[source,haskell]
 ----
 move rover 20 meters forward
 ----
@@ -30,7 +30,7 @@ arguments are. Here is a proposal: just make `rover` a _Position_ with some nice
 syntax and use _Double_ for all remaining arguments. The return value is the new position.
 
 .Making the command expression work
-[source,frege]
+[source,haskell]
 ----
 data Position = Pos { x, y :: Double }
 derive Show Position
@@ -86,7 +86,7 @@ When there is "bind" (in the form of the `>>=` operator) then we can also use th
 and we will do so in the final solution. Here it is.
 
 .Moving the rover by command expressions
-[source,frege]
+[source,haskell]
 ----
 module CommandExpressionRover where
 

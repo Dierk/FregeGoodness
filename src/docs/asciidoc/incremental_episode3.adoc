@@ -14,7 +14,7 @@ Since no code can possibly depend on the <em>last</em> increment,  changing it
 
 With that consideration out of the way, let's look at our last increment that finds the minimax value for a given board:
 
-[source,frege]
+[source,haskell]
 ----
 maxValue = maximize . static . prune 5 . gameTree
 ----
