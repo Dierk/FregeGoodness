@@ -15,7 +15,7 @@ li > p {
     -webkit-margin-after: 0px;
 }
 
-.comments-section {
+.sidebarblock .comments-section {
     background-color: papayawhip;
     padding-left: 10%;
 }
