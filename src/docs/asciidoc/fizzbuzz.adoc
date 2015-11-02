@@ -106,7 +106,7 @@ We have already seen twice how to combine them, but they
 can also be easily filtered and selected from for printing.
 
 .Showing parts of the infinite production
-[source,frege]
+[source,haskell]
 ----
 main _ = do
     println $ take 5 $ drop 200 fizzbuzz
@@ -203,5 +203,6 @@ The Scalarian has correctly pointed out that with Java 8 there is a much less im
 https://github.com/thescalarian/FregeGoodness/blob/patch-1/src/docs/asciidoc/fizzbuzz.adoc
 
 FizzBuzz Solutions::
-http://c2.com/cgi/wiki?FizzBuzzTest
+http://c2.com/cgi/wiki?FizzBuzzTest[C2 Wiki],
+https://vimeo.com/144335290[Fizzbuzz Trek] by Kevlin Henney
 

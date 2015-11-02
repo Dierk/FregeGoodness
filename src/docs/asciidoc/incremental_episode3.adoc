@@ -1,4 +1,110 @@
-<p>Why functional programming <em>really</em> matters:<br /> <em>providing more options for incremental development</em>.</p><p>In<a title="Why functional programming really matters – episode two" href="http://www.canoo.com/blog/2015/01/17/why-functional-programming-really-matters-episode-two/"> episode two</a> we have seen how designing with functions naturally leads to incremental development. We will now extend our running example with higher-order functions and data type evolution.</p><p><strong>Episode Three: higher-order functions and data type evolution</strong></p><p>In <a title="Why functional programming really matters – episode one" href="http://www.canoo.com/blog/2015/01/12/why-functional-programming-really-matters-episode-one/">episode one</a> we made the case for incremental development and the importance of staying <em>non-intrusive</em>. What we will do now is changing code from the last increment.</p>[caption id="attachment_8970" align="alignright" width="247"]<a href="https://www.canoo.com/blog/wp-content/uploads/2015/01/Untitled-Drawing.png"><img class="wp-image-8970 size-full" src="https://www.canoo.com/blog/wp-content/uploads/2015/01/Untitled-Drawing.png" alt="a stack of increments" width="247" height="176" /></a> a stack of increments[/caption]<p>Changing code is what we declared as being <em>intrusive</em>  but changing the <em>last</em> increment is allowed.</p><p>The problem with changing code is that any code that depends on it may be compromised. That is the intrusion. Since no code can possibly depend on the <em>last</em> increment,  changing it is safe.</p><p>With that consideration out of the way, let's look at our last increment that finds the minimax value for a given board:</p><pre class="lang:haskell decode:true">maxValue = maximize . static . prune 5 . gameTree</pre><p>It works fine but we would like to make it even more <em>idiomatic </em>in the functional sense.</p><p>We have already seen that functional programmers like to introduce abstractions very early and there is a hidden abstraction in the code above. We map a tree of boards to a tree of doubles. The structure of the tree remains untouched. This is the nature of an abstraction called <em>Functor</em>. Functors support a general function <em>fmap</em> that keeps the current structure but applies a function <em>f</em> to all elements. It turns out that our <em>Tree</em> type is such a <em>Functor</em>.</p><p>To use the Functor nature of trees, we use <em>fmap f</em> instead of <em>static</em>.</p><pre class="lang:haskell decode:true ">evaluateBy f = maximize . fmap f . prune 5 . gameTree
+[[incremental_episode3]]
+== Episode Three: Higher-order functions and data type evolution
 
-maxValue = evaluateBy static</pre><p>Note that <em>evaluateBy</em> now takes a parameter <em>f</em>, which can be any function that takes a <em>Board</em> and returns an <em>Ord</em> as required by <em>maximize</em>.</p><p>A function like <em>evaluateBy</em> that takes another function as a parameter is called a <strong><em>higher-order function</em></strong>. They are heavily used in functional programming and in fact we have used them before without giving it any attention. The current case, though, is different. We use this very common functional feature to set the stage for <em>non-intrusive increments</em>.</p>[caption id="attachment_8992" align="alignright" width="200"]<a href="https://klondike.canoo.com/tictactoe/game"><img class="wp-image-8992" src="https://www.canoo.com/blog/wp-content/uploads/2015/01/Bildschirmfoto-2015-01-20-um-13.16.07.png" alt="Tic Tac Toe with forecast" width="200" height="538" /></a> Computer knows he will win[/caption]<p><br /> <strong>A new requirement comes up: predict the future</strong></p><p>It appears that playing the game is fun but sometimes it is difficult to understand why the computer does a certain move. It would be interesting if we had a bit of insight and could show what the computer is considering. The idea is that we display a forecast: the final board that the computer thinks the game will develop into.</p><p>To this end, we need to capture the board that led to the minimax value. It turns out that this is easier than expected. We can use <em>evaluateBy</em> but we do not pass the <em>static</em> function any more. Instead, we pass a function that maps a board not only to its static value but to a <em>pair</em> of the static value and the board itself.</p><pre class="lang:haskell decode:true">endValue = evaluateBy capture where
-    capture board = (static board, board)</pre><p>This is nice. First and foremost it is a fully <em>non-intrusive</em> increment! We did not change any existing code at all.</p><p>Second, it falls in place very naturally when following the functional style with higher-order functions - without any anticipation of new requirements.</p><blockquote><p>Think what would have happened in a typical object-oriented style. We can of course achieve similar effects in OO but this requires some forethought to prepare for new use cases: template methods, strategy pattern, and the likes. Without such anticipation, OO design would lead to intrusive changes. One way or the other: incremental development is harder.</p></blockquote><p>The downside is: it doesn't compile.</p><p>Our mapping function must return an <em>Ord</em> but a pair (any tuple actually) is only of type <em>Ord</em> if all its elements are of type <em>Ord</em> as well. The <em>Double</em> value is but the <em>Board</em> type is not.</p><p>Hm, what next? Going back to the definition of <em>Board</em> and changing its definition? That would be an <em>intrusive </em>change.</p><p>Here we see a big benefit of Frege typeclasses (as opposed to let's say Java interfaces): we can <strong>evolve the data type!</strong> <em>Board</em> becomes an instance of the <em>Ord</em> typeclass <em>non-intrusively</em> in a new increment with full static type safety!<br /> There is not much logic to add since we make all boards equal. For the purpose of ordering our pairs we only need the <em>static</em> <em>Double</em> values of the pair.</p><pre class="lang:haskell decode:true">instance Ord Board where (<=>) a b = EQ</pre><p>This code looks so simple but the implications are huge. By making <em>Board</em> an instance of <em>Ord</em>, we have given the <em>Board</em> type a new capability!</p><blockquote><p>Note that this even works when the source code of <em>Board</em> is not available. It can come from a third-party library that we only have in binary form.<br /> We can even <strong>evolve</strong> <strong>foreign data types</strong>.</p></blockquote><p>Now we have everything compiling and working. You can <a title="Tic Tac Toe" href="https://klondike.canoo.com/tictactoe/game" target="_blank">play the game</a> and see the forecast working.</p><p>In the <a title="WhyFpReallyMatters: going safely parallel" href="http://www.canoo.com/blog/2015/02/11/fp4/">next episode</a>, I there is a big surprise waiting with regard to parallel execution.</p><p>Dierk König<br /> @mittie</p><p> </p><hr /><p>Links:</p><p><a title="Episode 1" href="%20http://www.canoo.com/fp1/">Episode 1</a><br /> <a title="Episode 2" href="%20http://www.canoo.com/fp2/">Episode 2</a><br /> <a title="Episode 3" href="%20http://www.canoo.com/fp3/">Episode 3</a><br /> <a title="Episode 4" href="%20http://www.canoo.com/fp4/">Episode 4</a><br /> The paper <a title="why functional programming matters" href="http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf" target="_blank">Why functional programming matters</a></p><p>The full <a title="minimax" href="https://github.com/Dierk/fregePluginApp/blob/game_only/src/frege/fregepluginapp/Minimax.fr" target="_blank">source code</a>. Play the game <a title="tic tac toe" href="https://klondike.canoo.com/tictactoe/game" target="_blank">here</a>.</p><p> </p><p> </p><p> </p><p> </p><p> </p><p> </p><p> </p><p> </p><p> </p><p> </p>
+In episode one we made the case for incremental development and the importance of staying <em>non-intrusive</em>.
+What we will do now is changing code from the last increment.
+
+image:stack_of_increments.png https://www.canoo.com/blog/wp-content/uploads/2015/01/Untitled-Drawing.png
+
+
+Changing code is what we declared as being <em>intrusive</em>  but changing the <em>last</em> increment is allowed.
+
+The problem with changing code is that any code that depends on it may be compromised. That is the intrusion.
+Since no code can possibly depend on the <em>last</em> increment,  changing it is safe.
+
+With that consideration out of the way, let's look at our last increment that finds the minimax value for a given board:
+
+[source,frege]
+----
+maxValue = maximize . static . prune 5 . gameTree
+----
+It works fine but we would like to make it even more <em>idiomatic </em>in the functional sense.
+
+We have already seen that functional programmers like to introduce abstractions very early 
+and there is a hidden abstraction in the code above.
+We map a tree of boards to a tree of doubles. The structure of the tree remains untouched.
+This is the nature of an abstraction called <em>Functor</em>.
+Functors support a general function <em>fmap</em> that keeps the current structure but applies a
+function <em>f</em> to all elements. It turns out that our <em>Tree</em> type is such a
+<em>Functor</em>.
+
+To use the Functor nature of trees, we use <em>fmap f</em> instead of <em>static</em>.
+
+----
+evaluateBy f = maximize . fmap f . prune 5 . gameTree
+
+maxValue = evaluateBy static
+----
+
+Note that <em>evaluateBy</em> now takes a parameter <em>f</em>, which can be any function that takes a <em>Board</em> 
+and returns an <em>Ord</em> as required by <em>maximize</em>.
+
+A function like <em>evaluateBy</em> that takes another function as a parameter is called a
+<strong><em>higher-order function</em></strong>.
+They are heavily used in functional programming and in fact we have used them before without giving it any attention.
+The current case, though, is different. We use this very common functional feature to set the stage
+for <em>non-intrusive increments</em>.
+
+=== A new requirement comes up: predicting the future
+
+https://www.canoo.com/blog/wp-content/uploads/2015/01/Bildschirmfoto-2015-01-20-um-13.16.07.png" alt="Tic Tac Toe with forecast"
+</a> Computer knows he will win[/caption]
+
+It appears that playing the game is fun but sometimes it is difficult to understand why the computer does a certain move.
+It would be interesting if we had a some insight and could show what the computer is considering.
+The idea is that we display a forecast: the final board that the computer thinks the game will develop into.
+
+To this end, we need to capture the board that led to the minimax value. It turns out that this is easier than expected.
+We can use <em>evaluateBy</em> but we do not pass the <em>static</em> function any more.
+Instead, we pass a function that maps a board not only to its static value but to a <em>pair</em>
+of the static value and the board itself.
+----
+endValue = evaluateBy capture where
+    capture board = (static board, board)
+----
+This is nice. First and foremost it is a fully <em>non-intrusive</em> increment!
+We did not change any existing code at all.
+
+Second, it falls in place very naturally when following the functional style with higher-order functions -
+without any anticipation of new requirements.
+
+.Compare with OO
+****
+Think what would have happened if we followed a typical object-oriented style.
+We can of course achieve similar effects in OO but this requires some forethought to prepare for new use cases:
+template methods, strategy pattern, and the likes. Without such anticipation, OO design would lead to intrusive changes.
+One way or the other: incremental development would be harder.
+****
+
+The downside is: it doesn't compile.
+
+Our mapping function must return an <em>Ord</em> but a pair (any tuple actually) is only of type <em>Ord</em>
+if all its elements are of type <em>Ord</em> as well. The <em>Double</em> value is but the <em>Board</em> type is not.
+
+Hm, what next? Going back to the definition of <em>Board</em> and changing its definition?
+That would be an <em>intrusive </em>change.
+
+Here we see a big benefit of Frege typeclasses (as opposed to let's say Java interfaces):
+we can <strong>evolve the data type!</strong> <em>Board</em> becomes an instance of the <em>Ord</em>
+typeclass <em>non-intrusively</em> in a new increment with full static type safety!
+
+There is not much logic to add since we make all boards equal.
+For the purpose of ordering our pairs we only need the <em>static</em> <em>Double</em> values of the pair.
+----
+instance Ord Board where (<=>) a b = EQ
+----
+
+This code looks so simple but the implications are huge. By making <em>Board</em> an instance of <em>Ord</em>,
+we have given the <em>Board</em> type a new capability!
+
+.Type evolution
+****
+Note that this even works when the source code of <em>Board</em> is not available.
+It can come from a third-party library that we only have in binary form. +
+We can even <strong>evolve</strong> <strong>foreign data types</strong>.
+****
+
+Now we have everything compiling and working. You can
+https://klondike.canoo.com/tictactoe/game[play the game] and see the forecast working.
+
+In the next episode, we will apply a rather unconventional increment: going safely parallel.
