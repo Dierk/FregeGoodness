@@ -4,8 +4,6 @@
 In episode one we made the case for incremental development and the importance of staying _non-intrusive_.
 What we will do now is changing code from the last increment.
 
-image:stack_of_increments.png https://www.canoo.com/blog/wp-content/uploads/2015/01/Untitled-Drawing.png
-
 .A stack of increments
 image:stack_of_increments.png[ "A stack of increments", link="stack_of_increments.png"]
 
@@ -21,7 +19,7 @@ With that consideration out of the way, let's look at our last increment that fi
 ----
 maxValue = maximize . static . prune 5 . gameTree
 ----
-It works fine but we would like to make it even more _idiomatic _in the functional sense.
+It works fine but we would like to make it even more _idiomatic_ in the functional sense.
 
 We have already seen that functional programmers like to introduce abstractions very early 
 and there is a hidden abstraction in the code above.
@@ -88,7 +86,7 @@ Our mapping function must return an _Ord_ but a pair (any tuple actually) is onl
 if all its elements are of type _Ord_ as well. The _Double_ value is but the _Board_ type is not.
 
 Hm, what next? Going back to the definition of _Board_ and changing its definition?
-That would be an _intrusive _change.
+That would be an _intrusive_ change.
 
 Here we see a big benefit of Frege typeclasses (as opposed to let's say Java interfaces):
 we can *evolve the data type!* _Board_ becomes an instance of the _Ord_
