@@ -17,6 +17,8 @@ li > p {
 
 .sidebarblock {
     background-color: papayawhip;
-    padding: 4%;
+    padding-left:  4%;
+    padding-top:   4%;
+    padding-right: 4%;
 }
 
