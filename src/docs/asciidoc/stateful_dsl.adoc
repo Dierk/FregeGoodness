@@ -101,15 +101,15 @@ meters  = 1.0
 forward = 1.0
 back    = -1.0
 
-move ∷ Double → Double -> Double → State Position ()  -- #1
+move ∷ Double → Double -> Double → State Position ()  -- ➊
 move distance unit direction = State.modify update where
     update pos = pos.{x <- (+ distance * unit * direction) }
 
-with start f = State.execState f start   -- #2
+with start f = State.execState f start   -- ➋
 
 main = do
     endPosition = with rover do
-        move 20 meters forward  -- #3
+        move 20 meters forward  -- ➌
         move 10 feet back
     println $ "moved the rover around, ending at " ++ show endPosition
 ----
@@ -122,18 +122,18 @@ moved the rover around, ending at Pos 16.95 0.0
 
 A few remarks about the code where it is not entirely obvious:
 
-At (#1) we see in the type signature `State Position ()`. Why the "()" unit? Well, in full
+At ➊ we see in the type signature `State Position ()`. Why the "()" unit? Well, in full
 generality, `State` has not only one type parameter  but two:
 `State s a`, where `s` is the type of the managed state - in our case `Position` - and `a` is the type that
 stateful computations can _evaluate_ to. We make no use of `a` in our solution since we
 are only interested in the state change. If you ever use
 `runState` or `evalState` you will see the differences.
 
-(#2) introduced the small convenience function `with` to flip the parameter positions
+➋ introduced the small convenience function `with` to flip the parameter positions
 of `execState` just because that makes the do-notation easier to use. I think it also
 reads nicer. There is a `flip` function to do this in-place but I found it distracting.
 
-At (#3) we see that `rover` has gone! It is now in the state. This is even more compelling as a DSL!
+At ➌ we see that `rover` has gone! It is now in the state. This is even more compelling as a DSL!
 And this works 100% typesafe without implicit delegates (this is for the language geeks).
 
 .Homework II
