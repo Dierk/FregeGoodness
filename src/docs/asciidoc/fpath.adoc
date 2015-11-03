@@ -139,25 +139,14 @@ value position       -- Position  -> Int
 ----
 
 
-.Required functions
+.Function type alignment
+[options="header",cols="^1,2*<5"]
 |===
-|Number |Functions |Type
-
-|1
-|bank.clients
-|[Client]
-
-|2
-|Client.portfolios
-|Client -> [Portfolio]
-
-|3
-|Portfolio.positions
-|Portfolio -> [Position]
-
-|4
-|value position
-|Position -> Int
+|Number |Function            |Type
+|1      |`bank.clients       ` |`             [Client]`
+|2      |`Client.portfolios  ` |`Client    -> [Portfolio]`
+|3      |`Portfolio.positions` |`Portfolio -> [Position]`
+|4      |`value position     ` |`Position  -> Int`
 |===
 
 
