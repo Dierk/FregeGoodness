@@ -11,7 +11,7 @@ as it is available. But unlike a blog, you also have the full
 series in your hand for browsing and searching.
 
 Furthermore, there is support for many reading devices on the web,
-smartphone, tablet, iBooks and kindle.
+smartphone, tablet, iBooks, and Kindle.
 
 === For the advanced beginner
 
@@ -38,6 +38,9 @@ When hovering over a paragraph, a "+" box appears. Just click on it to start a d
 
 I'm also happy to take https://github.com/Dierk/FregeGoodness/pulls[pull requests] from
 those who would like to contribute to the book.
+
+You can find me as https://twitter.com/mittie[@mittie] on twitter and on the various
+https://github.com/Frege/frege#contact[Frege channels].
 
 === Credits
 
