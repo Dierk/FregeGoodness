@@ -41,7 +41,7 @@ forward = 1.0
 
 move :: Position -> Double -> Double -> Double -> Position
 move position distance unit direction =
-    position.{x &lt;- (+ distance * unit * direction) }  -- #1
+    position.{x <- (+ distance * unit * direction) }  -- #1
 ----
 
 This should all be familiar, where at (#1) we modify the _x_ position in a fashion
@@ -103,7 +103,7 @@ back    = -1.0
 
 move ∷ Double → Double -> Double → State Position ()  -- #1
 move distance unit direction = State.modify update where
-    update pos = pos.{x &lt;- (+ distance * unit * direction) }
+    update pos = pos.{x <- (+ distance * unit * direction) }
 
 with start f = State.execState f start   -- #2
 

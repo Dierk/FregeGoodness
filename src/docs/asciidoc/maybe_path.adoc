@@ -186,9 +186,9 @@ just around the corner.
 [source,haskell]
 ----
 starTicker bank = do
-    warrenBuffet  &lt;- bank.star
-    starPortfolio &lt;- warrenBuffet.star
-    starPosition  &lt;- starPortfolio.star
+    warrenBuffet  <- bank.star
+    starPortfolio <- warrenBuffet.star
+    starPosition  <- starPortfolio.star
     Just starPosition.ticker
 ----
 
