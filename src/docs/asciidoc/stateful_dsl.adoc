@@ -101,7 +101,7 @@ meters  = 1.0
 forward = 1.0
 back    = -1.0
 
-move ∷ Double → Double -> Double → State Position ()  -- ➊
+move ∷ Double -> Double -> Double -> State Position ()  -- ➊
 move distance unit direction = State.modify update where
     update pos = pos.{x <- (+ distance * unit * direction) }
 
@@ -109,7 +109,7 @@ with start f = State.execState f start   -- ➋
 
 main = do
     endPosition = with rover do
-        move 20 meters forward  -- ➌
+        move 20 meters forward           -- ➌
         move 10 feet back
     println $ "moved the rover around, ending at " ++ show endPosition
 ----
