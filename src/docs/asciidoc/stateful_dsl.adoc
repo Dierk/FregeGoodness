@@ -41,10 +41,10 @@ forward = 1.0
 
 move :: Position -> Double -> Double -> Double -> Position
 move position distance unit direction =
-    position.{x <- (+ distance * unit * direction) }  -- #1
+    position.{x <- (+ distance * unit * direction) }  -- ➊
 ----
 
-This should all be familiar, where at (#1) we modify the _x_ position in a fashion
+This should all be familiar, where at ➊ we modify the _x_ position in a fashion
 that we already encountered in "<<dot_notation.adoc#dot_notation, The Power of the Dot>>".
 
 .Homework I
