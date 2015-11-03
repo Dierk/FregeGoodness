@@ -109,12 +109,15 @@ Let's step back and reconsider what we are doing here.
 
 Looking at the involved functions and their types we see a similar pattern as in "<<fpath.adoc#fpath,List and Path>>".
 
-----
-bank.star        --              Maybe Client    <1>
-Client.star      -- Client    -> Maybe Portfolio <2>
-Portfolio.star   -- Portfolio -> Maybe Position  <3>
-Position.ticker  -- Position  -> Ticker
-----
+.Function type alignment
+[options="header",cols="^1,2*<5"]
+|===
+|Number |Function         |Type
+|<1>    |`bank.star`      |`Maybe Client`
+|<2>    |`Client.star`    |`Client    -> Maybe Portfolio`
+|<3>    |`Portfolio.star` |`Portfolio -> Maybe Position`
+|<4>    |`Position.ticker`|`Position  -> Ticker`
+|===
 
 Each function returns a _Maybe_ of the type that the next function takes as the input.
 So maybe we can generalize over this pattern and _bind_ the functions
@@ -167,10 +170,12 @@ It is also instructive to see this variant where the argument that is passed to 
 is captured in the lambda parameter.
 
 We can simply follow the types. As we have seen in "<<silence.adoc#silence,Silent notation>>"
+[source,haskell]
 ----
 \position -> Just position.ticker   -- Position -> Maybe Ticker
 ----
 is just another notation for
+[source,haskell]
 ----
 foo :: Position -> Maybe Ticker
 foo position = Just position.ticker
@@ -207,7 +212,7 @@ would for example be the Groovy GPath
 
 .There is no _null_.
 ****
-Remember: there is no _null_ in Frege and thus no _NullPointerExceptions_.
+Remember: there is no _null_ in Frege and thus no _NullPointerExceptions_. +
 One cannot say that often enough.
 ****
 
