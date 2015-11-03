@@ -138,6 +138,30 @@ Portfolio.positions  -- Portfolio -> [Position]  <3>
 value position       -- Position  -> Int
 ----
 
+
+.Required functions
+|===
+|Number |Functions |Type
+
+|1
+|bank.clients
+|[Client]
+
+|2
+|Client.portfolios
+|Client -> [Portfolio]
+
+|3
+|Portfolio.positions
+|Portfolio -> [Position]
+
+|4
+|value position
+|Position -> Int
+|===
+
+
+
 Hm, something interesting becomes apparent here: *each function returns a list
 of elements that the next function needs as single elements*.
 So maybe we can generalize over this pattern and _bind_ the functions
