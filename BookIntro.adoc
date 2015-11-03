@@ -1,7 +1,7 @@
 == Welcome to Frege Goodness
 
-The purpose of this book is to assemble a series of
-_posts_ or _chapters_ where each chapter exposes a single characteristic of Frege.
+This book provides a series of
+chapters that each expose a single characteristic of Frege.
 The chapters are deliberately short. You should be able to read a complete one
 while riding the commuter train or while having lunch.
 
@@ -10,11 +10,13 @@ You can subscribe for instant updates and get the newest content as soon
 as it is available. But unlike a blog, you also have the full
 series in your hand for browsing and searching.
 
+Furthermore, there is support for many reading devices on the web,
+smartphone, tablet, iBooks and kindle.
+
 === For the advanced beginner
 
-I assume that you are an _advanced beginner_. You may have
-worked through the excellent books or online tutorials that
-introduce the Haskell syntax that Frege builds upon.
+I assume that you are an _advanced beginner_ that knows the basic
+syntax elements of Haskell/Frege.
 
 The purpose of this book is to ignite curiosity for topics that
 come after the initial steps: What can I do next?
@@ -30,6 +32,9 @@ In short, it is all about using Frege to its full potential!
 
 This book lives on github. If you have any feedback, questions, or suggestions for
 improvement, please https://github.com/Dierk/FregeGoodness/issues[file an issue].
+
+Since recently, gitbooks also support in-document discussions per paragraph.
+When hovering over a paragraph, a "+" box appears. Just click on it to start a discussion.
 
 I'm also happy to take https://github.com/Dierk/FregeGoodness/pulls[pull requests] from
 those who would like to contribute to the book.
