@@ -23,3 +23,7 @@ li > p {
     padding-bottom: 2%;
 }
 
+.book .book-body .page-wrapper .page-inner section.normal pre .hljs-title,
+.book .book-body .page-wrapper .page-inner section.normal code .hljs-title {
+  color: black;
+}
