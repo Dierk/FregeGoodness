@@ -1,6 +1,6 @@
 [[incremental_episode4]]
 
-== Episode 4: Going safely parallel
+== Episode Four: Going safely parallel
 
 So far we have incrementally developed
 
@@ -29,23 +29,25 @@ map :: ( α -> β ) -> [α] -> [β]
 
 Let's start with the first argument `( α -> β )`.
 
-It means that `map`'s first argument is a function from any unconstrained type `α`
+It means that the first argument to `map` is a function from any unconstrained type `α`
 to any unconstrained type `β`. Let's call that function _f_.
 The `map` function applies its argument function _f_ to all elements of a list of
-`α`s to produce a list of `β`s, not knowing any specifics about _f_.
+`α` values to produce a list of `β` values, not knowing any specifics about _f_.
 
-In our case _f_ happens to be `(probe lookahead)`.
+In our case _f_ happens to be `(probe lookahead)`. We are _probing_ each board, looking
+no further than the given _lookahead_ where probing can be either the valuation of the
+board or the detection of the forecast.
 
-Mapping any function _f_ over a list of `α`s cannot possibly perform a side effect.
+Mapping any function _f_ over a list of `α` values cannot possibly perform a side effect.
 The closest possibility would be a specific function _f_ that returns an IO action as type `β`.
-But even in that case, the IO action is only created, not performed.
+But even in that case, the IO action is only _created_, not _performed_.
 No implementation of `map` would ever be able to perform such an action since `map` cannot assume
 _anything_ about `β` - particularly it cannot assume that `β` is an action.
 
 In other words: *the signature of `map` asserts purity of `map f`* and the
 Frege *type system* enforces this _down the whole call chain_!
 We do not have to go back and check the code ourselves for possible purity breaches
-nor can any later intrusive change by a maintainer undermine our foundation.
+nor can any maintainer accidentally undermine our foundation through subsequent changes.
 
 Now, what happens if we go parallel and use `mapP` (the parallel version of `map`)
 instead of `map`? Here is the type signature of `mapP`:
@@ -70,7 +72,7 @@ We just did what is usual in Frege and it turned out to just fit.
 
 We can almost always safely go from _map_ to _mapP_.
 
-There are two _considerations_, that one should apply before blindly making all calls to _map_ parallel:
+There are two _considerations_, however, that we should apply before blindly making all calls to _map_ parallel:
 
 *1) Granularity*
 We applied parallel execution on the top-most layer of the evaluation only, not down to all splits of possible boards.
@@ -79,14 +81,20 @@ against the size of the unit of work.
 
 *2) Infinite data structures*
 Parallel execution makes usually no sense to work _lazily_ since new threads should start working eagerly to have the
-result ready when requested. But that approach would never finish when applied to _infinite_ data structures on the top-most
-level of expressions. Therefore, _mapP_ enforces the
-https://wiki.haskell.org/Weak_head_normal_form[weak-head-normal-form] of the given list -
-still allowing laziness for nested sub-expressions.
+result ready when requested. But that approach would never finish when applied to _infinite_ data structures.
 
 But those considerations are fully inside our mental context when applying our increment.
 We are in the position to decide about granularity and we know that _possibleMoves_ is a finite list.
-It is a reasoning that is local to one single line.
+It is a reasoning that is local to one single increment.
+
+.For the geeks
+****
+The parallel execution in `mapP` would have no effect at all if the usual lazy evaluation strategy was applied.
+Each parallel function application would return immediately, leaving an unevaluated expression behind - for later, lazy
+execution. +
+The implementation of _mapP_ avoids this trap by enforcing the
+https://wiki.haskell.org/Weak_head_normal_form[weak-head-normal-form (WHNF)] of each element in the result list.
+****
 
 My personal experience was very strange when I applied parallelism to the tic tac toe game.
 I went from _map_ to _mapP_,  let the code run, and enjoyed the speedup.
