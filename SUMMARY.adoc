@@ -18,3 +18,4 @@
 .. link:src/docs/asciidoc/incremental_episode1.adoc[Be infinitely lazy and defer all work]
 .. link:src/docs/asciidoc/incremental_episode2.adoc[Designing with functions and composition]
 .. link:src/docs/asciidoc/incremental_episode3.adoc[Higher-order functions and data type evolution]
+.. link:src/docs/asciidoc/incremental_episode4.adoc[Going safely parallel]
