@@ -1,0 +1,163 @@
+[[inference]]
+
+== The merits of type inference
+
+One of the lesser known benefits of Frege (and Haskell) is the way that
+it does type inference. One reason is that so many languages list
+type inference in their fact sheet and so having this feature doesn't get people excited.
+It must be said, though, that there are many different meanings of
+the word from meaning almost nothing to meaning everything.
+
+* In some languages, type inference only means that type declarations do not need to
+  be repeated when definition and assignment happens on the same line.
+* In other languages, the type system can infer the type of a variable
+  based on a literal declaration.
+* Some type systems can locally infer the return type of an expression if the parameter
+  types are given.
+* Frege belongs to the ML-family of languages that enjoy a Hindley-Milner type system.
+  They are solely build from expressions and can _globally_ infer each and every
+  expression in the program - up to the entire program. Only for very special constructions
+  where higher-kinded types are involved do they need some hints from the programmer.
+
+Let's see some examples why that makes a big difference.
+ 
+=== Beginning simply
+
+The simplest example to start with would be `f x`, just applying a function _f_ to _x_ once.
+When we define a method (say, `once`) that is implemented as `f x` then we can inspect
+the type that Frege infers for that function.
+
+.The simple definition
+[source,haskell]
+----
+once f x = f x
+----
+
+We can ask the repl with `:type once` or the eclipse plugin with Ctrl-Space
+for the inferred type.
+
+.The inferred type
+[source,haskell]
+----
+once :: (b->a) -> b -> a
+----
+
+The rationale is as follows: in `f x` the only option is that _f_ is a function.
+It takes one parameter _x_. We have no constraints for the type of _x_ nor for the
+return type of `f x`. So we just call those _a_ and _b_.
+
+When _f_ is of type `b -> a` then the first parameter to _once_ is consequently of type
+`(b->a)`, the second parameter _x_ must be of type `b` (since it is passed to _f_),
+and the return type of _once_ must be the same type as the return type of _f_, thus _a_.
+
+We say that the type that Frege infers is as polymorphic as possible.
+But what should it even mean to be _more or less_ polymorphic?
+
+=== Being more or less polymorphic
+
+In the code above, we did not declare any types and let the type inferencer do its job.
+But if we want, we can provide a type declaration ourselves and there are good reasons
+for doing so.
+
+.Including the type declaration
+[source,haskell]
+----
+once :: (b->a) -> b -> a
+once f x = f x
+----
+
+The first obvious benefit is that any reader of the code immediately sees the type without
+any need to ask the IDE or the REPL. The type declaration becomes part of the documentation
+since it reveals on which types `once` can operate and what it may return when given certain
+argument types (it will return the same type that _f_ returns).
+
+But we can also be more specific, i.e. _less_ polymorphic. Let's assume that we only care about functions that
+take an `Int` and return a `String`. The implementation can stay exactly the same but the
+declaration makes our function monomorphic (mono = one, morph = form -> "of one form").
+
+.Being less polymorphic (monomorphic even)
+[source,haskell]
+----
+once :: (Int->String) -> Int -> String
+once f x = f x
+----
+
+Now, the interesting part is that the type inferencer will anyway do its job and check whether
+our implementation complies to the given declaration. If not, we get an error.
+Explicit declarations are allowed to be more specific (= less polymorphic) but they are not
+allowed to be more general (= more polymorphic) as long as they are still consistent.
+
+It turns out that even this seemingly simple example is not quite as easy as initially thought
+and a slight extension makes it even more challenging.
+
+=== A slight extension
+
+Let's assume that we want to create a function `twice` that works just like `once`
+except that it applies _f_ to _x_ twice.
+
+.Applying f twice
+[source,haskell]
+----
+twice f x = f (f x)
+----
+
+Since we now apply `f` not only to `x` but also to the _result_ of `f x`,
+it should be clear that the result type of `f x` needs to be the same as the type of `x`, right?
+
+.Going cross-eyed?
+****
+This line of argumentation can easily lead to headaches.
+Take it easy. Read it again until it makes sense.
+****
+
+In other words, the signature of `twice` must be:
+
+[source,haskell]
+----
+twice :: (a->a) -> a -> a
+----
+
+and this is exactly what the type system infers for us. _Yippeah!_
+
+=== What if things go wrong?
+
+It is nice that the type inferencer takes on the headaches for us but what
+if we somehow got it wrong and made the following erroneous declaration?
+
+.Erroneous declaration
+[source,haskell]
+----
+falseTwice :: (b->a) -> b -> a
+falseTwice f x = f (f x)
+----
+
+Well, even in this case Frege doesn't let us down. It reports a very detailed
+description of where we went wrong. Let's look at the last of the reported
+errors.
+
+.Last error message
+[source]
+----
+E <console>.fr:7: type error in expression f x
+    type is : a
+    expected: b
+----
+
+Frege took issue with the expression `f x` since in the type signature we
+declared `f` to be of type `(b->a)` and therefore `f x` is of type `a`.
+
+But the type inferencer expects `f x` to be of type `b` since it is used
+in the expression `f (f x)` as the first argument to the outer _f_.
+
+.Understanding error messages
+****
+Languages with type inference like Haskell and Frege are notoriously known for
+giving error messages that are more difficult to understand than those from
+let's say Java. And this is true. +
+This is partly so because type inference inspects the code not only
+"from declaration to implementation" but also vice versa. The code is
+scrutinized much more deeply. But when inconsistencies are found, it is often
+difficult to say whether the declaration or the implementation is wrong. +
+However, the topic is under continuous improvement and the Frege project team
+is happy to receive any examples where the error message could be better.
+****
