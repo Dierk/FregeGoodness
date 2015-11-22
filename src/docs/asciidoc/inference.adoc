@@ -167,7 +167,7 @@ is happy to receive any examples where the error message could be better.
 Nothing beats QuickCheck when it comes to examples of type inference.
 
 Let's assume we have `twice` implemented without a type signature and
-use the inferred variant. Now we need a function that we can apply twice
+use the auto-inferred variant. Now we need a function that we can apply twice
 and here is one that prefixes any type that can be prefixed.
 And yes, I mean that so!
 
@@ -192,7 +192,7 @@ associative fashion like Strings or arbitrary lists.
 Now onto defining the invariant that we would like to have checked on
 random input: we assume that `twice` applies any function _twice_
 (not surprising). To make things even more difficult for Frege,
-we give the testing logic not as a function but as a lambda.
+we give the to-be-tested expression not as a function reference but as a lambda expression.
 Frege must now infer the type of a sub-expression.
 
 .The invariant for `twice` using `prefix`
@@ -203,29 +203,31 @@ applied_twice = property $ \x -> twice (prefix "<") x == "<<" ++ x
 quickCheck applied_twice
 ----
 
-And QuickCheck dutifully responds with `+++ OK, passed 100 tests.`
+And QuickCheck dutifully responds with `OK, passed 100 tests.`
 
-Imagine the sheer amount of intelligence that is needed to make this
-happen. Frege needs to find out the type for `x` such that ask it for
+Imagine the sheer amount of intelligence that Frege applies to work this out.
+Frege needs to find out the type for `x` such that ask it for
 random values. `x` is an argument to `twice` but that is unconstrained,
 so we get no information out of that directly. But the type of `x` is also the
-return type of the first argument to `twice` (i.e. prefix "<"). But
-that is a very abstract type (ListSemigroup). Only after unifying the
+return type of the first argument to `twice` (i.e. `prefix "<"`). But
+that is the very abstract type _ListSemigroup_. Only after unifying the
 String "<" (the first argument to _prefix_) with it's return type
-(_Semigroup String_), QuickCheck knows that `(prefix "<")` returns
+(_ListSemigroup String_), QuickCheck knows that `(prefix "<")` returns
 a String and thus it must have been fed a String and thus `x` is a
 String and thus it must ask the String type for random String values.
 Puh.
 
-And Frege worked that out without the slightest help from the programmer along the way.
+And Frege arrived at that conclusion without the slightest help from the programmer.
 
-Anyway, the code is guaranteed to be structurally sound.
+Anyway, the code is guaranteed to be structurally sound - at compile time!
 
 .Exercise
 ****
 You may want to convince yourself by sending some functions to _twice_ that would be
 problematic to be called twice.
 ****
+
+As a parting thought: imaging doing this with any other JVM language.
 
 === References
 [horizontal]
