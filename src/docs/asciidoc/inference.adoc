@@ -161,3 +161,82 @@ difficult to say whether the declaration or the implementation is wrong. +
 However, the topic is under continuous improvement and the Frege project team
 is happy to receive any examples where the error message could be better.
 ****
+
+=== The ultimate example for type inference
+
+Nothing beats QuickCheck when it comes to examples of type inference.
+
+Let's assume we have `twice` implemented without a type signature and
+use the inferred variant. Now we need a function that we can apply twice
+and here is one that prefixes any type that can be prefixed.
+And yes, I mean that so!
+
+.The prefix function
+[source,haskell]
+----
+prefix front x = front ++ x
+----
+
+We do not care at all _what_ to prefix but let Frege figure out the most
+general type that could be used here.
+
+.For the geeks
+****
+Frege will infer a rather surprising type for the _prefix_ function:
+`ListSemigroup b => b a -> b a -> b a`. We ignore it for now.
+It should suffice to say that it is an algebraic type for things that
+can be concatenated with `++`  in an
+associative fashion like Strings or arbitrary lists.
+****
+
+Now onto defining the invariant that we would like to have checked on
+random input: we assume that `twice` applies any function _twice_
+(not surprising). To make things even more difficult for Frege,
+we give the testing logic not as a function but as a lambda.
+Frege must now infer the type of a sub-expression.
+
+.The invariant for `twice` using `prefix`
+[source,haskell]
+----
+import Test.QuickCheck
+applied_twice = property $ \x -> twice (prefix "<") x == "<<" ++ x
+quickCheck applied_twice
+----
+
+And QuickCheck dutifully responds with `+++ OK, passed 100 tests.`
+
+Imagine the sheer amount of intelligence that is needed to make this
+happen. Frege needs to find out the type for `x` such that ask it for
+random values. `x` is an argument to `twice` but that is unconstrained,
+so we get no information out of that directly. But the type of `x` is also the
+return type of the first argument to `twice` (i.e. prefix "<"). But
+that is a very abstract type (ListSemigroup). Only after unifying the
+String "<" (the first argument to _prefix_) with it's return type
+(_Semigroup String_), QuickCheck knows that `(prefix "<")` returns
+a String and thus it must have been fed a String and thus `x` is a
+String and thus it must ask the String type for random String values.
+Puh.
+
+And Frege worked that out without the slightest help from the programmer along the way.
+
+Anyway, the code is guaranteed to be structurally sound.
+
+.Exercise
+****
+You may want to convince yourself by sending some functions to _twice_ that would be
+problematic to be called twice.
+****
+
+=== References
+[horizontal]
+Type Inference::
+https://en.wikipedia.org/wiki/Hindley–Milner_type_system[Hindley-Milner Type System]
+
+Semigroup::
+https://en.wikipedia.org/wiki/Semigroup[Wikipedia],
+https://wiki.haskell.org/Typeclassopedia#Semigroup[Haskell Typeclassopedia],
+http://www.frege-lang.org/doc/frege/control/Semigroupoid.html[Semigoupoid (API)],
+http://www.frege-lang.org/doc/frege/prelude/PreludeList.html#ListSemigroup[ListSemigroup (API)]
+
+QuickCheck::
+https://github.com/Frege/frege/wiki/Getting-Started#quickcheck[Frege Wiki Page]
