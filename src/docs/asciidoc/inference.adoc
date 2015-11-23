@@ -166,10 +166,10 @@ is happy to receive any examples where the error message could be better.
 
 Nothing beats QuickCheck when it comes to examples of type inference.
 
-Let's assume we have `twice` implemented without a type signature and
-use the auto-inferred variant. Now we need a function that we can apply twice
+Let's assume we have `twice` implemented without an explicit type signature.
+Now we need a function that we can apply twice
 and here is one that prefixes any type that can be prefixed.
-And yes, I mean that so!
+And, yes, I mean that so!
 
 .The prefix function
 [source,haskell]
@@ -206,14 +206,14 @@ quickCheck applied_twice
 And QuickCheck dutifully responds with `OK, passed 100 tests.`
 
 Imagine the sheer amount of intelligence that Frege applies to work this out.
-Frege needs to find out the type for `x` such that ask it for
+Frege needs to find out the type for `x` such that it can ask it for
 random values. `x` is an argument to `twice` but that is unconstrained,
 so we get no information out of that directly. But the type of `x` is also the
 return type of the first argument to `twice` (i.e. `prefix "<"`). But
 that is the very abstract type _ListSemigroup_. Only after unifying the
 String "<" (the first argument to _prefix_) with it's return type
 (_ListSemigroup String_), QuickCheck knows that `(prefix "<")` returns
-a String and thus it must have been fed a String and thus `x` is a
+a String and thus it must have been fed a String to begin with and thus `x` is a
 String and thus it must ask the String type for random String values.
 Puh.
 
@@ -227,7 +227,7 @@ You may want to convince yourself by sending some functions to _twice_ that woul
 problematic to be called twice.
 ****
 
-As a parting thought: imaging doing this with any other JVM language.
+As a parting thought: imagine doing this with any other JVM language.
 
 === References
 [horizontal]
