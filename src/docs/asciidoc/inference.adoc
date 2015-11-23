@@ -17,7 +17,7 @@ the word from meaning almost nothing to meaning everything.
 * Frege belongs to the ML-family of languages that enjoy a Hindley-Milner type system.
   They are solely build from expressions and can _globally_ infer each and every
   expression in the program - up to the entire program. Only for very special constructions
-  where higher-kinded types are involved do they need some hints from the programmer.
+  where higher-ranked types are involved do they need some hints from the programmer.
 
 Let's see some examples why that makes a big difference.
  
