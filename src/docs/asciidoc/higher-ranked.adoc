@@ -44,14 +44,16 @@ Whereas the Java code shows clearly both the introduction of type variables in t
 instantiation. To be fair, meanwhile the Java compiler can infer many of those instantiations. It needs a hint, however,
 where exactly it has to do that (the so called diamond operator `<>`).
 
-However, this chapter is not about syntactic convenience! 
-It is about two concepts that belong closely to parametric polymorphism, but are rather unknown.
-It is about _higher ranked types_ and _higher kinded types_. It is about what is missing in the parametric polymorphism
-provided by Java, making generic types a *parametric polymorphism light* at best. And thus, finally, it should provide
-insight why projects like FunctionalJava, HighJ, JavaSlang, to name a few, are ultimately doomed, as noble and honourable
-those efforts are.
+.This chapter is not about syntactic convenience!
+****
+It is about two concepts that belong closely to parametric polymorphism but less widely known:
+_higher ranked types_ and _higher kinded types_. It is about what is missing in the parametric polymorphism
+provided by Java. It should provide insight why noble and honourable
+efforts like FunctionalJava, HighJ, JavaSlang, and others are inherently limited in their abstraction capabilities
+by the language they build on.
+****
 
-### When _generic_ is not polymorphic enough
+=== When _generic_ is not polymorphic enough
 
 Suppose you are browsing your code, and find expressions like the following again and again:
 
