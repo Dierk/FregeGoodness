@@ -1,9 +1,12 @@
 [[higher]]
 == Parametric Polymorphism
 
-*Parametric polymorphism* is established in mainstream programming languages for quite some time, though the term is unknown to many. For example, in Java, it goes under the name *generic types*.
+*Parametric polymorphism* is established in mainstream programming languages for quite some time, though the term is
+unknown to many. For example, in Java, it goes under the name *generic types*.
 
-The baisc idea is simple: in the declaration of functions and data (or methods and classes), types that need not be known exactly are given as *type variables* that need to be *introduced*. Later, when the function or data is used, those formal type variables are *instantiated* with concrete types (which could well be other type variables that are valid in the context).
+The basic idea is simple: in the declaration of functions and data (or methods and classes), types that need not be
+known exactly are given as *type variables* that need to be *introduced*. Later, when the function or data is used,
+those formal type variables are *instantiated* with concrete types (which could well be other type variables that are valid in the context).
 
 Here is an example in Frege (that would also be valid in Haskell, of course)
 
@@ -31,12 +34,22 @@ static List<Integer> sqrs = <Integer, Integer>map(
 	Arrays.asList(1,2,3,4,5,6,7,8,9,10));
 ----
 
-Despite link:src/docs/asciidoc/inference.adoc[Frege type inference] is able to infer the type of `map` entirely on its own, it is customary to provide it explicitly. (Tools like the eclipse plugin make this a one-click action.) The point is that the introduction of type variables can be implicit, and the instantiation of type variables is always invisible. Nevertheless, it can be deduced that `map` is instantiated at type `(Int→Int) → [Int] → [Int]`. But because instantiation is invisible, many Haskell and Frege programmers don't even know that it exists at all.
+Despite link:src/docs/asciidoc/inference.adoc[Frege type inference] is able to infer the type of `map` entirely on its
+own, it is customary to provide it explicitly. (Tools like the eclipse plugin make this a one-click action.)
+The point is that the introduction of type variables can be implicit, and the instantiation of type variables is always invisible.
+Nevertheless, it can be deduced that `map` is instantiated at type `(Int→Int) → [Int] → [Int]`.
+But because instantiation is invisible, many Haskell and Frege programmers don't even know that it exists at all.
 
-Whereas the Java code shows clearly both the introduction of type variables in the method declaration as well as their instantiation. To be fair, meanwhile the Java compiler can infer many of those instantiations. It needs a hint, however, where exactly it has to do that (the so called diamond operator `<>`). 
+Whereas the Java code shows clearly both the introduction of type variables in the method declaration as well as their
+instantiation. To be fair, meanwhile the Java compiler can infer many of those instantiations. It needs a hint, however,
+where exactly it has to do that (the so called diamond operator `<>`).
 
 However, this chapter is not about syntactic convenience! 
-It is about two concepts that belong closely to parametric polymorphism, but are rather unknown. It is about _higher ranked types_ and _higher kinded types_. It is about what is missing in the parametric polymorphism provided by Java, making generic types a *parametric polymorphism light* at best. And thus, finally, it should provide insight why projects like FunctionalJava, HighJ, JavaSlang, to name a few, are ultimatly doomed, as noble and honourable those efforts are.
+It is about two concepts that belong closely to parametric polymorphism, but are rather unknown.
+It is about _higher ranked types_ and _higher kinded types_. It is about what is missing in the parametric polymorphism
+provided by Java, making generic types a *parametric polymorphism light* at best. And thus, finally, it should provide
+insight why projects like FunctionalJava, HighJ, JavaSlang, to name a few, are ultimately doomed, as noble and honourable
+those efforts are.
 
 ### When _generic_ is not polymorphic enough
 
@@ -62,7 +75,8 @@ For example, the following functions have this type (or a type that is slightly 
 
 In addition, it looks like  `somelist` and `otherlist` often have different element types.
 
-The intent is clear: we want to combine two lists, but only after having applied *the same* transformation to both lists. In short, what we have is
+The intent is clear: we want to combine two lists, but only after having applied *the same* transformation to both lists.
+In short, what we have is
 
    zip (f somelist) (f otherlist)
 
@@ -101,7 +115,8 @@ Turns out it's this one:
 Ouch! For some reason, it assumes our two lists to have the same element type!
 This is, of course, not what is needed.
 
-But certainly, it does make sense. If the transformer function takes `a` lists, then both arguemtns must be `a` lists. Just like in the `map` example at the start, if the mapping function takes `a` values, the list to be mapped must have `a` elements.
+But certainly, it does make sense. If the transformer function takes `a` lists, then both arguments must be `a` lists.
+Just like in the `map` example at the start, if the mapping function takes `a` values, the list to be mapped must have `a` elements.
 
 Does this mean we cannot write `zipf`, despite functions like `reverse`, `take 10` and so on are polymorphic in the list element type?
 
@@ -119,15 +134,24 @@ it wont be able to reverse integer lists. And if we choose
 
 it wont be able to reverse the character list. 
 
-But why is this instantiation needed at all? It is needed bcause of a restriction in the HM type system which dictates that lambda bound values (you can read this as "function arguments") must be _monomorphic_ if we look at them from inside the function. The type inference algortihm assumes that every type variable stands for some type. It doesn't matter which one, but it stays always the same in the scope of the function, and is different from all other types symbolized by different type variables and also from concrete types like `Int` or `Bool`. 
+But why is this instantiation needed at all? It is needed because of a restriction in the HM type system which dictates
+that lambda bound values (you can read this as "function arguments") must be _monomorphic_ if we look at them
+from inside the function. The type inference algorithm assumes that every type variable stands for some type.
+It doesn't matter which one, but it stays always the same in the scope of the function, and is different from all other
+types symbolized by different type variables and also from concrete types like `Int` or `Bool`.
 
-So, why can't we just abandon that apparently arbitrary restriction? We can't, because then type inference becomes *undecidable*. Another way to put this is that HM can only deal with polymorphism of rank 1.
+So, why can't we just abandon that apparently arbitrary restriction? We can't, because then type inference becomes
+*undecidable*. Another way to put this is that HM can only deal with polymorphism of rank 1.
 
-In fairness, it must be noted that HM type inference is a genial achievement, and rank 1 polymorphism offers enormous possibilities. Perhaps 95% of all conceivable programs, if not more, can be written without ever noticing that there is a restriction at all!
+In fairness, it must be noted that HM type inference is a genial achievement, and rank 1 polymorphism offers enormous
+possibilities. Perhaps 95% of all conceivable programs, if not more, can be written without ever noticing that there is a restriction at all!
 
 And yet, such a seemingly simple function like `zipf` cannot be written!
 
-Fortunately, another result from computer science says that while type *inference* for higher ranked types is undecidable, type *checking* is not. The type systems of Haskell (with language extension `RankNTypes`) and Frege employ this fact and allow polymorphic functions as arguments. However, the type of a function that takes polymorphic arguments must be annotated (more exactly: at least the polymorphic argument must be annotated accordingly, and type inference can infer the rest).
+Fortunately, another result from computer science says that while type *inference* for higher ranked types is undecidable,
+type *checking* is not. The type systems of Haskell (with language extension `RankNTypes`) and Frege employ this fact
+and allow polymorphic functions as arguments. However, the type of a function that takes polymorphic arguments must be
+annotated (more exactly: at least the polymorphic argument must be annotated accordingly, and type inference can infer the rest).
 
 This looks like so in our example:
 
