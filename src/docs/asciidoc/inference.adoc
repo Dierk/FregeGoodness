@@ -34,7 +34,8 @@ once f x = f x
 ----
 
 We can ask the repl with `:type once` or the eclipse plugin with Ctrl-Space
-for the inferred type.
+for the inferred type. The inferred type is also shown in the API documentation
+that we can create with the fregedoc tool.
 
 .The inferred type
 [source,haskell]
@@ -67,8 +68,9 @@ once f x = f x
 ----
 
 The first obvious benefit is that any reader of the code immediately sees the type without
-any need to ask the IDE or the REPL. The type declaration becomes part of the documentation
-since it reveals on which types `once` can operate and what it may return when given certain
+any need to ask the IDE, the REPL, or to consult the API documentation.
+The type declaration becomes part of the internal documentation
+that reveals on which types `once` can operate and what it may return when given certain
 argument types (it will return the same type that _f_ returns).
 
 But we can also be more specific, i.e. _less_ polymorphic. Let's assume that we only care about functions that
