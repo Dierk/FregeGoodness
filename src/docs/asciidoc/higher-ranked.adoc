@@ -34,7 +34,7 @@ static List<Integer> sqrs = <Integer, Integer>map(
 	Arrays.asList(1,2,3,4,5,6,7,8,9,10));
 ----
 
-Despite link:src/docs/asciidoc/inference.adoc[Frege type inference] is able to infer the type of `map` entirely on its
+Despite <<inference.adoc#inference,Frege type inference>> being able to infer the type of `map` entirely on its
 own, it is customary to provide it explicitly. (Tools like the eclipse plugin make this a one-click action.)
 The point is that the introduction of type variables can be implicit, and the instantiation of type variables is always invisible.
 Nevertheless, it can be deduced that `map` is instantiated at type `(Int→Int) → [Int] → [Int]`.
