@@ -115,7 +115,7 @@ fzip f somelist otherlist
 A possible implementation that comes to mind would be:
 
 [source,haskell]
----
+----
 fzip f [] [] = []
 fzip f xs ys = zip (f xs) (f ys)
 ----
@@ -183,20 +183,20 @@ and allow polymorphic functions as arguments.
 However, the type of a function that takes polymorphic arguments must be
 annotated, or at least the polymorphic argument itself must be annotated accordingly, and type inference will do the rest.
 
-Hence, the solution to our problem is simply to point out that we want our function to be polymorphic. We can do this by providing the following annotation for `fzip`:
+Hence, the solution to our problem is simply to point out that we want our function argument `f` to be polymorphic. We can do this by providing the following annotation for `fzip`:
 
 [source,haskell]
 ----
 fzip ∷ (∀ a.[a] → [a]) → [x] → [y] → [(x,y)]
 ----
 
-The code for `fzip` stays the same!
+The code for `fzip` stays the same! But the type now says that `f` is a function that takes a list and returns a list of the same type, for *all* possible list element types. In addition, the types of the lists `f` works on is now completely decoupled from the actual types of the list arguments. But since `f` works for all list types, it is safe to apply it to both arguments.
 
 Alternatively, we can write `fzip` like so:
 
 [source,haskell]
 ----
-fzip (f :: ∀a.[a] → [a]) xs ys = zip (f xs) (f ys)
+fzip (f ∷ ∀a.[a] → [a]) xs ys = zip (f xs) (f ys)
 ----
 
 though I find this much less readable.
