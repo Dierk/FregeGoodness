@@ -48,8 +48,8 @@ Nevertheless, it can be deduced that `map` is instantiated at type `(Int→Int) 
 But because instantiation is invisible, 
 many Haskell and Frege programmers don't even know that it exists at all.
 
-Whereas the Java code shows clearly both 
-the (mandatory) introduction of type variables in the method declaration 
+In contrast, the Java code shows clearly both 
+the mandatory introduction of type variables in the method declaration 
 as well as their instantiation. 
 To be fair, meanwhile the Java compiler can infer many of those instantiations. 
 It needs a hint sometimes, however,
@@ -64,7 +64,7 @@ It is about what is missing in the parametric polymorphism provided by Java.
 It should provide insight why noble and honourable efforts like FunctionalJava, HighJ, JavaSlang, and others are inherently limited in their abstraction capabilities by the language they build on.
 ****
 
-=== When _generic_ is not polymorphic enough
+=== When generic is not polymorphic enough
 
 Suppose you are browsing your code, and find expressions like the following again and again:
 
@@ -103,7 +103,7 @@ zip (f somelist) (f otherlist)
 ----
 
 for some appropriate function `f`, and now we want to get rid of the parentheses and of course of the
-repetition of `f` (remember that `f` could be a lengthy expression itself). 
+repetition of `f` (remember that `f` could be a rather lengthy expression itself). 
 
 It looks like we need a function `fzip`, such that we could write
 
@@ -129,7 +129,7 @@ But wait! When we ask the REPL for the type of `fzip`, it tells us this:
 ∀a b.([a]->[b]) -> [a] -> [a] -> [(b,b)]
 ----
 
-For some reason, it assumes our two lists to have the same element type!
+For some reason, it forces our two lists to have the same element type!
 
 But the expressions we wanted to refactor didn't have that restriction.
 After all, the transformation functions we intent to use are generic in the list element type, so they do work on any list. 
@@ -177,10 +177,11 @@ Think about this for a moment! There is an infinite number of ranks, and each ra
 
 ### Using Higher Ranked Types
 
-Fortunately, while *type inference* is undecidable for higher ranked types, *type checking* is not.  The type checkers of GHC (with language extension `RankNTypes`) and Frege employ this fact
-and allow polymorphic functions as arguments.
+Fortunately, while *type inference* is undecidable for higher ranked types, *type checking* is not. That is, a computer cannot find a higher ranked type for some expression without further information. But given a type and an expression, it can decide whether the expression can possibly have this type.
+
+The type checkers of GHC (with language extension `RankNTypes`) and Frege employ this fact and allow polymorphic functions as arguments.
  
-However, the type of a function that takes polymorphic arguments must be
+To make this work, the type of a function that takes polymorphic arguments must be
 annotated, or at least the polymorphic argument itself must be annotated accordingly, and type inference will do the rest.
 
 Hence, the solution to our problem is simply to point out that we want our function argument `f` to be polymorphic. We can do this by providing the following annotation for `fzip`:
@@ -188,9 +189,29 @@ Hence, the solution to our problem is simply to point out that we want our funct
 [source,haskell]
 ----
 fzip ∷ (∀ a.[a] → [a]) → [x] → [y] → [(x,y)]
+--     ---------------                             universally quantified
+--                                                 polymorphic type of f
+fzip f xs ys = zip (f xs) (f ys)
 ----
 
 The code for `fzip` stays the same! But the type now says that `f` is a function that takes a list and returns a list of the same type, for *all* possible list element types. In addition, the types of the lists `f` works on is now completely decoupled from the actual types of the list arguments. But since `f` works for all list types, it is safe to apply it to both arguments.
+
+The crucial point is the universally quantified polymorphic type for the function argument. When in doubt what to write here, one can simply ask the REPL for the type of some function we want to pass here
+
+[source,haskell]
+----
+:type reverse
+[α] -> [α]
+----
+
+To get the quantified type, add the `forall` keyword (that can also be written `∀`, if you like) and list all type variables that occur in the type. If you don't like the type variable names, you can simply rename them. For example, the following types are indistinguishable for the compiler:
+
+[source,haskell]
+----
+forall a.[a] → [a]
+forall b.[b] → [b]
+∀ quetzalcoatl.[quetzalcoatl] → [quetzalcoatl]
+----
 
 Alternatively, we can write `fzip` like so:
 
