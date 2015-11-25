@@ -241,6 +241,6 @@ We will come back to this and discuss the shortcomings as well as possible impro
 
 Meanwhile, here is some homework for the very interested:
 
-* Why not be even more general and let the type of `f` be `∀a b.[a] → [b]`? (The last example hints at the reason.)
+* Why not be even more general and let the type of `f` be `∀a b.[a] → [b]`? (The last example hints at one reason.)
 * (for true Java experts) Write `fzip` in Java without using casts or `@SuppressWarnings` so that it compiles without warnings! (Yes, it is possible.)
 
