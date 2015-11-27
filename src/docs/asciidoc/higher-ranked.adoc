@@ -64,17 +64,16 @@ The Java compiler can sometimes - but not always - infer those instantiations as
 
 .This chapter is not about syntactic convenience!
 ****
-It is about a concept that belongs closely to parametric polymorphism but are less widely known:
-_higher ranked types_ (we will cover _higher kinded types_ later).
-It is about what is missing in the parametric polymorphism provided by Java.
- 
+It is about a concept that belongs closely to parametric polymorphism but is less widely known:
+_higher ranked types_.
+
 It should provide insight why noble and honourable efforts like FunctionalJava, HighJ, JavaSlang, and others are
-inherently limited in their abstraction capabilities by the language they build upon.
+inherently limited in their abstraction capabilities by the language they build upon, because Java knows no higher ranked types, at least not directly.
 ****
 
 === When generic is not polymorphic enough
 
-In programming we always strive to avoid duplication and one polymorphy is one way of achieving this by allowing
+In programming we always strive to avoid duplication and  polymorphism is one way of achieving this by allowing
 a piece of code to be used in "many forms".
 
 Suppose your code contains a repeated use of a function (`reverse` or `drop n`) in a use pattern like
@@ -88,7 +87,7 @@ zip (drop n  somelist) (drop n  otherlist)
 zip (reverse somelist) (reverse otherlist)
 ----
 
-The type of `reverse` and `drop n`) look identical.
+The type of `reverse` and `drop n` look identical.
 
 .The type of _reverse_ or _drop n_
 [source,haskell]
@@ -133,7 +132,7 @@ fzip f somelist otherlist
 
 A possible implementation that comes to mind would be:
 
-.This is _not_ what we want
+.First attempt at `fzip`
 [source,haskell]
 ----
 fzip f [] [] = []
@@ -144,7 +143,6 @@ Indeed, what could be easier?
 
 But wait! When we ask the REPL for the type of `fzip`, it tells us this:
 
-.The type of _fzip_ is not generic enough
 [source,haskell]
 ----
 ∀a b.([a]->[b]) -> [a] -> [a] -> [(b,b)]
@@ -157,7 +155,7 @@ After all, the transformation functions we intent to use are generic in the list
 
 Anyway, as it stands, applying the planned refactoring would result in type errors in all places
 where the first and the second list are not of the same type. We cannot _fzip_ let's say a list of
-Characters with a list of Integers.
+characters with a list of integers.
 
 So, what is wrong with our `fzip`? 
 
@@ -167,8 +165,10 @@ In an expression like
 .This will not work
 [source,haskell]
 ----
-fzip reverse ['a', 'b', 'c'] [1, 2, 3]
--- Error: Char is not an instance of Num
+fzip reverse ['a', 'b', 'c'] [false, true]
+-- type error in expression [false,true]
+--    type is : [Bool]
+--    expected: [Char]
 ----
 
 at what type should `reverse` get instantiated? If we choose
@@ -178,20 +178,22 @@ at what type should `reverse` get instantiated? If we choose
 [Char] → [Char]
 ----
 
-it wont be able to reverse integer lists. And if we choose 
+it wont be able to reverse boolean lists. And if we choose 
 
 [source,haskell]
 ----
-[Int] → [Int]
+[Bool] → [Bool]
 ----
 
 it wont be able to reverse the character list. 
+
+In the above example, the compiler chooses to instantiate `reverse` at type `[Char] → [Char]` according to the character list argument, and therefore, it expects the remaining argument to have the same type. After all, this is what the type of `fzip` demands! This explains the error message.
 
 But why is this instantiation needed at all? 
 It is needed because of a restriction of type inference in the Hindley-Milner type system, which forms the base of the type systems of
 languages like ML, Haskell, F# and Frege. This restriction says
 that lambda bound values (you can read this as "function arguments") are assumed to be _monomorphic_. 
-And this needs to be so because otherwise type inference would become *undecidable*. 
+And this needs to be so because otherwise type inference would become _undecidable_. 
 
 ### Ranking Types
 
@@ -273,7 +275,7 @@ fzip (f ∷ ∀a.[a] → [a]) xs ys = zip (f xs) (f ys)
 though I find this much less readable.
 
 We can now use `fzip` with a variety of functions. But the types of all of them need to be *at least as polymorphic*
-as the annotated type for `f`.
+as the annotated type for `f`. For example, we can not use `fzip` with a function of type `[Int] → [Int]`, even if both lists are integer lists. 
 
 Here are some examples. I give the type of `f` as comment:
 
