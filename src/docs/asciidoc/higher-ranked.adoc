@@ -1,89 +1,106 @@
 [[higherranked]]
+
+_Guest post by Ingo Wechsung._
+
 == Advanced Parametric Polymorphism
 
 *Parametric polymorphism* is established in mainstream programming languages for quite some time, though the term is unknown to many. 
-For example, in Java, it goes under the name *generic types*.
+For example, in Java, it goes under the name of *generic types*.
 
 The basic idea is simple: in the declaration of functions and data (or methods and classes), 
-types that need not be known exactly are given as *type variables*. 
+types can be given as *type variables* as long as their concrete types can be determined later.
 Such type variables may be *introduced* at certain places, depending on the language. 
-Also, Java for example, requires explicit introduction of type variables. 
+Java for example requires explicit introduction of type variables.
 Later, when the function or data is used,
-those formal type variables are *instantiated* with concrete types (which could well be other type variables that are valid in the context).
+those formal type variables are *instantiated* with concrete types
+(which could well be other type variables that are valid in the context).
 
-Here is an example in Frege
+Here is an example in Frege that shows the abstract type declaration for the classical _map_ function,
+its implementation, and its usage for the concrete type of integer lists and a usage thereof.
 
-.Traditional Haskell map function
+.Classical Haskell _map_ function
 [source,haskell]
 ----
-map ∷ (a→b) → [a] → [b]   -- optional!
+map ∷ (a→b) → [a] → [b]   -- can be implicit
 map f []     = []
 map f (x:xs) = f x : map f xs
 
+-- instantiation is always invisible
 sqrs = map (^2) [1..10]
 ----
 
 Here is an approximation of how this would look like in Java:
 
-.Imagined Java map function
+.Hypothetical Java _map_ function
 [source,java]
 ----
+// generic types are explicitly
 public static<A,B> List<B> map(Function<A,B> f, List<A> xxs) {
     // ... details omitted ...
 }
 
+// instantiation is visible
 static List<Integer> sqrs = <Integer, Integer>map(
 	x -> x*x, 
 	Arrays.asList(1,2,3,4,5,6,7,8,9,10));
 ----
 
 Despite <<inference.adoc#inference,Frege type inference>> 
-being able to infer the type of `map` entirely on its own, 
-it is customary to provide it explicitly. 
+being able to infer the type of `map` entirely on its own,
+it is customary to provide they type declaration explicitly.
 (Tools like the eclipse plugin make this a one-click action.)
 
 The point is that in Frege, the introduction of type variables can be implicit, 
 and the instantiation of type variables is always invisible.
-Nevertheless, it can be deduced that `map` is instantiated at type `(Int→Int) → [Int] → [Int]` on the right hand side of the definition of `sqrs`.
+Nevertheless, it can be deduced that `map` is instantiated at type `(Int→Int) → [Int] → [Int]`
+on the right hand side of the definition of `sqrs`.
 But because instantiation is invisible, 
 many Haskell and Frege programmers don't even know that it exists at all.
 
 In contrast, the Java code shows clearly both 
 the mandatory introduction of type variables in the method declaration 
 as well as their instantiation. 
-To be fair, meanwhile the Java compiler can infer many of those instantiations. 
-It needs a hint sometimes, however,
-where exactly it has to do that (the so called diamond operator `<>`).
+The Java compiler can sometimes - but not always - infer those instantiations as well.
 
 .This chapter is not about syntactic convenience!
 ****
-It is about two concepts that belong closely to parametric polymorphism but are less widely known:
-_higher ranked types_ and _higher kinded types_. 
+It is about a concept that belongs closely to parametric polymorphism but are less widely known:
+_higher ranked types_ (we will cover _higher kinded types_ later).
 It is about what is missing in the parametric polymorphism provided by Java.
  
-It should provide insight why noble and honourable efforts like FunctionalJava, HighJ, JavaSlang, and others are inherently limited in their abstraction capabilities by the language they build on.
+It should provide insight why noble and honourable efforts like FunctionalJava, HighJ, JavaSlang, and others are
+inherently limited in their abstraction capabilities by the language they build upon.
 ****
 
 === When generic is not polymorphic enough
 
-Suppose you are browsing your code, and find expressions like the following again and again:
+In programming we always strive to avoid duplication and one polymorphy is one way of achieving this by allowing
+a piece of code to be used in "many forms".
 
+Suppose your code contains a repeated use of a function (`reverse` or `drop n`) in a use pattern like
+"first apply that function to the first list, then to the second list, and then combine the
+resulting lists with _zip_".
+
+.A repeated pattern
 [source,haskell]
 ----
 zip (drop n  somelist) (drop n  otherlist)
 zip (reverse somelist) (reverse otherlist)
 ----
 
-where the function applied to the lists is different each time, and belongs to the infinite set of functions of type
+The type of `reverse` and `drop n`) look identical.
 
+.The type of _reverse_ or _drop n_
 [source,haskell]
 ----
-∀a.[a] → [a]  <1>
+∀a.[a] → [a]  --<1>
 ----
-<1> For the sake of clarity, all types are written using explicit quantification in this article.
+<1> For the sake of clarity, we provide types using explicit quantification (∀a.) in this article.
+Giving this quantification is optional and most often omitted in real code.
 
-For example, the following functions have this type (or a type that is even more general):
+There are even more examples for functions of this type that we might want to use.
 
+.Functions of type ∀a.[a] → [a]
 [source,haskell]
 ----
 reverse
@@ -97,6 +114,7 @@ id
 The intent is clear: we want to combine two lists, but only after having applied *the same* transformation to both lists.
 In short, what we have is
 
+.Showing the repeated use of _f_
 [source,haskell]
 ----
 zip (f somelist) (f otherlist)
@@ -107,6 +125,7 @@ repetition of `f` (remember that `f` could be a rather lengthy expression itself
 
 It looks like we need a function `fzip`, such that we could write
 
+.Abstracting over the pattern with _fzip_
 [source,haskell]
 ----
 fzip f somelist otherlist
@@ -114,6 +133,7 @@ fzip f somelist otherlist
 
 A possible implementation that comes to mind would be:
 
+.This is _not_ what we want
 [source,haskell]
 ----
 fzip f [] [] = []
@@ -124,6 +144,7 @@ Indeed, what could be easier?
 
 But wait! When we ask the REPL for the type of `fzip`, it tells us this:
 
+.The type of _fzip_ is not generic enough
 [source,haskell]
 ----
 ∀a b.([a]->[b]) -> [a] -> [a] -> [(b,b)]
@@ -134,15 +155,20 @@ For some reason, it forces our two lists to have the same element type!
 But the expressions we wanted to refactor didn't have that restriction.
 After all, the transformation functions we intent to use are generic in the list element type, so they do work on any list. 
 
-Anyway, as it stands, applying the planned refactoring would result in type errors everywhere the types of the two lists are not equal.
+Anyway, as it stands, applying the planned refactoring would result in type errors in all places
+where the first and the second list are not of the same type. We cannot _fzip_ let's say a list of
+Characters with a list of Integers.
+
 So, what is wrong with our `fzip`? 
 
 To understand the case, one needs to remember what has been said about instantiation above. 
 In an expression like
 
+.This will not work
 [source,haskell]
 ----
-fzip reverse ['a', 'b', 'c'] [1, 2, 3] 
+fzip reverse ['a', 'b', 'c'] [1, 2, 3]
+-- Error: Char is not an instance of Num
 ----
 
 at what type should `reverse` get instantiated? If we choose
@@ -162,30 +188,44 @@ it wont be able to reverse integer lists. And if we choose
 it wont be able to reverse the character list. 
 
 But why is this instantiation needed at all? 
-It is needed because of a restriction in the Hindley-Milner type system, which forms the base of the type systems of languages like ML, Haskell, F# and Frege. This restriction says
+It is needed because of a restriction of type inference in the Hindley-Milner type system, which forms the base of the type systems of
+languages like ML, Haskell, F# and Frege. This restriction says
 that lambda bound values (you can read this as "function arguments") are assumed to be _monomorphic_. 
 And this needs to be so because otherwise type inference would become *undecidable*. 
 
 ### Ranking Types
 
-Another way to put this is that type inference à la Hindley-Milner (in the following HM for short) can only deal with polymorphism of rank 1. 
-Yet another way to put this is that rank 1 types are exactly those polymorphic types that a HM algorithm can infer. Practically, this means that in languages that obey strictly to HM, higher order functions can only take monomorphic functions or functions that are instantiated at a monomorphic type. To be blunt, our `fzip` can't be written in ML or F#!
+Another way to put this is that type inference à la Hindley-Milner (in the following HM for short)
+can only deal with polymorphism of rank 1.
+Yet another way to put this is that rank 1 types are exactly those polymorphic types that a HM algorithm can infer.
+Practically, this means that in languages that obey strictly to HM,
+higher order functions can only take monomorphic functions or functions that are instantiated at a monomorphic type.
+To be blunt, our `fzip` can't be written in ML or F#!
 
-If we have numbered ranks, there should also be rank 2 types. How would such a type look like? Well, a rank 2 type is a function type where a rank 1 type appears as argument, that is, left of the function array. Generall, a type of rank k is a function type that has a type of rank (k-1) in argument position.
+If we have numbered ranks, there should also be rank 2 types.
+How would such a type look like? Well, a rank 2 type is a function type where a rank 1 type appears as argument,
+that is, left of the function array. Generally, a type of rank _k_ is a function type that has a type of rank _(k-1)_
+in argument position.
 
-Think about this for a moment! There is an infinite number of ranks, and each rank is inhabited by an infinite number of types. Isn't that great?
+Think about this for a moment! There is an infinite number of ranks, and each rank is inhabited by an infinite
+number of types. Isn't that great?
 
 ### Using Higher Ranked Types
 
-Fortunately, while *type inference* is undecidable for higher ranked types, *type checking* is not. That is, a computer cannot find a higher ranked type for some expression without further information. But given a type and an expression, it can decide whether the expression can possibly have this type.
+Fortunately, while *type inference* is undecidable for higher ranked types, *type checking* is not.
+That is, a computer cannot find a higher ranked type for some expression without further information.
+But given a type and an expression, it can decide whether the expression can possibly have this type.
 
-The type checkers of GHC (with language extension `RankNTypes`) and Frege employ this fact and allow polymorphic functions as arguments.
+The type checkers of GHC (with language extension `RankNTypes`) and Frege
+employ this fact and allow polymorphic functions as arguments.
  
 To make this work, the type of a function that takes polymorphic arguments must be
 annotated, or at least the polymorphic argument itself must be annotated accordingly, and type inference will do the rest.
 
-Hence, the solution to our problem is simply to point out that we want our function argument `f` to be polymorphic. We can do this by providing the following annotation for `fzip`:
+Hence, the solution to our problem is simply to point out that we want our function argument `f` to be polymorphic.
+We can do this by providing the following annotation for `fzip`:
 
+.Making _fzip_ work with higher rank polymorphism
 [source,haskell]
 ----
 fzip ∷ (∀ a.[a] → [a]) → [x] → [y] → [(x,y)]
@@ -194,18 +234,26 @@ fzip ∷ (∀ a.[a] → [a]) → [x] → [y] → [(x,y)]
 fzip f xs ys = zip (f xs) (f ys)
 ----
 
-The code for `fzip` stays the same! But the type now says that `f` is a function that takes a list and returns a list of the same type, for *all* possible list element types. In addition, the types of the lists `f` works on is now completely decoupled from the actual types of the list arguments. But since `f` works for all list types, it is safe to apply it to both arguments.
+The code for `fzip` stays the same! But the type now says that `f` is a function that takes a list
+and returns a list of the same type, for *all* possible list element types.
+In addition, the types of the lists `f` works on is now completely decoupled from the actual types of the list arguments.
+But since `f` works on all list types, it is safe to apply it to both arguments.
 
-The crucial point is the universally quantified polymorphic type for the function argument. When in doubt what to write here, one can simply ask the REPL for the type of some function we want to pass here
+The crucial point is the universally quantified polymorphic type for the function argument.
+When in doubt what to write here, one can simply ask the REPL for the type of some function we want to pass here
 
+.Getting help from the REPL
 [source,haskell]
 ----
 :type reverse
 [α] -> [α]
 ----
 
-To get the quantified type, add the `forall` keyword (that can also be written `∀`, if you like) and list all type variables that occur in the type. If you don't like the type variable names, you can simply rename them. For example, the following types are indistinguishable for the compiler:
+To get the quantified type, add the `forall` keyword (that can also be written `∀`, if you like)
+and list all type variables that occur in the type. If you don't like the type variable names,
+you can simply rename them. For example, the following types are indistinguishable for the compiler:
 
+.Type declaration variants
 [source,haskell]
 ----
 forall a.[a] → [a]
@@ -213,8 +261,10 @@ forall b.[b] → [b]
 ∀ quetzalcoatl.[quetzalcoatl] → [quetzalcoatl]
 ----
 
-Alternatively, we can write `fzip` like so:
+Alternatively, we can write `fzip` with an in-line type declaration for _f_ only
+but without the full type declaration for `fzip`:
 
+.Annotating only _f_
 [source,haskell]
 ----
 fzip (f ∷ ∀a.[a] → [a]) xs ys = zip (f xs) (f ys)
@@ -222,10 +272,12 @@ fzip (f ∷ ∀a.[a] → [a]) xs ys = zip (f xs) (f ys)
 
 though I find this much less readable.
 
-We can now use `fzip` with a variety of functions. But the types of all of them need to be *at least as polymorphic* as the annotated type for `f`.
+We can now use `fzip` with a variety of functions. But the types of all of them need to be *at least as polymorphic*
+as the annotated type for `f`.
 
 Here are some examples. I give the type of `f` as comment:
 
+.Working _f_ functions
 [source,haskell]
 ----
 fzip id         [1..10] ['a'..'z']   -- ∀a. a  →  a
@@ -239,8 +291,9 @@ fzip (const []) [1..10] ['a'..'z']   -- ∀a b.a → [b]
 This is it. 
 We will come back to this and discuss the shortcomings as well as possible improvements of the higher rank solution.
 
-Meanwhile, here is some homework for the very interested:
+Meanwhile, here is some homework for the very interested ones:
 
 * Why not be even more general and let the type of `f` be `∀a b.[a] → [b]`? (The last example hints at one reason.)
-* (for true Java experts) Write `fzip` in Java without using casts or `@SuppressWarnings` so that it compiles without warnings! (Yes, it is possible.)
+* (for true Java experts) Write `fzip` in Java without using casts or `@SuppressWarnings` so that it compiles without
+warnings! (Yes, it is possible.)
 
