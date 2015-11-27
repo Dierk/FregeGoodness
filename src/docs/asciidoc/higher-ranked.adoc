@@ -224,7 +224,7 @@ employ this fact and allow polymorphic functions as arguments.
 To make this work, the type of a function that takes polymorphic arguments must be
 annotated, or at least the polymorphic argument itself must be annotated accordingly, and type inference will do the rest.
 
-When such an annotation is present, instead of looking for the type a functional argument needs to be instantiated, the type checker just checks if the argument's type is _at least as general_ as the annotated type.
+When such an annotation is present, instead of looking for the type a functional argument needs to be instantiated at, the type checker just checks if the argument's type is _at least as general_ as the annotated type.
 
 Hence, the solution to our problem is simply to point out that we want our function argument `f` to be polymorphic.
 We can do this by providing the following annotation for `fzip`:
