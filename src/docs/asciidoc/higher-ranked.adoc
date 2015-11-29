@@ -310,3 +310,7 @@ Meanwhile, here is some homework for the very interested ones:
 * (for true Java experts) Write `fzip` in Java without using casts or `@SuppressWarnings` so that it compiles without
 warnings! (Yes, it is possible.)
 
+[horizontal]
+Java solution::
+https://gist.github.com/mmhelloworld/eac189d52cd1e2a91ad5[Marimuthu's proposal]
+
