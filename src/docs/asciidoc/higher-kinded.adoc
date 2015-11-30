@@ -1,0 +1,83 @@
+== More Advanced Polymorphism
+
+In the link:higher-ranked.adoc[last article] we arrived at the following solution for our function `fzip` with a rank 2 type:
+
+[source,haskell]
+----
+fzip :: (∀a.[a] → [a]) → [b] → [c] → [(b,c)]
+fzip f xs ys = zip (f xs) (f ys)
+----
+
+=== When higher ranked types are too general
+
+Unfortunately, this  doesn't cover all possible use cases. For example we can still not refactor the following expression:
+
+[source,haskell]
+----
+let inc = map (1+) in zip (inc xs) (inc ys)
+----
+
+When we try something like this:
+
+[source,haskell]
+----
+fzip (map (1+)) [8..13] [1,2,3]
+----
+
+we get the following error:
+
+[source]
+----
+inferred type is more constrained than expected type
+    inferred:  Num a => [a] -> [a]
+    expected:  [a] -> [a]
+----
+
+
+Indeed, `map (1+)` is not as general as required by our type signature: it works only on numbers, but we promised to pass a function that works on **all** lists.
+
+We can, of course, come up with a solution for the case that we often want to map a numeric function over both lists:
+
+[source,haskell]
+----
+nzip :: (Num c,Num b) => (∀a.Num a => [a] -> [a]) -> [b] -> [c] -> [(b,c)]
+----
+
+With this numeric zip we can do things like:
+
+[source, haskell]
+----
+frege> nzip (map (1+)) [8..13] (iterate (*1.5) 1)
+[(9, 2.0),(10, 2.5),(11, 3.25),(12, 4.375),(13, 6.0625),(14, 8.59375)]
+----
+
+However, because of the class constraints, the type doesn't look as elegant as before. What is worse: since we cannot _abstract over type classes_ (arguably a shortcoming in the type system), we need to write a new function for every type class we are using. For example, to refactor
+
+[source,haskell]
+----
+zip (map succ [8..13]) (map succ ['a', 'b', 'c'])
+----
+
+we need 
+
+[source,haskell]
+----
+ezip :: (Enum c,Enum b) => (∀a.Enum a => [a] -> [a]) -> [b] -> [c] -> [(b,c)]
+----
+
+Is it not infuriating that `ezip` and `nzip` are almost identical up to the name of the type class?
+
+But even if we could abstract over type classes, we would still have to write new versions of our generalized `zip` to abstract over:
+
+[source,haskell]
+----
+zip (map show [8..13]) (map show ['a', 'b', 'c'])
+zip (filter (<maxBound) xs) (filter (<maxBound) ys)
+----
+
+The former has the `Show` constraint and a fixed return type `[String]`, which is not general enough for the functions we have writen so far. The latter requires two constraints (`Bounded` and `Ord`) instead of a single one. Whatever we do, one can always come up with a more or less contrieved example that does not work.
+
+
+=== A Quantum of Solace
+
+Does this mean higher ranked types are useless? Not at all! They are very powerful, but like with everything else, they are no silver bullet that solve any programming problem. One is well advised to know the limitations.
