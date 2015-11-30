@@ -65,7 +65,7 @@ we need
 ezip :: (Enum c,Enum b) => (∀a.Enum a => [a] -> [a]) -> [b] -> [c] -> [(b,c)]
 ----
 
-Is it not infuriating that `ezip` and `nzip` are almost identical up to the name of the type class?
+Is it not infuriating that the types of `ezip` and `nzip` are almost identical up to the name of the type class? By the way, did you notice that I did only give the type for `nzip` and `ezip`? This is because the definition itself remains the same as the one for  `fzip` (except for the function name, of course).
 
 But even if we could abstract over type classes, we would still have to write new versions of our generalized `zip` to abstract over:
 
