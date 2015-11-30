@@ -80,4 +80,4 @@ The former has the `Show` constraint and a fixed return type `[String]`, which i
 
 === A Quantum of Solace
 
-Does this mean higher ranked types are useless? Not at all! They are very powerful, but like with everything else, they are no silver bullet that solve any programming problem. One is well advised to know the limitations.
+Does this mean higher ranked types are useless? Not at all! They are very powerful, but like with everything else, they are no silver bullet that solve any programming problem. Thus, one is well advised to know the limitations.
