@@ -81,3 +81,9 @@ The former has the `Show` constraint and a fixed return type `[String]`, which i
 === A Quantum of Solace
 
 Does this mean higher ranked types are useless? Not at all! They are very powerful, but like with everything else, they are no silver bullet that solve any programming problem. Thus, one is well advised to know the limitations.
+
+In the next section, we'll see how we can do more amazing things with *higher kinded types*. Unfortunaely, higher kinded and higher ranked types are often confused in discussions. Hopefully, this article will help to demystify the terms.
+
+=== Higher kinded types
+
+First of all, we must admit that the term *higher kinded type* is a bit misleading, for the same reason that it would be misleading to call the phrase "a cup of" a *higher kinded beverage*. 
