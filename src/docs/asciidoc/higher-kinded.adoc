@@ -90,6 +90,12 @@ First of all, we must admit that the term *higher kinded type* is a bit misleadi
 
 The truth is that the phrase "a cup of" denotes a _function_ that waits, so to speak, for some beverage to form concepts like "a cup of tea", "a cup of coffee" or "a cup of milk", and those latter concepts only denote real (or at least, conceivable) things.
 
-Likewise, `Maybe`, `[]` or `Either` are not types, but functions on the type level.  We call them _type constructors_, but this concept is often not exact enough. For, there is a difference between `Int`, `Maybe` and `Either, which are all three called type constructors. `Int` is a type (after all, there exist values that do have type `Int`), but `Maybe` is not a type, nor is `Either`.
+Likewise, `Maybe`, `[]` or `Either` are not types, but functions on the type level.  They are also called _type constructors_, but this is often not exact enough. For, there is surely a difference between `Int`, `Maybe` and `Either`, which are all three called type constructors. `Int` is a type (after all, there exist values that do have type `Int`), but `Maybe` is not a type, nor is `Either`.
+
+In the end, the concept *higher kinded types* means the ability to use certain expressions in the type language that do not denote plain types, but type functions.
+
+For this, it is useful to have a notation for the different *kinds* of type expressions. (It is perhaps to avoid even more confusion that we say "kind of type expressions" and not "type of type expressions".)
+
+
 
 
