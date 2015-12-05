@@ -12,6 +12,8 @@ where child nodes represent the boards that result from the players mutually pla
 In order to find the next best move we have to give some value to a board such that we can pick the one with the
 highest value. Let's go with a _Double_ value where `1` represents that the computer has won and `-1` for the opponent. 
 A function that tells us the static value of a board has this type:
+
+.The static evaluation function
 [source, haskell]
 ----
 static :: Board -> Double
@@ -21,7 +23,7 @@ For the purpose of our discussion, we don't need to know how it is implemented f
 If you are curious, you find a simple valuation for the tic tac toe game
 http://github.com/Dierk/fregePluginApp/blob/game_only/src/frege/fregepluginapp/Minimax.fr[here].
 
-.A difference to object orientated design
+.A difference to object oriented design
 ****
 Let's pause for a minute and think what we would do in object-oriented design now.
 We may be tempted to make `static` a method of the `Board` type, right?
@@ -42,10 +44,12 @@ All other values are derived from the maximum/minimum value one level below.
 Here is a figure that calculates the next move for a given board.
 Note that the static valuation is in circles, the minimax value has no circle around it.
 
-.The minimax tree.
+.The minimax tree with a lookahead of 2.
 image:minimax.jpg[ "The minimax tree", link="minimax.jpg"]
 
 Here is the natural way of putting this into a functional design:
+
+.The mutually recursive Minimax algorithm
 [source, haskell]
 ----
 maximize :: Ord a => Tree a -> a
@@ -78,6 +82,8 @@ This is where function composition appears again.
 We have already seen it when we composed the pruning function with the `gameTree` to produce a
 `prunedTree` as `prune 5 . gameTree`.
 By the same means we can make a tree of boards into a tree of the `static` values of those boards.
+
+.From a game tree to a tree of Double values
 [source, haskell]
 ----
 valueTree = static . prunedTree

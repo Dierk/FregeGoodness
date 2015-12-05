@@ -31,6 +31,7 @@ _Functor_.
 
 To use the Functor nature of trees, we use _fmap f_ instead of _static_.
 
+.Generalizing _static_ into _fmap static_
 [source,haskell]
 ----
 evaluateBy f = maximize . fmap f . prune 5 . gameTree
@@ -61,6 +62,7 @@ We can use _evaluateBy_ but we do not pass the _static_ function any more.
 Instead, we pass a function that maps a board not only to its static value but to a _pair_
 of the static value and the board itself.
 
+.Pairing up the static value with its board
 [source,haskell]
 ----
 endValue = evaluateBy capture where
@@ -95,6 +97,7 @@ typeclass _non-intrusively_ in a new increment with full static type safety!
 There is not much logic to add since we make all boards equal.
 For the purpose of ordering our pairs we only need the _static_ _Double_ values of the pair.
 
+.All Boards are created equal...
 [source,haskell]
 ----
 instance Ord Board where (<=>) a b = EQ

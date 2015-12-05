@@ -22,6 +22,7 @@ implementation: _the type system tells us so_!
 And this comes so: the main entry point to our solution is a call to the `map` function and
 the type signature of _map_ is
 
+.The signature of _map_
 [source,haskell]
 ----
 map :: ( α -> β ) -> [α] -> [β]
@@ -52,14 +53,15 @@ nor can any maintainer accidentally undermine our foundation through subsequent 
 Now, what happens if we go parallel and use `mapP` (the parallel version of `map`)
 instead of `map`? Here is the type signature of `mapP`:
 
+.The signature of _mapP_
 ----
 mapP :: ( α -> β ) -> [α] -> [β]
 ----
 
 That is *exactly the same*! The whole line of argumentation about purity of `map f` equally applies to `mapP f`!
-
+....
 *Let that sink in for a minute.*
-
+....
 === Parallelism as an increment
 
 With Frege, we can again apply a _non-intrusive increment_: from _sequential_ to _parallel_ execution in an absolutely safe manner.
