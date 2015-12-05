@@ -196,7 +196,7 @@ But even if that would be resolved, one could only test the whole solution in to
 In his seminal paper "Why functional programming matters", John Hughes makes the point that
 one main benefit is *improved modularity* by separating production of data from its usage and
 combining simple pieces of logic. +
-The fizzbuzz task is an compelling evidence for that claim. Every single line of the functional code
+The fizzbuzz task is a compelling evidence for that claim. Every single line of the functional code
 constitutes a module. The imperative solution is a monolith.
 
 === References
