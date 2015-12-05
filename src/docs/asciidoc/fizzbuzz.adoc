@@ -182,10 +182,22 @@ How well is the specification reflected in the implementation? +
 __Imperative: very indirectly (where is modulo 15 in the spec?) +
 Frege: exact one-to-one correspondence__
 
+Incremental Development::
+The Frege solution can be developed incrementally: one line at a time.
+We never have to go back to change and old line. We don't even have to recompile!
+This is big, because we cannot possibly introduce bugs in the code that we build upon. +
+The imperative solution must be touched and recompiled with every increment.
+
+Testability::
+The Frege solution allows testing of every single line. +
+The imperative solution is hard to test at all because the side effect is wired in.
+But even if that would be resolved, one could only test the whole solution in total.
+
 In his seminal paper "Why functional programming matters", John Hughes makes the point that
 one main benefit is *improved modularity* by separating production of data from its usage and
 combining simple pieces of logic. +
-The fizzbuzz task is an compelling evidence for that claim.
+The fizzbuzz task is an compelling evidence for that claim. Every single line of the functional code
+constitutes a module. The imperative solution is a monolith.
 
 === References
 [horizontal]
