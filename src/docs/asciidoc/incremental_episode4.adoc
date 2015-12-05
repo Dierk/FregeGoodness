@@ -59,9 +59,11 @@ mapP :: ( α -> β ) -> [α] -> [β]
 ----
 
 That is *exactly the same*! The whole line of argumentation about purity of `map f` equally applies to `mapP f`!
-....
+
+****
 *Let that sink in for a minute.*
-....
+****
+
 === Parallelism as an increment
 
 With Frege, we can again apply a _non-intrusive increment_: from _sequential_ to _parallel_ execution in an absolutely safe manner.
