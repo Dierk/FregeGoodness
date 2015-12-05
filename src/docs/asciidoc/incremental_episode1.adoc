@@ -3,8 +3,19 @@
 === Episode One: Be infinitely lazy and defer all work
 
 A board game is a series of mutual moves, each resulting in a new board position. 
-Since there are many possible moves and for every move a number of possible reactions by the opponent,
+Since there are many possible moves and for every move there are a number of possible counter-moves by the opponent,
 the possible evolutions of the game form a tree of board positions.
+
+.Moves and counter-moves form a tree.
+----
+start
+  move option 1
+    counter-move 1
+    counter-move 2
+  move option 2
+    counter-move 3
+    counter-move 4
+----
 
 Depending on the game rules, such a game tree can become infinitely large.
 
@@ -14,9 +25,11 @@ We stay focused on generation task and defer the limitation work to later.
 
 Here is the construction for an arbitrary payload "a".
 Children of each node recursively arise from making Nodes for all the payloads that "a" can `unfold` to.
-[source, frege]
+
+.The general recursive tree building
+[source, haskell]
 ----
-buildTree :: (a -&gt; [a]) -&gt; a -&gt; Tree a
+buildTree :: (a -> [a]) -> a -> Tree a
 buildTree unfold a = Node a children where 
     children = map (buildTree unfold) (unfold a)  
 ----
@@ -27,9 +40,11 @@ Laziness in the language cares for constructing children only when needed.
 
 This is now something that we can specialize for a given data type `Board` and a function `moves` 
 that unfolds to all boards that result from applying a valid move.
-[source, frege]
+
+.A game tree unfolds by placing all possible moves on the board
+[source, haskell]
 ----
-gameTree :: Board -&gt; Tree Board
+gameTree :: Board -> Tree Board
 gameTree board = buildTree moves board
 ----
 
@@ -39,14 +54,18 @@ We have extended the system _non-intrusively_ and we will do so again for limiti
 When an evaluation of the tree shall be limited to a depth "n" we simply prune the tree at that depth.
 That code is independent of our special game use case and can therefore work on nodes of arbitrary trees.
 Here is the recursive definition.
-[source, frege]
+
+.Pruning any arbitrary tree
+[source, haskell]
 ----
 prune 0 (Node a children) = Node a []
 prune n (Node a children) = Node a (map (prune (n-1)) children)
 ----
 
 To make a pruned game tree we use function composition (.) for the generation:
-[source, frege]
+
+.Pruning a game tree at depth 5
+[source, haskell]
 ----
 prunedTree = prune 5 . gameTree
 ----

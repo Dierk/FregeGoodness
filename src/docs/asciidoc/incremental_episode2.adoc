@@ -12,9 +12,9 @@ where child nodes represent the boards that result from the players mutually pla
 In order to find the next best move we have to give some value to a board such that we can pick the one with the
 highest value. Let's go with a _Double_ value where `1` represents that the computer has won and `-1` for the opponent. 
 A function that tells us the static value of a board has this type:
-[source, frege]
+[source, haskell]
 ----
-static :: Board -&gt; Double
+static :: Board -> Double
 ----
 
 For the purpose of our discussion, we don't need to know how it is implemented for our special game.
@@ -46,13 +46,13 @@ Note that the static valuation is in circles, the minimax value has no circle ar
 image:minimax.jpg[ "The minimax tree", link="minimax.jpg"]
 
 Here is the natural way of putting this into a functional design:
-[source, frege]
+[source, haskell]
 ----
-maximize :: Ord a =&gt; Tree a -&gt; a
+maximize :: Ord a => Tree a -> a
 maximize (Node a []) = a
 maximize (Node a children) = maximum (map minimize children)
 
-minimize :: Ord a =&gt; Tree a -&gt; a
+minimize :: Ord a => Tree a -> a
 minimize (Node a []) = a
 minimize (Node a children) = minimum (map maximize children)
 ----
@@ -60,9 +60,9 @@ minimize (Node a children) = minimum (map maximize children)
 Is this really "natural"? Yes.
 The functional way assumes the least what is needed (the "weakest precondition" like in Hoare proofs).
 In order to minimax a tree, we only need to assume that the payload can be ordered in some way
-(in Java terms, it is "comparable"). In the type annotation `Tree a -&gt; a` the "a" is a type variable.
+(in Java terms, it is "comparable"). In the type annotation `Tree a -> a` the "a" is a type variable.
 It tells that our method maps from a tree of "a" payloads to a value of exactly that type "a".
-The only thing that we assume about the "a" type is the `Ord a =&gt;` constraint,
+The only thing that we assume about the "a" type is the `Ord a =>` constraint,
 i.e. the "a" type must be an instance of the `Ord` typeclass such that we can call `minimum` and `maximum` 
 on a list thereof.
 
@@ -78,7 +78,7 @@ This is where function composition appears again.
 We have already seen it when we composed the pruning function with the `gameTree` to produce a
 `prunedTree` as `prune 5 . gameTree`.
 By the same means we can make a tree of boards into a tree of the `static` values of those boards.
-[source, frege]
+[source, haskell]
 ----
 valueTree = static . prunedTree
 ----
@@ -93,7 +93,7 @@ maximize . valueTree
 ----
 
 or in its expanded form:
-[source, frege]
+[source, haskell]
 ----
 maxValue = maximize . static . prune 5 . gameTree
 ----
