@@ -96,6 +96,12 @@ In the end, the concept *higher kinded types* means the ability to use certain e
 
 For this, it is useful to have a notation for the different *kinds* of type expressions. (It is perhaps to avoid even more confusion that we say "kind of type expressions" and not "type of type expressions".)
 
+=== Notation of Kinds
 
+The notation of type kinds is dead simple; however, that doesn't mean kinds are simple or at least, easy to decipher. Here are the rules:
 
-
+1. A proper type has kind `\*` Examples are `Int`, `[Int]` or `Int → Int` Types with kind `*` can be inhabitated by values, for example `42`, `[1,2,3]` or `\n → n+1`
+2. If `k` is a kind, then `(k)` is the same kind.
+2. If `k1` and `k2` are kinds, then so is `k1 → k2` 
+3. Like in the syntax for types, the `->` is right associative. Use parentheses to disambiguate `(* → \*) → *` and `* → (* → *)`. 
+nly the latter can be written  \* -> \*
