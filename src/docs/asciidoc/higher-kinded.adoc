@@ -75,18 +75,18 @@ zip (map show [8..13]) (map show ['a', 'b', 'c'])
 zip (filter (<maxBound) xs) (filter (<maxBound) ys)
 ----
 
-The former has the `Show` constraint and a fixed return type `[String]`, which is not general enough for the functions we have writen so far. The latter requires two constraints (`Bounded` and `Ord`) instead of a single one. Whatever we do, one can always come up with a more or less contrieved example that does not work.
+The former has the `Show` constraint and a fixed return type `[String]`, which is not general enough for the functions we have written so far. The latter requires two constraints (`Bounded` and `Ord`) instead of a single one. Whatever we do, one can always come up with a more or less contrived example that does not work.
 
 
 === A Quantum of Solace
 
 Does this mean higher ranked types are useless? Not at all! They are very powerful, but like with everything else, they are no silver bullet that solve any programming problem. Thus, one is well advised to know the limitations.
 
-In the next section, we'll see how we can do more amazing things with *higher kinded types*. Unfortunaely, higher kinded and higher ranked types are often confused in discussions. Hopefully, this article will help to demystify the terms.
+In the next section, we'll see how we can do more amazing things with *higher kinded types*. Unfortunately, higher kinded and higher ranked types are often confused in discussions. Hopefully, this article will help to demystify the terms.
 
 === Higher Kinded Types
 
-First of all, we must admit that the term *higher kinded type* is a bit misleading, for the same reason that it would be misleading to call the phrase "a cup of" a *higher kinded beverage*. "a cup of" is not only not a beverage, it doesn't denote anything at all that exists, or at least could psossibly exist, in the material world!
+First of all, we must admit that the term *higher kinded type* is a bit misleading, for the same reason that it would be misleading to call the phrase "a cup of" a *higher kinded beverage*. "a cup of" is not only not a beverage, it doesn't denote anything at all that exists, or at least could possibly exist, in the material world!
 
 The truth is that the phrase "a cup of" denotes a _function_ that waits, so to speak, for some beverage to form concepts like "a cup of tea", "a cup of coffee" or "a cup of milk", and those latter concepts only denote real (or at least, conceivable) things.
 
@@ -100,8 +100,8 @@ For this, it is useful to have a notation for the different *kinds* of type expr
 
 The notation of type kinds is dead simple; however, that doesn't mean kinds are simple or at least, easy to decipher. Here are the rules:
 
-1. A proper type has kind `\*` Examples are `Int`, `[Int]` or `Int → Int` Types with kind `*` can be inhabitated by values, for example `42`, `[1,2,3]` or `\n → n+1`
+1. A proper type has kind `\*` Examples are `Int`, `[Int]` or `Int → Int` Types with kind `*` can be inhabited by values, for example `42`, `[1,2,3]` or `\n → n+1`
 2. If `k` is a kind, then `(k)` is the same kind.
 2. If `k1` and `k2` are kinds, then so is `k1 → k2` 
-3. Like in the syntax for types, the `->` is right associative. Use parentheses to disambiguate `(* → \*) → *` and `* → (* → *)`. 
-nly the latter can be written  \* -> \*
+3. Like in the syntax for types, the `->` is right associative. Use parentheses to disambiguate `(* → \*) → *` and `* → (* → *)`. +
+Only the latter can be written  `\* -> \*`.
