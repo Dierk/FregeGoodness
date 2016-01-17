@@ -74,7 +74,13 @@ BigData value (not 1000 of them).
 
 It should come at no surprise that you can use the functions below
 to get access to elements in the list. Access to a value at a given
-index uses the `!!` operator.
+index uses the `!!` operator, which needs an extra import.
+
+.The !! operator needs importing
+[source, haskell]
+----
+import Data.List(!!)
+----
 
 .List functions that mostly do what you think they do
 [source,haskell]
