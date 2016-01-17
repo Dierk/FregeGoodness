@@ -65,7 +65,7 @@ using `Millimeter` as the return type instead of `Int`.
 .Update return types from Int to Millimeter
 [source,haskell]
 ----
-class Metric (Integral a)  => a  where
+class (Integral a) => Metric a  where
     mm :: a -> Millimeter
     cm :: a -> Millimeter
     m  :: a -> Millimeter
@@ -112,7 +112,7 @@ instance Num Seconds where
     fromInt     a     = SEC a
     fromInteger a     = SEC a.fromIntegral
 
-class Time (Integral a)  => a  where
+class (Integral a) => Time a where
     sec     :: a -> Seconds
     minutes :: a -> Seconds
     h       :: a -> Seconds
@@ -143,7 +143,7 @@ And now we can go even further and mix distances and duration to describe veloci
 data Velocity = KMH Double
 derive Eq Velocity
 
-class Unit (Real a)  => a  where
+class (Real a)  => Unit a where
     kmh :: a -> Velocity
 
 instance Unit Double where

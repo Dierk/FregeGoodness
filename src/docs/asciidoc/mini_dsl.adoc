@@ -37,7 +37,7 @@ can be the type or a type class of the following value `1`. Our actual `Int` typ
 .The definition of a Millimeter type class for an integral type "a"
 [source,haskell]
 ----
-class Millimeter (Integral a) => a  where
+class (Integral a) => Millimeter a  where
     mm :: a -> a
     cm :: a -> a
     m  :: a -> a
