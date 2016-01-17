@@ -117,6 +117,11 @@ class (Integral a) => Time a where
     minutes :: a -> Seconds
     h       :: a -> Seconds
 
+instance Time Int where
+    sec     i = SEC i
+    minutes i = i.sec * 60
+    h       i = i.minutes * 60
+
 main args = do
     println $ 3.sec + 1.h - 30.minutes == 1803.sec
 ----
