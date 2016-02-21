@@ -13,6 +13,9 @@ series in your hand for browsing and searching.
 Furthermore, there is support for many reading devices on the web,
 smartphone, tablet, iBooks, and Kindle.
 
+There is also an ongoing https://www.gitbook.com/book/y-taka-23/frege-goodness-jp/details[Japanese translation]
+by Yuto Takahashi (@y-taka-23).
+
 === For the advanced beginner
 
 I assume that you are an _advanced beginner_ that knows the basic
