@@ -121,7 +121,18 @@ to a yet unbound variable. This is very much unlike other languages.
 
 In every function or lambda term there is at most one such unbound variable that the underscore
 can refer to since, technically, functions and lambda terms in Frege and Haskell only ever take one
-parameter. They can appear in a nested fashion, though.
+parameter. Any additional unbound variables remain unbound like in the example below.
+
+.Notational options with more parameters
+[source,haskell]
+----
+String.startsWith "Dierk" "D"
+"Dierk".startsWith "D"
+map (\s -> s.startsWith "D") ["Ingo","Dierk"]
+map (_.startsWith "D") ["Ingo","Dierk"]
+----
+
+Furthermore, underscores can appear in a nested fashion.
 
 .Nesting with underscore-dot notation
 [source,haskell]
@@ -148,3 +159,15 @@ code, you can replace it with an explicit parameter any time.
 
 Future IDE support could easily provide refactorings that switch between the two notations.
 Completion after `_.` would be another interesting feature.
+
+=== Comparison to Haskell
+
+The way that Frege is handling the dot is not available in Haskell.
+One can see it as a special syntax extension.
+
+This extension has many benefits. Between them are:
+
+- terse notation as seen above that is familiar to Java programmers
+- typically plays well with Java-like APIs and their native definitions
+- enables IDE code completion
+- allows https://prime.haskell.org/wiki/TypeDirectedNameResolution[type-directed name resolution]
