@@ -1,0 +1,135 @@
+[[underscore_dot_notation]]
+
+== The underscore-dot notation
+
+We have already seen "<<dot_notation.adoc#dot_notation,The Power of the Dot>>"
+and how it can make programming easier when referring to functions that are
+in the scope of a module, a data type, or a type class.
+
+We have seen usages like below where before the dot either
+the explicit scope of the data type `TextArea` is referenced or
+a value thereof (`inputArea`).
+
+.Referencing a scope or a value before the dot
+[source,haskell]
+----
+-- dot notation on scope
+TextArea.getCaretPosition inputArea
+-- dot notation on reference
+inputArea.getCaretPosition
+----
+
+The underscore-dot notation allow us to be even more succinct.
+
+=== Introducing the underscore-dot
+
+Let's suppose that we are in a situation where know that
+`inputArea` is of type `TextArea`. The simplest example is an explicit
+declaration.
+
+.Explicit declaration
+[source,haskell]
+----
+insertionPoint :: TextArea -> JFX Int
+insertionPoint inputArea = inputArea.getCaretPosition
+----
+
+We see that `inputArea` is somewhat duplicated and the underscore-dot notation
+resolves that redundancy.
+
+.Underscore-dot to reference the unbound variable
+[source,haskell]
+----
+insertionPoint :: TextArea -> JFX Int
+insertionPoint = _.getCaretPosition
+----
+
+As a side note: remember that a function definition is just giving a name to
+a lambda expression. There function definition `f x = x`
+and the lambda declaration `f = \x -> x` are equivalent.
+
+In other words, the underscore-dot notation just replaces
+
+.Lambda term
+[source,haskell]
+----
+\inputArea -> inputArea.getCaretPosition
+----
+
+with
+
+.Underscore-dot term
+[source,haskell]
+----
+_.getCaretPosition
+----
+
+Let's see more places where this is useful.
+
+=== More Usages
+
+For getting the name of the current thread, we have a variety of options.
+
+.Many styles to get to the current thread name
+[source,haskell]
+----
+-- do notation
+do
+    thread <- Thread.current()
+    name   <- thread.getName
+
+-- lambda with formal parameter
+Thread.current() >>= \t -> t.getName
+
+-- lambda with partial application
+-- (needs 'Thread' as explicit scope)
+Thread.current() >>= Thread.getName
+
+-- underscore-dot notation
+Thread.current() >>= _.getName
+----
+
+The underscore-dot notation is also nice to use for higher-order functions
+where one would otherwise use sectioning or partial application. Let's try this with
+the classical `map` function and the usage of mapping a list of thread values
+to their names.
+
+.Mapping threads to their names
+[source,haskell]
+----
+map _.getName threads
+----
+
+Even the record-syntax can profit from using the underscore-dot notation, particularly
+when updating or modifying a record. Assume we have `Person` record with a `name` field.
+Modifying then just means passing in a person record and returning an updated one.
+
+.Updating a record with the underscore-dot notation
+[source,haskell]
+----
+data Person = Person {name :: String}
+setName :: String -> State Person ()
+setName newName = do
+    State.modify _.{name = newName}
+----
+
+=== Final Thoughts
+
+One can only use the underscore in combination with an immediately following dot when trying to refer
+to a yet unbound variable. This is very much unlike other languages.
+
+In every function or lambda term there is at most one such unbound variable that the underscore
+can refer to since, technically, functions and lambda terms in Frege and Haskell only ever take one
+parameter. They can appear in a nested fashion, though.
+
+.Nesting with underscore-dot notation
+[source,haskell]
+----
+data Person  = Person  {addr :: Address}
+data Address = Address {street :: String}
+setStreet :: String -> State Person ()
+setStreet newStreet = do
+    State.modify _.{addr <- _.{street = newStreet} }
+----
+
+
