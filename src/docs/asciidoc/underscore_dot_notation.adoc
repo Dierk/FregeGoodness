@@ -7,7 +7,7 @@ and how it can make programming easier when referring to functions that are
 in the scope of a module, a data type, or a type class.
 
 We have seen usages like below where before the dot either
-the explicit scope of the data type `TextArea` is referenced or
+the explicit scope of the data type (`TextArea`) is referenced or
 a value thereof (`inputArea`).
 
 .Referencing a scope or a value before the dot
@@ -45,7 +45,7 @@ insertionPoint = _.getCaretPosition
 ----
 
 As a side note: remember that a function definition is just giving a name to
-a lambda expression. There function definition `f x = x`
+a lambda expression. The function definition `f x = x`
 and the lambda declaration `f = \x -> x` are equivalent.
 
 In other words, the underscore-dot notation just replaces
@@ -68,7 +68,7 @@ Let's see more places where this is useful.
 
 === More Usages
 
-For getting the name of the current thread, we have a variety of options.
+For getting the name of the current thread, we have a variety of notational options.
 
 .Many styles to get to the current thread name
 [source,haskell]
@@ -115,7 +115,8 @@ setName newName = do
 
 === Final Thoughts
 
-One can only use the underscore in combination with an immediately following dot when trying to refer
+One can only use the underscore in combination _with an immediately following dot_.
+A free-standing underscore is _not_ allowed as a means of referring
 to a yet unbound variable. This is very much unlike other languages.
 
 In every function or lambda term there is at most one such unbound variable that the underscore
@@ -132,4 +133,18 @@ setStreet newStreet = do
     State.modify _.{addr <- _.{street = newStreet} }
 ----
 
+The first underscore refers to a `Person`, the second one to its `Address` and there can be
+absolutely no question about it.
 
+However, if you ever find it difficult to "decipher" the meaning of an underscore in your
+code, you can replace it with an explicit parameter any time.
+
+.Replace back with an explicitly named parameter
+[source,haskell]
+----
+...
+    State.modify (\p -> p.{addr <- (\a -> a.{street = newStreet} ) } )
+----
+
+Future IDE support could easily provide refactorings that switch between the two notations and
+also support code completion after `_.`.
