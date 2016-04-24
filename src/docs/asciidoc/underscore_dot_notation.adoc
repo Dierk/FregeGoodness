@@ -146,5 +146,5 @@ code, you can replace it with an explicit parameter any time.
     State.modify (\p -> p.{addr <- (\a -> a.{street = newStreet} ) } )
 ----
 
-Future IDE support could easily provide refactorings that switch between the two notations and
-also support code completion after `_.`.
+Future IDE support could easily provide refactorings that switch between the two notations.
+Completion after `_.` would be another interesting feature.
