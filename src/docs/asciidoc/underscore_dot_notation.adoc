@@ -23,7 +23,7 @@ The underscore-dot notation allow us to be even more succinct.
 
 === Introducing the underscore-dot
 
-Let's suppose that we are in a situation where know that
+Let's suppose that we are in a situation where we know that
 `inputArea` is of type `TextArea`. The simplest example is an explicit
 declaration.
 
