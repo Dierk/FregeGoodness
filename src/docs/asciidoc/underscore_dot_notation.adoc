@@ -44,9 +44,12 @@ insertionPoint :: TextArea -> JFX Int
 insertionPoint = _.getCaretPosition
 ----
 
-As a side note: remember that a function definition is just giving a name to
+.Side note
+****
+Remember that a function definition is just giving a name to
 a lambda expression. The function definition `f x = x`
 and the lambda declaration `f = \x -> x` are equivalent.
+****
 
 In other words, the underscore-dot notation just replaces
 
@@ -102,7 +105,7 @@ map _.getName threads
 
 Even the record-syntax can profit from using the underscore-dot notation, particularly
 when updating or modifying a record. Assume we have `Person` record with a `name` field.
-Modifying then just means passing in a person record and returning an updated one.
+Modifying a person record just means passing in a person record and returning an updated one.
 
 .Updating a record with the underscore-dot notation
 [source,haskell]
@@ -145,7 +148,7 @@ setStreet newStreet = do
 ----
 
 The first underscore refers to a `Person`, the second one to its `Address` and there can be
-absolutely no question about it.
+absolutely no question about which underscore refers to which type.
 
 However, if you ever find it difficult to "decipher" the meaning of an underscore in your
 code, you can replace it with an explicit parameter any time.
@@ -158,7 +161,7 @@ code, you can replace it with an explicit parameter any time.
 ----
 
 Future IDE support could easily provide refactorings that switch between the two notations.
-Completion after `_.` would be another interesting feature.
+Code completion after `_.` would be another interesting IDE feature.
 
 === Comparison to Haskell
 
