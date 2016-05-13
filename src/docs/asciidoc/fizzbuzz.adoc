@@ -100,6 +100,9 @@ fizzbuzz = zipWith combine pattern [1..] where
                              then show number
                              else word
 ----
+NOTE: The use of 'null' in the code above does not refer to the null
+      pointer reference but to a function called 'null' which returns
+      true if it's argument is an empty list (eg. a blank string).
 
 These infinite productions are very versatile to use.
 We have already seen twice how to combine them, but they
