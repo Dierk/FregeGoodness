@@ -29,7 +29,7 @@ data Client     = Client    { star   :: Maybe Portfolio  }
 data Portfolio  = Portfolio { star   :: Maybe Position   }
 data Position   = Position  { soMany :: Int, ticker :: Ticker }
 ----
-NOTE: A `Position` always has a ticker, even though that makes our live a little harder later.
+NOTE: A `Position` always has a ticker, even though that makes our life a little harder later.
       We want to keep it a bit "realistic".
 
 
@@ -172,7 +172,9 @@ is captured in the lambda parameter.
 We can simply follow the types. As we have seen in "<<silence.adoc#silence,Silent notation>>"
 [source,haskell]
 ----
-\position -> Just position.ticker   -- Position -> Maybe Ticker
+-- the type of the anonymous lambda expression is
+-- Position -> Maybe Ticker
+\position -> Just position.ticker
 ----
 is just another notation for
 [source,haskell]
