@@ -7,7 +7,7 @@ as it led to interesting insights about the benefits of functional design.
 However, there is still room for improvement.
 Some pieces in the implementation look somewhat "ad hoc" - or if you will
 "carefully chosen" such that we get the desired outcome.
-Let's revisit that problem with a more structural approach that will show us:
+Let's revisit that problem with a more type-directed approach that will show us:
 
 * the essence of the solution idea
 * the value of abstraction
@@ -35,7 +35,7 @@ This solution only works because the empty String never appears as a value
 in our business rules. It is an excluded value. Our solution is not "total"
 but we do not expose this fact.
 
-This is unfortunate under two considerations.
+This is unfortunate.
 
 * It limits the applicability of our solution.
   If tomorrow the boss comes with the new rule "every 7th number must be
@@ -63,7 +63,7 @@ Luckily, such a function readily exists in the standard library.
 It is defined in the `Data.Monoid` module.
 A _Monoid_ is a mathematical abstraction for a type that can handle
 _append_ functionality (called `mappend` or denoted with the `<>` operator),
-given that the type meets the following rules:
+provided that the type meets the following rules:
 
 * there is a _neutral element_ `mempty` that when appended behaves like `""` or `Nothing` above
 * appending is associative: `(a <> b) <> c == a <> (b <> c)`
@@ -93,9 +93,11 @@ buzzes   = cycle [Nothing, Nothing, Nothing, Nothing, Just "buzz"]
 pattern  = zipWith mappend fizzes buzzes
 ----
 
+That looks definitely cleaner. Now let's see how to use that pattern as a mask over the numbers.
+
 === Piece two: the conditional combination
 
-The second part is combining the numbers with the fizzbuzz pattern such that the numbers should only "show through" if
+The second part is combining the numbers with the fizzbuzz pattern such that the numbers should only "shine through"
 where the pattern evaluates to `Nothing`.
 
 In other words, we need a function that from a _Maybe_ type evaluates to the _Just_ value if present and to a default
@@ -108,7 +110,7 @@ fromMaybe number (Just x) = x
 fromMaybe number Nothing = number
 ----
 
-Now, this logic is totally independent of the type of `x` and no wonder that the _Maybe_ type
+Now, this logic is totally independent of the type of `x` and `number`. No wonder that the _Maybe_ type
 conveniently supplies us exactly this function.
 Abstraction has payed off again since we can reuse existing functionality.
 
@@ -131,7 +133,7 @@ main _ = do
 ----
 
 You may want to refine the solution even further.
-For example, one could replace `[Nothing, Nothing]` with `repeat 2 Nothing`.
+For example, you could replace `[Nothing, Nothing]` with `repeat 2 Nothing`.
 
 Anyway, if you follow the link in the references, you will find that there are
 _many_, _many_, _many_ monoidal data types. Identifying and using them is
@@ -141,6 +143,7 @@ I our case we have captured the essence of our business rules being
 "maybe append" in the type abstraction.
 
 _Thanks to Ingo Wechsung for proposing this refactoring!_
+
 === References
 [horizontal]
 Monoid in Frege doc::
