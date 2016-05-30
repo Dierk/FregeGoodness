@@ -219,5 +219,7 @@ https://github.com/thescalarian/FregeGoodness/blob/patch-1/src/docs/asciidoc/fiz
 
 FizzBuzz Solutions::
 http://c2.com/cgi/wiki?FizzBuzzTest[C2 Wiki],
-https://vimeo.com/144335290[Fizzbuzz Trek] by Kevlin Henney
+https://vimeo.com/144335290[Fizzbuzz Trek] by Kevlin Henney,
+https://gist.github.com/olivergierke/714b46e78b1b575a099e9f9c6d0af5f3[Better Java Solutions] by
+Oliver Gierke and others
 

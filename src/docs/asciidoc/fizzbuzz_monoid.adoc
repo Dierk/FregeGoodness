@@ -1,0 +1,147 @@
+[[fizzbuzz_monoid]]
+== FizzBuzz Revisited
+
+Our first stab at implementing a fizzbuzz solution was already very fruitful
+as it led to interesting insights about the benefits of functional design.
+
+However, there is still room for improvement.
+Some pieces in the implementation look somewhat "ad hoc" - or if you will
+"carefully chosen" such that we get the desired outcome.
+Let's revisit that problem with a more structural approach that will show us:
+
+* the essence of the solution idea
+* the value of abstraction
+* the right tool for the job
+
+The refactored solution will not be dramatically different but somewhat cleaner in its design
+and more versatile in its application.
+
+=== Piece one: the FizzBuzz pattern
+
+We chose the empty String `""` to represent the do-nothing case in our
+business rules. Well, that works because appending an empty
+String (both left or right) always evaluates to the other String:
+
+.Appending an empty String does what we need
+[source,haskell]
+----
+"fizz" ++ ""     == "fizz"
+"" ++ "buzz"     == "buzz"
+"fizz" ++ "buzz" == "fizzbuzz"
+"" ++ ""         == ""
+----
+
+This solution only works because the empty String never appears as a value
+in our business rules. It is an excluded value. Our solution is not "total"
+but we do not expose this fact.
+
+This is unfortunate under two considerations.
+
+* It limits the applicability of our solution.
+  If tomorrow the boss comes with the new rule "every 7th number must be
+  silently ignored (print the empty String)", we have an issue.
+* An empty String does not _communicate_ the absence of a value.
+
+But no worries, we do have a type that is exactly made for this purpose: `Maybe String`.
+It can be `Nothing` or `Just "fizz"`.
+
+The question is: can we append values of the Maybe type? Let's see.
+
+We would like to append `Maybe String` values just like we did with Strings.
+To this end, we assume that there is a function `mappend` that does just that.
+
+.How appending `Maybe String` values should work
+[source,haskell]
+----
+Just "fizz" `mappend` Nothing     == Just "fizz"
+Nothing     `mappend` Just "buzz" == Just "buzz"
+Just "fizz" `mappend` Just "buzz" == Just "fizzbuzz"
+Nothing     `mappend` Nothing     == Nothing
+----
+
+Luckily, such a function readily exists in the standard library.
+It is defined in the `Data.Monoid` module.
+A _Monoid_ is a mathematical abstraction for a type that can handle
+_append_ functionality (called `mappend` or denoted with the `<>` operator),
+given that the type meets the following rules:
+
+* there is a _neutral element_ `mempty` that when appended behaves like `""` or `Nothing` above
+* appending is associative: `(a <> b) <> c == a <> (b <> c)`
+
+The String type is a monoid with `mappend = (++)` and `mempty = ""`.
+
+`Maybe String` is a monoid with `mappend` as shown above and `mempty = Nothing`.
+
+.For the Geeks
+****
+In fact, any `Maybe a` is a monoid if `a` is again a monoid, such that `Just x` and `Just y` can
+be appended to `Just (x <> y)`.
+Since in this case the neutral element of the `a` type is never needed, it actually suffices that `a` is a
+so-called _Semigroup_: a monoid where the neutral element is not required.
+****
+
+Combining all the information from above leads to the following definition of the
+fizzbuzz business rules and combination thereof.
+
+.Monoidal fizzbuzz business rules
+[source,haskell]
+----
+import Data.Monoid
+
+fizzes   = cycle [Nothing, Nothing, Just "fizz"]
+buzzes   = cycle [Nothing, Nothing, Nothing, Nothing, Just "buzz"]
+pattern  = zipWith mappend fizzes buzzes
+----
+
+=== Piece two: the conditional combination
+
+The second part is combining the numbers with the fizzbuzz pattern such that the numbers should only "show through" if
+where the pattern evaluates to `Nothing`.
+
+In other words, we need a function that from a _Maybe_ type evaluates to the _Just_ value if present and to a default
+in case of _Nothing_.
+
+.How fromMaybe should (and does) work
+[source,haskell]
+----
+fromMaybe number (Just x) = x
+fromMaybe number Nothing = number
+----
+
+Now, this logic is totally independent of the type of `x` and no wonder that the _Maybe_ type
+conveniently supplies us exactly this function.
+Abstraction has payed off again since we can reuse existing functionality.
+
+.The final refactored solution
+[source,haskell]
+----
+module FizzBuzz where
+
+import Data.Monoid
+
+nums     = map show [1..]
+fizzes   = cycle [Nothing, Nothing, Just "fizz"]
+buzzes   = cycle [Nothing, Nothing, Nothing, Nothing, Just "buzz"]
+pattern  = zipWith mappend fizzes buzzes
+
+fizzbuzz = zipWith fromMaybe nums pattern
+
+main _ = do
+    println $ take 100 fizzbuzz
+----
+
+You may want to refine the solution even further.
+For example, one could replace `[Nothing, Nothing]` with `repeat 2 Nothing`.
+
+Anyway, if you follow the link in the references, you will find that there are
+_many_, _many_, _many_ monoidal data types. Identifying and using them is
+often helpful to capture the essence of a solution.
+
+I our case we have captured the essence of our business rules being
+"maybe append" in the type abstraction.
+
+_Thanks to Ingo Wechsung for proposing this refactoring!_
+=== References
+[horizontal]
+Monoid in Frege doc::
+http://www.frege-lang.org/doc/frege/data/Monoid.html
