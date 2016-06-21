@@ -1,0 +1,33 @@
+Frege for the Java Programmer
+
+Why should I care?
+
+main function
+- program arguments
+- is a module definition needed?
+
+class/object vs module
+
+subclassing and generics vs
+- sum types
+- type classes
+
+function definition
+function application
+
+(un-) bounded iteration: for/while vs
+- recursion
+- fold
+- iterate
+- zipWith [1..]
+- list comprehension
+
+IO
+- read/write stdin stdout
+- read/write/append
+
+concurrency / parallelism
+
+Maybe, Either, Exception
+
+Record Syntax
