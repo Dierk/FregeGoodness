@@ -223,3 +223,6 @@ https://vimeo.com/144335290[Fizzbuzz Trek] by Kevlin Henney,
 https://gist.github.com/olivergierke/714b46e78b1b575a099e9f9c6d0af5f3[Better Java Solutions] by
 Oliver Gierke and others
 
+Carlo Pescio::
+A criticial review https://drive.google.com/file/d/0B59Tysg-nEQZOGhsU0U5QXo0Sjg/view?pref=2&pli=1[Draft]
+
