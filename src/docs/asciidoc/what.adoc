@@ -8,7 +8,7 @@ corner cases and inconsistencies when dealing with numbers as nicely pointed out
 this http://xkcd.com/1537/[xkcd comic].
 
 This comes to a large extend from using numerical operators with non-numerical values
-(think `+` for String concatenation) and automatic coercion between number types and
+(think `+` for String concatenation) and automatic coercion
 between numbers and Strings. These issues do not occur in Frege (nor in Haskell) where
 operators never work on a mixture of types.
 
