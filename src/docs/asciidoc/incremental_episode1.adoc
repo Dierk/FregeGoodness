@@ -1,6 +1,6 @@
 [[incremental_episode1]]
 
-=== Episode One: Be infinitely lazy and defer all work
+== Episode One: Be infinitely lazy and defer all work
 
 A board game is a series of mutual moves, each resulting in a new board position. 
 Since there are many possible moves and for every move there are a number of possible counter-moves by the opponent,
