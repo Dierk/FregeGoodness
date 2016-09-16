@@ -133,7 +133,7 @@ main _ = do
 ----
 
 You may want to refine the solution even further.
-For example, you could replace `[Nothing, Nothing]` with `repeat 2 Nothing`.
+For example, you could replace `[Nothing, Nothing]` with `replicate 2 Nothing`.
 
 Anyway, if you follow the link in the references, you will find that there are
 _many_, _many_, _many_ monoidal data types. Identifying and using them is
