@@ -54,6 +54,7 @@ Now, what happens if we go parallel and use `mapP` (the parallel version of `map
 instead of `map`? Here is the type signature of `mapP`:
 
 .The signature of _mapP_
+[source,haskell]
 ----
 mapP :: ( α -> β ) -> [α] -> [β]
 ----
