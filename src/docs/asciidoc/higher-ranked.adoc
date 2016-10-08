@@ -200,7 +200,7 @@ languages like ML, Haskell, F# and Frege. This restriction says
 that lambda bound values (you can read this as "function arguments") are assumed to be _monomorphic_. 
 And this needs to be so because otherwise type inference would become _undecidable_. 
 
-### Ranking Types
+=== Ranking Types
 
 Another way to put this is that type inference à la Hindley-Milner (in the following HM for short)
 can only deal with polymorphism of rank 1.
