@@ -123,6 +123,7 @@ https://www.youtube.com/watch?v=NZeDRs6snm0
 
 Bartosz Milewski::
 http://bartoszmilewski.com/2015/04/07/natural-transformations/[Natural Transformations],
+https://www.youtube.com/watch?v=2LJC-XD5Ffo[video],
 http://bartoszmilewski.com/2015/09/01/the-yoneda-lemma[The Yoneda Lemma]
 
 Functor::
