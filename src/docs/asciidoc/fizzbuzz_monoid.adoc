@@ -148,3 +148,9 @@ _Thanks to Ingo Wechsung for proposing this refactoring!_
 [horizontal]
 Monoid in Frege doc::
 http://www.frege-lang.org/doc/frege/data/Monoid.html
+
+Monoidal fizzbuzz in Purescript::
+https://gist.github.com/Dierk/c37941c9383b695b30209e34638f8d65
+
+Extensible monoidal fizzbuzz in Haskell::
+https://gist.github.com/mathiasverraes/763ebf4a7c6ed5e364840e021af5e431
