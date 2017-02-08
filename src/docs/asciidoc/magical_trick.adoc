@@ -1,4 +1,19 @@
 [[magical_trick]]
+
+Let's start our Frege journey in a rather unconventional way.
+
+Instead of showing the syntax for `"Hello, World"`, we begin with an example of
+_equational reasoning_.
+
+Frege brings this novel kind of designing and re-factoring solutions to the JVM.
+Its way of purely functional programming bases our programs on a
+solid foundation that roots deeply in the fabric of mathematics.
+
+So while in Frege you can of course do everything that you can do in any other language,
+we start with a Frege benefit that you will _not_ get in any other JVM language.
+
+Enjoy the show!
+
 == A Magical Trick
 
 First, think of a function _f_ that maps a lists of arbitrary element types to another list of the exact same type.
