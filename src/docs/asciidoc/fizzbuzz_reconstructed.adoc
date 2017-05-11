@@ -264,7 +264,7 @@ regardless what language you use.
 .Thanks!
 [NOTE]
 ===============================
-Many thanks to Daniel Kröni for the fruitful discussions and suggestions.
+Many thanks to Daniel Kröni for many inspiring discussions and suggestions.
 ===============================
 
 === References
