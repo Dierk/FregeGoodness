@@ -4,7 +4,7 @@
 [quote]
 ____
 There is no problem that - when you look at it closely enough -
-doesn't become even weirder and incomprehensible.
+doesn't become even weirder and less comprehensible.
 ____
 
 FizzBuzz has turned out to be a much more interesting programming challenge
@@ -12,9 +12,9 @@ than originally expected. It looks so simple on the outside but it
 expands into a prolific solution space.
 
 Our previous solutions (link:fizzbuzz.adoc[fizzbuzz] and link:fizzbuzz_monoid.adoc[revisited])
-had many benefits but they share a
+have many benefits but they share a
 downside that we silently ignored so far: they do not perform well for
-large numbers, let's say the FizzBuzz values from one million upwards.
+large numbers like the FizzBuzz values from one million upwards.
 The old solutions had to iterate to the one million before emitting values.
 
 We will resolve this issue with a reconstruction that
@@ -22,8 +22,8 @@ shows even more characteristics of _functional thinking_:
 
 * The fundamental question of functional programming
 * Modeling with types
-* Be compositional
-* Follow the types
+* Being compositional
+* Following the types
 
 We take another step up the ladder of functional programming proficiency.
 
@@ -33,9 +33,10 @@ When solving a programming challenge the functional way, there
 is one fundamental question to ask:
 
 .The Fundamental Question of Functional Programming
-==========================
-"This task is a function from _what_ to _what_?"
-==========================
+[quote]
+____
+This task is a function from _what_ to _what_?
+____
 
 FizzBuzz is a function from a sequence of integers to a sequence
 of strings.
@@ -47,7 +48,7 @@ fizzbuzz :: [Int] -> [String]
 fizzbuzz = map transform [1..100]
 ----
 
-Now we have the fundamental question again: `transform` is a function from what to what?
+Now we have the fundamental question again: `transform` is a function from _what_ to _what_?
 
 It transforms the integer 1 to the String result "1", 3 to "fizz", 5 to "buzz", 15 to "fizzbuzz", etc. with respect
 to the rules of the game.
@@ -61,13 +62,11 @@ transform :: Int -> String
 This leaves us with two considerations for implementing `transform`:
 
 * the rules of the game
-* the `toString` logic
+* a `toString` for rules
 
 === Model with Types
 
-Let's start with the rules.
-
-And here are the rules that we have to apply:
+Let's start with the rules that we have to apply:
 
 * if n is divisible by 3, add "fizz" to the result
 * if n is divisible by 5, add "buzz" to the result
@@ -85,7 +84,7 @@ In other words: a rule is a function. And again the question: _a function from w
 type Rule = Int -> [String] -> [String]
 ----
 
-A first step at modelling a fizz-rule could be
+A first step at modelling the fizz-rule could be
 
 .Preliminary fizz rule
 [source,haskell]
@@ -96,7 +95,7 @@ fizzRule n old = if n `rem` 3 > 0
               else old ++ ["fizz"]
 ----
 
-But, well, we need to do the same for "buzz", so we remove the duplication early on
+But, well, we need to do the same for "buzz", so we remove the duplication
 by using parameters for the divisor (3 or 5) and the result word ("fizz" or "buzz"):
 
 .Parameterized Fizz and Buzz Rule
@@ -175,10 +174,14 @@ Again, we ask the fundamental question: "`toString` is a function from _what_ to
 * We need a number where the rule is applied to.
 * We return a String.
 
-In code: `toString :: Rule -> Int -> String`.
+.The type of toString
+[source,haskell]
+----
+toString :: Rule -> Int -> String
+----
 
 The implementation is almost writes itself. We have no other choice than applying
-the rule to the number and initially empty result list in order to get a
+the rule to the number and an initially empty result list in order to get a
 list of result strings.
 
 From that list of strings, we make a single string by concatenation.
@@ -196,7 +199,7 @@ toString rule n = joined "" (rule n [])
 ----
 
 This `transform` works for any rule, and since our combination of rules,
-namely `rules`, is itself a rule, it works for this as well.
+namely `rules`, is itself a rule, it works for that whole combination as well.
 
 === Putting it all together
 
@@ -250,6 +253,19 @@ The new solution
 You are hopefully convinced (again) that functions are cool and
 function types even more so.
 
+.This is a function from what to what?
+****
+Asking the fundamental question of functional programming
+"this is a function from _what_ to _what_" will change your way of programming
+regardless what language you use.
+****
+
+
+.Thanks!
+[NOTE]
+===============================
+Many thanks to Daniel Kröni for the fruitful discussions and suggestions.
+===============================
 
 === References
 [horizontal]
