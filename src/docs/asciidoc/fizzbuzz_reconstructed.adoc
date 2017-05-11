@@ -22,7 +22,7 @@ shows even more characteristics of _functional thinking_:
 
 * The fundamental question of functional programming
 * Modeling with types
-* Being compositional
+* Using composition
 * Following the types
 
 We take another step up the ladder of functional programming proficiency.
@@ -70,7 +70,7 @@ Let's start with the rules that we have to apply:
 
 * if n is divisible by 3, add "fizz" to the result
 * if n is divisible by 5, add "buzz" to the result
-* if no other rules apply, make `show n` the only result
+* if no other rules apply then `show n` is the only result
 
 In other words: a rule is a function. And again the question: _a function from what to what_?
 
@@ -137,7 +137,7 @@ numberRule n []     = [show n]
 numberRule _ result = result
 ----
 
-=== Be Compositional
+=== Composing Rules
 
 The rules work fine in isolation but for the FizzBuzz challenge, we have to combine the
 rules. Here is where the functional approach really shines.
@@ -168,9 +168,9 @@ With the composition of all rules under our belt, we can start thinking
 about the `toString` functionality that we need to apply to the
 result of having all rules applied to a number.
 
-Again, we ask the fundamental question: "`toString` is a function from _what_ to _what_?"
+Again, we ask the fundamental question: " `toString` is a function from _what_ to _what_?"
 
-* We need a rule who's result we show as a String.
+* We need a rule and show its result as a String.
 * We need a number where the rule is applied to.
 * We return a String.
 
@@ -180,7 +180,7 @@ Again, we ask the fundamental question: "`toString` is a function from _what_ to
 toString :: Rule -> Int -> String
 ----
 
-The implementation is almost writes itself. We have no other choice than applying
+The implementation almost writes itself. We have no other choice than applying
 the rule to the number and an initially empty result list in order to get a
 list of result strings.
 
