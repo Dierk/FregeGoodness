@@ -91,7 +91,7 @@ so putting that in between should also work, right? Yes it does.
     foo . bar . baz . buz $ x  -- this is not used so often
 ----
 
-Now, can we shave the _x_ off such that we can drop dollars and parens as well?
+Now, can we shave the _x_ off such that we can drop dollars and parentheses as well?
 
 Yes, but that needs a bit of background.
 

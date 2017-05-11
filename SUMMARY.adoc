@@ -9,6 +9,7 @@
 . link:src/docs/asciidoc/maybe_path.adoc[The Maybe Path]
 . link:src/docs/asciidoc/fizzbuzz.adoc[FizzBuzz]
 .. link:src/docs/asciidoc/fizzbuzz_monoid.adoc[FizzBuzz Revisited]
+.. link:src/docs/asciidoc/fizzbuzz_reconstructed.adoc[FizzBuzz Reconstructed]
 . link:src/docs/asciidoc/dot_notation.adoc[The Power of the Dot]
 .. link:src/docs/asciidoc/underscore_dot_notation.adoc[The underscore-dot notation]
 . link:src/docs/asciidoc/lists_as_streams_and_iterators.adoc[Lists are Streams and Iterators]
