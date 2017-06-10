@@ -270,4 +270,4 @@ Many thanks to Daniel Kröni for many inspiring discussions and suggestions.
 === References
 [horizontal]
 Froogle::
-Lookup `joined` by type: http://hoogle.haskell.org:8081/?hoogle=%5BString%5D%20-%3E%20String&scope=null
+Lookup `joined` by type: http://hoogle.haskell.org:8081/?hoogle=%5BString%5D%20-%3E%20String
