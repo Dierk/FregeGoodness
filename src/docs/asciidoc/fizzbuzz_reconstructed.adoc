@@ -273,7 +273,7 @@ Many thanks to Daniel Kröni for many inspiring discussions and suggestions.
 Froogle::
 Lookup `joined` by type: http://hoogle.haskell.org:8081/?hoogle=%5BString%5D%20-%3E%20String
 Kevlin Henney::
-gives a similar example in JavaScript in this video: https://www.youtube.com/watch?v=FyCYva9DhsI a
+gives a similar example in terse JavaScript in this video: https://www.youtube.com/watch?v=FyCYva9DhsI
 around minute 21ff, calling it "too clever"
 Maciej Pirog::
 FizzBuzz in Haskell by Embedding a Domain-Specific Language https://themonadreader.files.wordpress.com/2014/04/fizzbuzz.pdf
