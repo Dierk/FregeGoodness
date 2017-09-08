@@ -198,7 +198,7 @@ toString :: Rule -> Int -> String
 toString rule n = joined "" (rule n [])
 ----
 
-This `transform` works for any rule, and since our combination of rules,
+This `toString` works for any rule, and since our combination of rules,
 namely `rules`, is itself a rule, it works for that whole combination as well.
 
 === Putting it all together
