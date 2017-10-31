@@ -9,7 +9,7 @@ So far we have incrementally developed
 * an extra _forecast_ feature to see how the computer thinks that the game will develop.
 
 All that code turns out to be _purely functional_.
-There is _not a single assignment_ in the code, _no state_ that needs to get updated,
+There is _not an assignment_ in the code, _no state_ that needs to get updated,
 and therefore also no shared mutable state that could impose any issues when going parallel.
 Furthermore, there are _no side effects_ in the code.
 
