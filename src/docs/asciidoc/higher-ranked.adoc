@@ -31,6 +31,7 @@ map f (x:xs) = f x : map f xs
 
 -- instantiation is always invisible
 sqrs = map (^2) [1..10]
+-- sqrs == [1, 4, 9, 16, ... , 100]
 ----
 
 Here is an approximation of how this would look like in Java:
@@ -45,13 +46,13 @@ public static<A,B> List<B> map(Function<A,B> f, List<A> xxs) {
 
 // instantiation is visible
 static List<Integer> sqrs = <Integer, Integer>map(
-	x -> x*x, 
+	x -> x * x,
 	Arrays.asList(1,2,3,4,5,6,7,8,9,10));
 ----
 
 Despite <<inference.adoc#inference,Frege type inference>> 
 being able to infer the type of `map` entirely on its own,
-it is customary to provide they type declaration explicitly.
+it is customary to provide the type declaration explicitly.
 (Tools like the eclipse plugin make this a one-click action.)
 
 The point is that in Frege, the introduction of type variables can be _implicit_,
@@ -71,7 +72,8 @@ The Java compiler can sometimes - but not always - infer those instantiations as
 It is about a concept that belongs closely to parametric polymorphism but is less widely known:
 _higher ranked types_.
 
-It should provide insight why noble and honourable efforts like FunctionalJava, HighJ, JavaSlang, and others are
+It should provide insight why noble and honourable efforts like FunctionalJava, HighJ, Vavr (formerly JavaSlang),
+and others are
 inherently limited in their abstraction capabilities by the language they build upon,
 because Java doesn't support higher ranked types, at least not directly.
 ****
