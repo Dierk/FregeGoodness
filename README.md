@@ -1,10 +1,5 @@
 # FregeGoodness
-Short, interesting Frege snippets, published in random order. 
 
-Inspired by the Groovy goodness series by @MrHaki.
+Viewing via Github pages is no longer supported.
 
-The last post:
-http://dierk.github.io/FregeGoodness/html/latest.html
-
-All posts:
-http://dierk.github.io/FregeGoodness/html/index.html
+Please view via gitbook: https://dierk.gitbooks.io/fregegoodness/content/
