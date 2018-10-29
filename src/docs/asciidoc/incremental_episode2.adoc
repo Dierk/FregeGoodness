@@ -83,10 +83,20 @@ We have already seen it when we composed the pruning function with the `gameTree
 `prunedTree` as `prune 5 . gameTree`.
 By the same means we can make a tree of boards into a tree of the `static` values of those boards.
 
+.Mapping a whole tree at once
+****
+To this end, we must apply the `static` function to each and every `Board` in the tree. Luckily, our tree provides
+such a capability per default since it is a so-called `Functor` with a `fmap` function to do just that.
+`fmap static` can be applied to a tree of `Board`s to return the tree of respective `Double`s.
+Note that `static` is a function from `Board` to `Double` and thus `fmap static` is a function from
+`Tree Board` to `Tree Double`.
+(Thanks to @atennert for pointing out the missing `fmap` in the text.)
+****
+
 .From a game tree to a tree of Double values
 [source, haskell]
 ----
-valueTree = static . prunedTree
+valueTree = fmap static . prunedTree
 ----
 
 Remember that the tree is not materialized! Only on demand when we access the children will they be built.
@@ -101,7 +111,7 @@ maximize . valueTree
 or in its expanded form:
 [source, haskell]
 ----
-maxValue = maximize . static . prune 5 . gameTree
+maxValue = maximize . fmap static . prune 5 . gameTree
 ----
 
 .Where is the board?
@@ -118,7 +128,7 @@ The compiler will infer all the types and makes sure that they properly line up.
 For example, we cannot accidentally `maximize` a tree of values that don't define an order.
 But we can have such trees - actually, `gameTree` is of that nature.
 
-The types tell us that we can happily `prune` before or after calling `static`
+The types tell us that we can happily `prune` before or after calling `fmap static`
 while they catch errors such as putting `prune` in a place where it cannot work.
 
 This is not only a nice toolbox to play with. It is _compositional_ in more than one meaning of the word.
