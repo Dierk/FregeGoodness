@@ -87,7 +87,7 @@ By the same means we can make a tree of boards into a tree of the `static` value
 ****
 To this end, we must apply the `static` function to each and every `Board` in the tree. Luckily, our tree provides
 such a capability per default since it is a so-called `Functor` with a `fmap` function to do just that.
-`fmap static` can be applied to a tree of `Board`s to return the tree of respective `Double`s.
+`fmap static` can be applied to a tree of `Board` values to return the tree of respective `Double` values.
 Note that `static` is a function from `Board` to `Double` and thus `fmap static` is a function from
 `Tree Board` to `Tree Double`.
 (Thanks to @atennert for pointing out the missing `fmap` in the text.)
