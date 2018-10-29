@@ -17,19 +17,19 @@ With that consideration out of the way, let's look at our last increment that fi
 
 [source,haskell]
 ----
-maxValue = maximize . static . prune 5 . gameTree
+maxValue = maximize . fmap static . prune 5 . gameTree
 ----
 It works fine but we would like to make it even more _idiomatic_ in the functional sense.
 
 We have already seen that functional programmers like to introduce abstractions very early 
-and there is a hidden abstraction in the code above.
-We map a tree of boards to a tree of doubles. The structure of the tree remains untouched.
-This is the nature of an abstraction called _Functor_.
-Functors support a general function _fmap_ that keeps the current structure but applies a
-function _f_ to all elements. It turns out that our _Tree_ type is such a
-_Functor_.
+and there is a hidden abstraction in the code above as we might want to find the _maxValue_
+for different versions of _static_ evaluation.
 
-To use the Functor nature of trees, we use _fmap f_ instead of _static_.
+Our given _static_ function happens to be just one of possibly many functions that we might want
+to use for evaluation while the minimax evaluation approach is the same for all evaluations.
+
+So, let's separate the two: make a general _evaluateBy_ function that can be parameterized with
+a specific function that evaluates a single board.
 
 .Generalizing _static_ into _fmap static_
 [source,haskell]
