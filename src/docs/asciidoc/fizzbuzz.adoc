@@ -187,7 +187,7 @@ Frege: exact one-to-one correspondence__
 
 Incremental Development::
 The Frege solution can be developed incrementally: one line at a time.
-We never have to go back to change and old line. We don't even have to recompile!
+We never have to go back to change an old line. We don't even have to recompile!
 This is big, because we cannot possibly introduce bugs in the code that we build upon. +
 The imperative solution must be touched and recompiled with every increment.
 
